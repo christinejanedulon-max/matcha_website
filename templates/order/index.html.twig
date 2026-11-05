@@ -1,0 +1,399 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Checkout & Place Order — Matcha Moments Café{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    <style>
+        .checkout-wrap {
+            background: #F7FAF6;
+            min-height: 100vh;
+            padding: clamp(7rem,12vw,9rem) 1.5rem clamp(4rem,8vw,6rem);
+        }
+        .checkout-container {
+            max-width: var(--container);
+            margin: 0 auto;
+        }
+        .checkout-page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .checkout-page-header .eyebrow {
+            display: inline-block;
+            background: #E8F1E6;
+            color: #2E5227;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 0.35rem 1rem;
+            border-radius: 50px;
+            margin-bottom: 0.8rem;
+        }
+        .checkout-page-header h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem,5vw,3rem);
+            color: #2E5227;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin: 0 0 0.5rem;
+        }
+        .checkout-page-header p { color: #7D9778; font-size: 0.95rem; }
+
+        /* Step indicators */
+        .checkout-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 2.5rem;
+        }
+        .checkout-step {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #A4B9A1;
+        }
+        .checkout-step .step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #D2DCD0;
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+        .checkout-step.done .step-num { background: #2E5227; }
+        .checkout-step.done { color: #2E5227; }
+        .step-connector { width: 40px; height: 2px; background: #D2DCD0; margin: 0 0.5rem; }
+
+        /* Grid */
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            align-items: start;
+        }
+        @media (max-width: 860px) { .checkout-grid { grid-template-columns: 1fr; } }
+
+        /* Cards */
+        .checkout-card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            border: 1px solid #E8F1E6;
+            box-shadow: 0 4px 24px rgba(46,82,39,0.07);
+            padding: clamp(1.5rem,4vw,2.5rem);
+        }
+        .checkout-card h2 {
+            font-family: var(--font-heading);
+            font-size: 1.3rem;
+            color: #2E5227;
+            font-weight: 800;
+            margin: 0 0 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1.5px solid #E8F1E6;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .checkout-card h2 .step-badge {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            background: #2E5227;
+            color: #FFFFFF;
+            font-size: 0.75rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Fulfillment pills */
+        .toggle-pills {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 0.4rem;
+        }
+        .toggle-pill {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 14px;
+            border: 2px solid #D2DCD0;
+            background: #FFFFFF;
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: #55744F;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .toggle-pill.active {
+            border-color: #2E5227;
+            background: #2E5227;
+            color: #FFFFFF;
+            box-shadow: 0 4px 14px rgba(46,82,39,0.2);
+        }
+
+        /* Payment cards */
+        .payment-methods-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        .payment-option-card {
+            border: 2px solid #D2DCD0;
+            border-radius: 16px;
+            padding: 1.1rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #FFFFFF;
+        }
+        .payment-option-card:hover { border-color: #7D9778; }
+        .payment-option-card.active {
+            border-color: #2E5227;
+            background: #E8F1E6;
+            box-shadow: 0 4px 14px rgba(46,82,39,0.12);
+        }
+        .payment-option-card strong { color: #2E5227; font-size: 0.9rem; }
+
+        /* GCash box */
+        .gcash-info-box {
+            background: #E8F1E6;
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            font-size: 0.85rem;
+            color: #2E5227;
+            margin-top: 0.8rem;
+        }
+
+        /* Submit */
+        .btn-place-order {
+            width: 100%;
+            background: #2E5227;
+            color: #FFFFFF;
+            border: none;
+            padding: 1rem;
+            border-radius: 14px;
+            font-family: var(--font-heading);
+            font-size: 1.05rem;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: all 0.2s;
+            letter-spacing: 0.01em;
+        }
+        .btn-place-order:hover { background: #4C6B46; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(46,82,39,0.2); }
+
+        /* Order Summary */
+        .order-summary-card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            border: 1px solid #E8F1E6;
+            box-shadow: 0 4px 24px rgba(46,82,39,0.07);
+            padding: 1.8rem;
+            position: sticky;
+            top: 90px;
+        }
+        .order-summary-card h2 {
+            font-family: var(--font-heading);
+            font-size: 1.3rem;
+            color: #2E5227;
+            margin: 0 0 1.2rem;
+            font-weight: 800;
+        }
+        .summary-items-list { margin-bottom: 1rem; }
+        .summary-item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #F0F7EE;
+            font-size: 0.9rem;
+            color: #2E5227;
+        }
+        .summary-totals-box { margin-top: 1rem; padding-top: 1rem; border-top: 2px dashed #D2DCD0; }
+        .summary-line { display: flex; justify-content: space-between; font-size: 0.88rem; color: #55744F; margin-bottom: 0.5rem; }
+        .total-line {
+            font-family: var(--font-heading);
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #2E5227;
+            margin-top: 0.5rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="checkout-wrap">
+    <div class="checkout-container">
+
+        {# Header #}
+        <div class="checkout-page-header">
+            <div class="eyebrow">🛒 Order Checkout</div>
+            <h1>COMPLETE YOUR ORDER</h1>
+            <p>Confirm your drink choices, delivery details, and payment method.</p>
+        </div>
+
+        {# Empty cart notice #}
+        <div id="checkoutEmptyNotice" style="display:none;text-align:center;background:#FFFFFF;border-radius:24px;padding:4rem 2rem;border:1px solid #E8F1E6;box-shadow:0 4px 24px rgba(46,82,39,0.07);max-width:500px;margin:0 auto;">
+            <div style="font-size:4rem;margin-bottom:1rem;">🍃</div>
+            <h2 style="font-family:var(--font-heading);color:#2E5227;margin:0 0 0.5rem;font-weight:800;">Your tray is empty</h2>
+            <p style="color:#7D9778;margin-bottom:1.8rem;">Pick some of our signature matcha creations first.</p>
+            <a href="{{ path('app_menu') }}" class="btn-hero-primary" style="display:inline-block;">Explore Menu</a>
+        </div>
+
+        <div class="checkout-grid" id="checkoutGrid">
+
+            {# LEFT: Details #}
+            <div class="checkout-card">
+                <h2><span class="step-badge">1</span> Order & Contact Details</h2>
+
+                <form action="{{ path('app_order_place') }}" method="POST" id="checkoutForm">
+                    <input type="hidden" name="items_json" id="checkoutItemsJson">
+
+                    <div class="form-group">
+                        <label class="form-label">Fulfillment Method</label>
+                        <div class="toggle-pills">
+                            <button type="button" class="toggle-pill active" id="pillPickup" onclick="setFulfillment('Pickup')">🏪 In-Store Pickup</button>
+                            <button type="button" class="toggle-pill" id="pillDelivery" onclick="setFulfillment('Delivery')">🛵 Express Delivery (+₱50)</button>
+                        </div>
+                        <input type="hidden" name="fulfillment_method" id="fulfillmentInput" value="Pickup">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="custName">Your Full Name *</label>
+                        <input type="text" name="customer_name" id="custName" class="form-control" placeholder="e.g. Maria Santos" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="custPhone">Mobile Phone Number *</label>
+                        <input type="tel" name="phone" id="custPhone" class="form-control" placeholder="0917-XXX-XXXX" required>
+                    </div>
+
+                    <div class="form-group" id="deliveryAddressGroup" style="display:none;">
+                        <label class="form-label" for="deliveryAddress">Delivery Address *</label>
+                        <textarea name="delivery_address" id="deliveryAddress" class="form-control" rows="2" placeholder="House/Unit #, Street, Barangay, City, Landmark"></textarea>
+                    </div>
+
+                    <h2 style="margin-top:2rem;"><span class="step-badge">2</span> Payment Method</h2>
+
+                    <div class="payment-methods-grid">
+                        <div class="payment-option-card active" id="payCardCash" onclick="setPayment('Cash')">
+                            <div style="font-size:1.6rem;margin-bottom:0.3rem;">💵</div>
+                            <strong>Cash / COD</strong>
+                            <div style="font-size:0.76rem;color:#7D9778;margin-top:0.2rem;">Pay upon pickup or delivery</div>
+                        </div>
+                        <div class="payment-option-card" id="payCardGcash" onclick="setPayment('GCash')">
+                            <div style="font-size:1.6rem;margin-bottom:0.3rem;">📱</div>
+                            <strong>GCash Express</strong>
+                            <div style="font-size:0.76rem;color:#7D9778;margin-top:0.2rem;">Fast mobile transfer</div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="payment_method" id="paymentInput" value="Cash">
+
+                    <div class="gcash-info-box" id="gcashDetailsBox" style="display:none;">
+                        <strong>GCash Payment Instructions:</strong><br>
+                        Send payment to: <strong>09653994962 (Matcha Moments Café)</strong>
+                        <div style="margin-top:0.8rem;">
+                            <label class="form-label" for="gcashRef">GCash Reference / Transaction No. *</label>
+                            <input type="text" name="reference_number" id="gcashRef" class="form-control" placeholder="e.g. 9048291048">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top:1.5rem;">
+                        <label class="form-label" for="orderNotes">Special Requests (Optional)</label>
+                        <input type="text" name="notes" id="orderNotes" class="form-control" placeholder="e.g. Extra napkins, leave at lobby guard">
+                    </div>
+
+                    <button type="submit" class="btn-place-order" id="submitOrderBtn">
+                        Confirm & Place Order →
+                    </button>
+                </form>
+            </div>
+
+            {# RIGHT: Summary #}
+            <div class="order-summary-card">
+                <h2>Order Summary</h2>
+                <div class="summary-items-list" id="checkoutSummaryList"></div>
+                <div class="summary-totals-box">
+                    <div class="summary-line"><span>Drinks Subtotal</span><span id="summarySubtotal">₱0.00</span></div>
+                    <div class="summary-line"><span>Fulfillment Fee</span><span id="summaryFulfillmentFee">₱0.00 (Pickup)</span></div>
+                    <div class="summary-line total-line"><span>Total Amount</span><span id="summaryGrandTotal">₱0.00</span></div>
+                </div>
+                <div style="margin-top:1.2rem;text-align:center;">
+                    <a href="{{ path('app_menu') }}" style="font-size:0.85rem;color:#4C6B46;font-weight:700;">+ Add More Drinks from Menu</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+let fulfillment = 'Pickup';
+let payment = 'Cash';
+
+function setFulfillment(method) {
+    fulfillment = method;
+    document.getElementById('fulfillmentInput').value = method;
+    document.getElementById('pillPickup').classList.toggle('active', method === 'Pickup');
+    document.getElementById('pillDelivery').classList.toggle('active', method === 'Delivery');
+    const ag = document.getElementById('deliveryAddressGroup');
+    const ai = document.getElementById('deliveryAddress');
+    if (method === 'Delivery') { ag.style.display = 'block'; ai.setAttribute('required','required'); }
+    else { ag.style.display = 'none'; ai.removeAttribute('required'); }
+    renderCheckoutSummary();
+}
+
+function setPayment(method) {
+    payment = method;
+    document.getElementById('paymentInput').value = method;
+    document.getElementById('payCardCash').classList.toggle('active', method === 'Cash');
+    document.getElementById('payCardGcash').classList.toggle('active', method === 'GCash');
+    const gb = document.getElementById('gcashDetailsBox');
+    const gr = document.getElementById('gcashRef');
+    if (method === 'GCash') { gb.style.display = 'block'; gr.setAttribute('required','required'); }
+    else { gb.style.display = 'none'; gr.removeAttribute('required'); }
+}
+
+function renderCheckoutSummary() {
+    const cart = getCart();
+    const emptyNotice = document.getElementById('checkoutEmptyNotice');
+    const checkoutGrid = document.getElementById('checkoutGrid');
+    const list = document.getElementById('checkoutSummaryList');
+    const itemsJson = document.getElementById('checkoutItemsJson');
+
+    if (cart.length === 0) {
+        if (emptyNotice) emptyNotice.style.display = 'block';
+        if (checkoutGrid) checkoutGrid.style.display = 'none';
+        return;
+    }
+    if (emptyNotice) emptyNotice.style.display = 'none';
+    if (checkoutGrid) checkoutGrid.style.display = 'grid';
+    if (itemsJson) itemsJson.value = JSON.stringify(cart);
+
+    let subtotal = 0, html = '';
+    cart.forEach(item => {
+        const lt = item.unitPrice * item.quantity;
+        subtotal += lt;
+        html += `<div class="summary-item-row"><div><strong>${item.quantity}× ${item.name}</strong><div style="font-size:0.73rem;color:#A4B9A1;">${item.options || 'Regular'}</div></div><div style="font-weight:700;">₱${lt.toFixed(2)}</div></div>`;
+    });
+    if (list) list.innerHTML = html;
+
+    const fee = fulfillment === 'Delivery' ? 50 : 0;
+    document.getElementById('summarySubtotal').textContent = `₱${subtotal.toFixed(2)}`;
+    document.getElementById('summaryFulfillmentFee').textContent = fulfillment === 'Delivery' ? '₱50.00 (Delivery)' : '₱0.00 (Pickup)';
+    document.getElementById('summaryGrandTotal').textContent = `₱${(subtotal + fee).toFixed(2)}`;
+}
+
+document.getElementById('checkoutForm')?.addEventListener('submit', () => {
+    setTimeout(() => localStorage.removeItem(CART_STORAGE_KEY), 200);
+});
+
+window.addEventListener('cartUpdated', renderCheckoutSummary);
+document.addEventListener('DOMContentLoaded', renderCheckoutSummary);
+</script>
+{% endblock %}

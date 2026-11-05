@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contact Us & Store Location — Matcha Moments Café{% endblock %}
+{% block meta_description %}Get in touch with Matcha Moments Café. Operating hours, location, phone 09653994962, and customer inquiry form.{% endblock %}
+
+{% block body %}
+
+{# ── HERO ── #}
+<section style="background:linear-gradient(145deg,#2E5227 0%,#1A3216 100%);padding:clamp(7rem,12vw,9rem) 1.5rem clamp(3.5rem,6vw,5rem);text-align:center;position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:radial-gradient(circle at 20% 60%, rgba(76,107,70,0.4) 0%, transparent 55%),radial-gradient(circle at 80% 20%, rgba(125,151,120,0.25) 0%, transparent 50%);pointer-events:none;"></div>
+    <div style="position:relative;max-width:620px;margin:0 auto;">
+        <span style="display:inline-block;background:rgba(232,241,230,0.15);border:1px solid rgba(232,241,230,0.3);backdrop-filter:blur(10px);padding:0.4rem 1.1rem;border-radius:50px;font-size:0.78rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#E8F1E6;margin-bottom:1.2rem;">
+            💬 We'd Love to Hear from You
+        </span>
+        <h1 style="font-family:var(--font-heading);font-size:clamp(2.8rem,7vw,4.8rem);font-weight:800;color:#FFFFFF;line-height:1.05;margin:0 0 1rem;letter-spacing:-0.03em;">
+            GET IN TOUCH
+        </h1>
+        <p style="font-size:clamp(0.95rem,2vw,1.1rem);color:rgba(232,241,230,0.85);line-height:1.65;max-width:500px;margin:0 auto;">
+            Questions about catering, bulk orders, or seasonal creations? Our team responds within 24 hours.
+        </p>
+    </div>
+</section>
+
+{# ── MAIN CONTENT ── #}
+<section style="background:#F7FAF6;padding:clamp(3.5rem,7vw,5.5rem) 1.5rem;">
+    <div style="max-width:var(--container);margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:3rem;align-items:start;">
+
+        {# ── LEFT: INFO CARDS ── #}
+        <div style="display:flex;flex-direction:column;gap:1.2rem;">
+
+            {# Phone #}
+            <div style="background:#FFFFFF;border-radius:20px;padding:1.6rem 1.8rem;border:1px solid #E8F1E6;box-shadow:0 4px 20px rgba(46,82,39,0.06);display:flex;gap:1.2rem;align-items:center;">
+                <div style="width:50px;height:50px;border-radius:14px;background:#E8F1E6;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <img src="{{ asset('images/phone.png') }}" alt="Phone" style="width:24px;height:24px;object-fit:contain;">
+                </div>
+                <div>
+                    <div style="font-size:0.72rem;text-transform:uppercase;color:#7D9778;font-weight:700;letter-spacing:0.08em;">Customer Care Line</div>
+                    <a href="tel:09653994962" style="font-size:1.2rem;font-weight:800;color:#2E5227;text-decoration:none;font-family:var(--font-heading);">09653994962</a>
+                </div>
+            </div>
+
+            {# Email #}
+            <div style="background:#FFFFFF;border-radius:20px;padding:1.6rem 1.8rem;border:1px solid #E8F1E6;box-shadow:0 4px 20px rgba(46,82,39,0.06);display:flex;gap:1.2rem;align-items:center;">
+                <div style="width:50px;height:50px;border-radius:14px;background:#E8F1E6;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <img src="{{ asset('images/mail.png') }}" alt="Email" style="width:24px;height:24px;object-fit:contain;">
+                </div>
+                <div>
+                    <div style="font-size:0.72rem;text-transform:uppercase;color:#7D9778;font-weight:700;letter-spacing:0.08em;">Direct Email</div>
+                    <a href="mailto:matchamoments@gmail.com" style="font-size:1.05rem;font-weight:800;color:#2E5227;text-decoration:none;font-family:var(--font-heading);">matchamoments@gmail.com</a>
+                </div>
+            </div>
+
+            {# Hours #}
+            <div style="background:#FFFFFF;border-radius:20px;padding:1.6rem 1.8rem;border:1px solid #E8F1E6;box-shadow:0 4px 20px rgba(46,82,39,0.06);display:flex;gap:1.2rem;align-items:center;">
+                <div style="width:50px;height:50px;border-radius:14px;background:#E8F1E6;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <img src="{{ asset('images/place.png') }}" alt="Location" style="width:24px;height:24px;object-fit:contain;">
+                </div>
+                <div>
+                    <div style="font-size:0.72rem;text-transform:uppercase;color:#7D9778;font-weight:700;letter-spacing:0.08em;">Store Hours</div>
+                    <div style="font-size:1.02rem;font-weight:800;color:#2E5227;font-family:var(--font-heading);">Mon — Sun: 9AM – 9PM</div>
+                    <div style="font-size:0.82rem;color:#7D9778;margin-top:0.2rem;">In-Store Pickup & Express Delivery</div>
+                </div>
+            </div>
+
+            {# Social #}
+            <div style="background:#2E5227;border-radius:20px;padding:1.6rem 1.8rem;box-shadow:0 8px 28px rgba(46,82,39,0.2);">
+                <h3 style="font-family:var(--font-heading);font-size:1.1rem;color:#E8F1E6;margin:0 0 1rem;font-weight:700;">Follow Our Journey</h3>
+                <div style="display:flex;gap:0.8rem;flex-wrap:wrap;">
+                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"
+                       style="display:flex;align-items:center;gap:0.5rem;background:rgba(232,241,230,0.15);border:1px solid rgba(232,241,230,0.3);padding:0.6rem 1.2rem;border-radius:50px;font-size:0.85rem;font-weight:700;color:#FFFFFF;text-decoration:none;">
+                        <img src="{{ asset('images/face.png') }}" alt="Facebook" style="width:17px;height:17px;">Facebook
+                    </a>
+                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"
+                       style="display:flex;align-items:center;gap:0.5rem;background:rgba(232,241,230,0.15);border:1px solid rgba(232,241,230,0.3);padding:0.6rem 1.2rem;border-radius:50px;font-size:0.85rem;font-weight:700;color:#FFFFFF;text-decoration:none;">
+                        <img src="{{ asset('images/gram.png') }}" alt="Instagram" style="width:17px;height:17px;">Instagram
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        {# ── RIGHT: INQUIRY FORM ── #}
+        <div style="background:#FFFFFF;border-radius:24px;padding:clamp(1.8rem,4vw,2.8rem);border:1px solid #E8F1E6;box-shadow:0 8px 40px rgba(46,82,39,0.08);">
+            <div style="margin-bottom:1.8rem;">
+                <span style="font-size:0.72rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4C6B46;">Get In Touch</span>
+                <h2 style="font-family:var(--font-heading);font-size:1.9rem;color:#2E5227;margin:0.4rem 0 0.5rem;font-weight:800;">Send Us a Message</h2>
+                <p style="font-size:0.88rem;color:#7D9778;">Our café manager will respond within 24 hours.</p>
+            </div>
+
+            <form action="{{ path('app_contact_send') }}" method="POST">
+                <div class="form-group">
+                    <label class="form-label" for="contactName">Your Name *</label>
+                    <input type="text" name="name" id="contactName" class="form-control" placeholder="e.g. Alexis Reyes" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="contactEmail">Email Address *</label>
+                    <input type="email" name="email" id="contactEmail" class="form-control" placeholder="e.g. alexis@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="contactSubject">Subject</label>
+                    <input type="text" name="subject" id="contactSubject" class="form-control" placeholder="e.g. Bulk Order / Catering Inquiry">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="contactMessage">Your Message *</label>
+                    <textarea name="message" id="contactMessage" class="form-control" rows="4" placeholder="How can we make your matcha moment special?" required></textarea>
+                </div>
+                <button type="submit" class="btn-hero-primary" style="width:100%;border:none;padding:0.95rem;border-radius:14px;cursor:pointer;font-size:0.98rem;margin-top:0.5rem;">
+                    Send Message →
+                </button>
+            </form>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

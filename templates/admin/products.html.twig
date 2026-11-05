@@ -1,0 +1,172 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Menu &amp; Stocks — Matcha Admin{% endblock %}
+
+{% block content %}
+<div class="admin-topbar">
+    <div>
+        <h1 style="margin: 0;">Menu &amp; Inventory Management</h1>
+        <p style="color: var(--clr-text-muted); margin: 0.3rem 0 0; font-size: 0.9rem;">
+            Control drink pricing, stock levels, and add new seasonal creations.
+        </p>
+    </div>
+    <div>
+        <button type="button" class="btn-hero-primary" onclick="openAddProductModal()" style="border: none; padding: 0.65rem 1.4rem; font-size: 0.9rem; border-radius: 8px; cursor: pointer;">
+            + Add New Drink
+        </button>
+    </div>
+</div>
+
+<!-- Products Table -->
+<div class="admin-panel-card">
+    <div class="admin-panel-header">
+        <h2>Drink Catalog ({{ products|length }} items)</h2>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Drink Preview</th>
+                    <th>Name &amp; Category</th>
+                    <th>Price</th>
+                    <th>Current Stock</th>
+                    <th>Stock Status</th>
+                    <th>Manage Stock</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                    {% set inStock  = p.stockQuantity > 25 %}
+                    {% set lowStock = p.stockQuantity > 0 and p.stockQuantity <= 25 %}
+                    {% set outStock = p.stockQuantity == 0 %}
+
+                    <tr>
+                        <td>
+                            <img src="{{ asset(p.imageUrl|drink_image) }}" alt="{{ p.name }}" style="width: 48px; height: 60px; object-fit: cover; object-position: center 45%; border-radius: 10px; background: #F2F0E9;">
+                        </td>
+                        <td>
+                            <strong style="font-size: 0.95rem; color: var(--clr-dark);">{{ p.name }}</strong>
+                            <div style="font-size: 0.75rem; color: var(--clr-text-muted);">{{ p.category }}</div>
+                        </td>
+                        <td>
+                            <strong style="color: var(--clr-matcha-dark); font-size: 0.95rem;">₱{{ p.price }}</strong>
+                        </td>
+                        <td>
+                            <span style="font-weight: 700; font-size: 1rem;">{{ p.stockQuantity }}</span>
+                            <span style="font-size: 0.75rem; color: #888;">cups</span>
+                        </td>
+                        <td>
+                            {% if inStock %}
+                                <span class="status-pill status-ready">In Stock</span>
+                            {% elseif lowStock %}
+                                <span class="status-pill status-pending">Low Stock ({{ p.stockQuantity }})</span>
+                            {% else %}
+                                <span class="status-pill status-cancelled">Sold Out</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form action="{{ path('admin_product_stock', { id: p.id }) }}" method="POST" style="display: flex; gap: 0.3rem; align-items: center;">
+                                <button type="button" class="btn-admin-action btn-hero-secondary" onclick="this.nextElementSibling.value = Math.max(0, parseInt(this.nextElementSibling.value || 0) - 5); this.form.submit();">-5</button>
+                                <input type="number" name="stock" value="{{ p.stockQuantity }}" min="0" style="width: 60px; padding: 0.3rem; border: 1px solid #ccc; border-radius: 6px; text-align: center; font-size: 0.85rem;">
+                                <button type="button" class="btn-admin-action btn-hero-secondary" onclick="this.previousElementSibling.value = parseInt(this.previousElementSibling.value || 0) + 5; this.form.submit();">+5</button>
+                                <button type="submit" class="btn-admin-action btn-primary-action" title="Save stock">Save</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form action="{{ path('admin_product_delete', { id: p.id }) }}" method="POST" onsubmit="return confirm('Are you sure you want to remove {{ p.name|e('js') }} from the menu?');">
+                                <button type="submit" class="btn-admin-action btn-danger-action" title="Delete drink">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Product Modal -->
+<div class="modal-backdrop" id="addProductModalBackdrop" style="display: none;">
+    <div class="custom-modal" style="max-width: 580px; padding: 2rem;">
+        <button class="modal-close-btn" onclick="closeAddProductModal()">&times;</button>
+        <h2 style="font-family: var(--font-heading); font-size: 1.8rem; color: var(--clr-matcha-dark); margin-bottom: 0.5rem;">
+            Add New Matcha Creation
+        </h2>
+        <p style="font-size: 0.85rem; color: var(--clr-text-muted); margin-bottom: 1.5rem;">
+            Introduce a new handcrafted beverage to your café's active menu.
+        </p>
+
+        <form action="{{ path('admin_product_add') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label" for="addProdName">Drink Name *</label>
+                <input type="text" name="name" id="addProdName" class="form-control" placeholder="e.g. Kyoto Caramel Cloud" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label" for="addProdCat">Category *</label>
+                    <select name="category" id="addProdCat" class="form-control" required>
+                        <option value="Signature Lattes &amp; Bestsellers">Signature Lattes &amp; Bestsellers</option>
+                        <option value="Fruit &amp; Specialty Fusions">Fruit &amp; Specialty Fusions</option>
+                        <option value="Premium Cake Matcha Creations">Premium Cake Matcha Creations</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="addProdPrice">Price (₱) *</label>
+                    <input type="number" step="0.50" name="price" id="addProdPrice" class="form-control" placeholder="185.00" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="addProdStock">Initial Stock (Cups)</label>
+                <input type="number" name="stockQuantity" id="addProdStock" class="form-control" value="40" min="0">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Drink Image (Local Asset) *</label>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 0.5rem; max-height: 140px; overflow-y: auto; padding: 0.5rem; border: 1px solid var(--clr-cream-dark); border-radius: 10px;">
+                    {% set availableImages = [
+                        'images/tropical.png', 'images/latte.png', 'images/cloud.png',
+                        'images/choco.png', 'images/vanilla.png', 'images/strawberry.png',
+                        'images/mango.png', 'images/coconut.png', 'images/peach.png',
+                        'images/sea.png', 'images/ube.png', 'images/pis.png',
+                        'images/tira.png', 'images/cake.png'
+                    ] %}
+                    {% for img in availableImages %}
+                        <label style="cursor: pointer; text-align: center; border: 2px solid transparent; border-radius: 8px; padding: 4px;" class="img-pick-label">
+                            <input type="radio" name="imageUrl" value="{{ img }}" {% if loop.first %}checked{% endif %} style="display: none;" onchange="highlightImgPick(this)">
+                            <img src="{{ asset(img|drink_image) }}" alt="" style="width: 44px; height: 55px; object-fit: cover; object-position: center 45%; border-radius: 6px; margin: 0 auto;">
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="addProdDesc">Description</label>
+                <textarea name="description" id="addProdDesc" class="form-control" rows="2" placeholder="Brief flavor notes (e.g. Rich dark chocolate layered with ceremonial matcha)."></textarea>
+            </div>
+
+            <button type="submit" class="btn-hero-primary" style="width: 100%; border: none; padding: 0.85rem; border-radius: 50px; cursor: pointer; font-size: 0.95rem; margin-top: 0.5rem;">
+                Publish Drink to Menu &rarr;
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openAddProductModal() {
+    document.getElementById('addProductModalBackdrop').style.display = 'flex';
+}
+function closeAddProductModal() {
+    document.getElementById('addProductModalBackdrop').style.display = 'none';
+}
+function highlightImgPick(radio) {
+    document.querySelectorAll('.img-pick-label').forEach(lbl => lbl.style.borderColor = 'transparent');
+    radio.parentElement.style.borderColor = 'var(--clr-matcha)';
+}
+// Init first selection
+document.querySelector('.img-pick-label')?.style.setProperty('border-color', 'var(--clr-matcha)');
+</script>
+{% endblock %}

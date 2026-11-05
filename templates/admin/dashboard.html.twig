@@ -1,0 +1,183 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Dashboard Overview — Matcha Admin{% endblock %}
+
+{% block content %}
+<div class="admin-topbar">
+    <div>
+        <h1 style="margin: 0;">Dashboard Overview</h1>
+        <p style="color: var(--clr-text-muted); margin: 0.3rem 0 0; font-size: 0.9rem;">
+            Real-time store metrics, fulfillment progress, and stock status.
+        </p>
+    </div>
+    <div style="display: flex; gap: 0.8rem;">
+        <a href="{{ path('admin_products') }}" class="btn-hero-primary" style="padding: 0.6rem 1.2rem; font-size: 0.85rem; border-radius: 8px;">
+            + Add New Drink
+        </a>
+        <a href="{{ path('admin_orders') }}" class="btn-hero-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.85rem; border-radius: 8px;">
+            All Orders &rarr;
+        </a>
+    </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="admin-stats-grid">
+    <div class="admin-stat-card">
+        <div class="stat-icon-wrap stat-icon-green">💰</div>
+        <div class="stat-info-wrap">
+            <span class="stat-label">Total Revenue</span>
+            <span class="stat-value">₱{{ stats.totalRevenue }}</span>
+        </div>
+    </div>
+
+    <div class="admin-stat-card">
+        <div class="stat-icon-wrap stat-icon-blue">📦</div>
+        <div class="stat-info-wrap">
+            <span class="stat-label">Total Orders</span>
+            <span class="stat-value">{{ stats.totalOrders }}</span>
+        </div>
+    </div>
+
+    <div class="admin-stat-card">
+        <div class="stat-icon-wrap stat-icon-gold">⏳</div>
+        <div class="stat-info-wrap">
+            <span class="stat-label">Pending Orders</span>
+            <span class="stat-value">{{ stats.pendingOrders }}</span>
+        </div>
+    </div>
+
+    <div class="admin-stat-card">
+        <div class="stat-icon-wrap stat-icon-green">🍵</div>
+        <div class="stat-info-wrap">
+            <span class="stat-label">Menu Drinks</span>
+            <span class="stat-value">{{ stats.totalProducts }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Low Stock Warning if any -->
+{% if stats.lowStockCount > 0 %}
+    <div style="background: #fff8e1; border: 1px solid #ffe082; border-radius: 12px; padding: 1rem 1.4rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <span style="font-size: 1.5rem;">⚠️</span>
+            <div>
+                <strong style="color: #b78103;">Low Stock Alert:</strong>
+                <span style="color: #6d4c00; font-size: 0.9rem;">
+                    {{ stats.lowStockCount }} menu items have 25 or fewer cups remaining in inventory.
+                </span>
+            </div>
+        </div>
+        <a href="{{ path('admin_products') }}" style="font-size: 0.82rem; font-weight: 700; color: #b78103; text-decoration: underline;">
+            Manage Inventory &rarr;
+        </a>
+    </div>
+{% endif %}
+
+<!-- Recent Orders Section -->
+<div class="admin-panel-card">
+    <div class="admin-panel-header">
+        <h2>Recent Customer Orders</h2>
+        <a href="{{ path('admin_orders') }}" style="font-size: 0.82rem; color: var(--clr-matcha-dark); font-weight: 600;">
+            View All {{ stats.totalOrders }} Orders &rarr;
+        </a>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Fulfillment</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in stats.recentOrders %}
+                    <tr>
+                        <td>
+                            <strong>#{{ order.orderNumber }}</strong>
+                            <div style="font-size: 0.72rem; color: #888;">{{ order.orderDate|date('h:i A') }}</div>
+                        </td>
+                        <td>
+                            <strong>{{ order.customerName }}</strong>
+                            <div style="font-size: 0.75rem; color: #888;">{{ order.phone }}</div>
+                        </td>
+                        <td>
+                            <div style="font-size: 0.82rem;">
+                                {% for item in order.items %}
+                                    <div>{{ item.quantity }}x {{ item.name }}</div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            <strong style="color: var(--clr-matcha-dark);">₱{{ order.totalAmount }}</strong>
+                        </td>
+                        <td>
+                            <span style="font-size: 0.82rem; font-weight: 600;">
+                                {% if order.fulfillmentMethod == 'Delivery' %}🛵 Delivery{% else %}🏪 Pickup{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="font-size: 0.82rem;">{{ order.paymentMethod }}</div>
+                            {% if order.referenceNumber %}
+                                <div style="font-size: 0.7rem; color: #1565c0;">Ref: {{ order.referenceNumber }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% set st = order.status|lower %}
+                            <span class="status-pill status-{{ st }}">{{ order.status }}</span>
+                        </td>
+                        <td>
+                            <form action="{{ path('admin_order_status', { orderNumber: order.orderNumber }) }}" method="POST" style="display: flex; gap: 0.4rem;">
+                                {% if st == 'pending' %}
+                                    <input type="hidden" name="status" value="Preparing">
+                                    <button type="submit" class="btn-admin-action btn-primary-action">Start Preparing</button>
+                                {% elseif st == 'preparing' %}
+                                    <input type="hidden" name="status" value="Ready">
+                                    <button type="submit" class="btn-admin-action btn-primary-action">Mark Ready</button>
+                                {% elseif st == 'ready' %}
+                                    <input type="hidden" name="status" value="Completed">
+                                    <button type="submit" class="btn-admin-action btn-primary-action">Complete</button>
+                                {% else %}
+                                    <span style="font-size: 0.78rem; color: #999;">✓ Done</span>
+                                {% endif %}
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 2rem; color: #999;">No orders found yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Quick Products Preview -->
+<div class="admin-panel-card">
+    <div class="admin-panel-header">
+        <h2>Active Menu Drinks ({{ products|length }})</h2>
+        <a href="{{ path('admin_products') }}" style="font-size: 0.82rem; color: var(--clr-matcha-dark); font-weight: 600;">
+            Manage Menu Catalog &rarr;
+        </a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
+        {% for p in products|slice(0, 6) %}
+            <div style="background: #F7FAF6; border: 1px solid #E8F1E6; border-radius: 12px; padding: 0.8rem; display: flex; align-items: center; gap: 0.8rem;">
+                <img src="{{ asset(p.imageUrl|drink_image) }}" alt="{{ p.name }}" style="width: 44px; height: 54px; object-fit: cover; object-position: center 45%; border-radius: 8px; background: #F2F0E9;">
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-weight: 700; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ p.name }}</div>
+                    <div style="font-size: 0.78rem; color: var(--clr-matcha-dark); font-weight: 600;">₱{{ p.price }} • {{ p.stockQuantity }} cups</div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

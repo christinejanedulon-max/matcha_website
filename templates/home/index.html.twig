@@ -1,0 +1,699 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Matcha Moments Café — Pure Matcha, Pure Moments{% endblock %}
+{% block meta_description %}Handcrafted ceremonial matcha drinks made with premium Japanese ingredients. Order Tropical Matcha, Matcha Latte, Matcha Cloud and more. Pickup or delivery available.{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    <style>
+        /* =====================================================
+           HOMEPAGE MODERN EDITORIAL REDESIGN
+           Palette: #2E5227, #4C6B46, #FFFFFF, #E8F1E6, #55744F, #7D9778, #A4B9A1, #D2DCD0
+           ===================================================== */
+        .hero-landscape-section {
+            min-height: 90vh;
+            width: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: #1B3518 url("{{ asset('images/hero.png') }}") center right / cover no-repeat;
+            overflow: hidden;
+            padding: clamp(7rem, 12vw, 9rem) 0 clamp(4rem, 8vw, 6rem);
+        }
+        .hero-landscape-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                90deg,
+                rgba(46, 82, 39, 0.96) 0%,
+                rgba(46, 82, 39, 0.90) 45%,
+                rgba(46, 82, 39, 0.65) 75%,
+                rgba(46, 82, 39, 0.40) 100%
+            );
+            z-index: 1;
+        }
+        .hero-container {
+            position: relative;
+            z-index: 2;
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 clamp(1rem, 4vw, 2.5rem);
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 3rem;
+            align-items: center;
+            width: 100%;
+        }
+        .hero-floating-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .hero-floating-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(232, 241, 230, 0.18);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(232, 241, 230, 0.35);
+            padding: 0.45rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #E8F1E6;
+            margin-bottom: 1.4rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .hero-pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #7D9778;
+            box-shadow: 0 0 10px #A4B9A1;
+        }
+        .hero-floating-title {
+            font-family: var(--font-heading);
+            font-size: clamp(3rem, 7vw, 5.2rem);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            color: #FFFFFF;
+            margin-bottom: 1.2rem;
+            text-shadow: 0 4px 25px rgba(0,0,0,0.3);
+        }
+        .hero-floating-title span {
+            color: #E8F1E6;
+            text-decoration: underline;
+            text-decoration-color: #4C6B46;
+            text-underline-offset: 8px;
+        }
+        .hero-floating-sub {
+            font-size: clamp(1rem, 2vw, 1.15rem);
+            color: rgba(232, 241, 230, 0.9);
+            line-height: 1.7;
+            max-width: 520px;
+            margin-bottom: 2rem;
+        }
+        .hero-floating-badges {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 2.2rem;
+            flex-wrap: wrap;
+        }
+        .hero-mini-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            background: rgba(232, 241, 230, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(232, 241, 230, 0.25);
+            padding: 0.4rem 0.95rem;
+            border-radius: 50px;
+            font-size: 0.78rem;
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+        .hero-actions-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .btn-hero-deep {
+            background: #FFFFFF;
+            color: #2E5227;
+            font-weight: 700;
+            font-size: 0.88rem;
+            letter-spacing: 0.04em;
+            padding: 0.95rem 2.2rem;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all var(--trans-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-hero-deep:hover {
+            background: #E8F1E6;
+            transform: translateY(-3px);
+            box-shadow: 0 14px 35px rgba(0, 0, 0, 0.25);
+        }
+        .btn-hero-glass {
+            background: rgba(232, 241, 230, 0.14);
+            color: #FFFFFF;
+            backdrop-filter: blur(10px);
+            border: 1.5px solid rgba(232, 241, 230, 0.4);
+            font-weight: 600;
+            font-size: 0.88rem;
+            letter-spacing: 0.04em;
+            padding: 0.95rem 2.2rem;
+            border-radius: 50px;
+            transition: all var(--trans-fast);
+            cursor: pointer;
+        }
+        .btn-hero-glass:hover {
+            background: rgba(232, 241, 230, 0.28);
+            border-color: #FFFFFF;
+            transform: translateY(-2px);
+        }
+
+        /* Floating Cup Card on Right */
+        .hero-floating-card-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hero-cup-glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid #D2DCD0;
+            border-radius: 28px;
+            padding: 2rem;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            max-width: 380px;
+            width: 100%;
+            position: relative;
+        }
+        .hero-cup-stage {
+            background: #F2F0E9; /* matches the normalized photo backdrop */
+            border-radius: 20px;
+            aspect-ratio: 4 / 5;
+            width: min(100%, 280px);
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        .hero-cup-stage img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 45%;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .hero-cup-glass-card:hover .hero-cup-stage img {
+            transform: scale(1.05);
+        }
+        .hero-floating-tag-top {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: #2E5227;
+            color: #FFFFFF;
+            font-weight: 700;
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.35rem 0.9rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+        }
+        .hero-floating-tag-bot {
+            margin-top: 1.2rem;
+            background: #FAFDF9;
+            border: 1px solid #D2DCD0;
+            border-radius: 16px;
+            padding: 0.85rem 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* 4-Pillars Ribbon */
+        .features-ribbon {
+            background: #FFFFFF;
+            border-bottom: 1px solid #D2DCD0;
+            box-shadow: 0 4px 20px rgba(46, 82, 39, 0.03);
+            position: relative;
+            z-index: 10;
+        }
+        .features-ribbon-inner {
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 1.8rem clamp(1rem, 4vw, 2rem);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 1.5rem;
+        }
+        .ribbon-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .ribbon-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: #E8F1E6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            color: #2E5227;
+            flex-shrink: 0;
+            border: 1px solid #D2DCD0;
+        }
+        .ribbon-text strong {
+            display: block;
+            font-size: 0.95rem;
+            color: #2E5227;
+            margin-bottom: 0.15rem;
+            font-weight: 700;
+        }
+        .ribbon-text span {
+            font-size: 0.78rem;
+            color: #55744F;
+        }
+
+        /* Category Filter Chips */
+        .home-menu-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+        .home-menu-tab {
+            padding: 0.6rem 1.35rem;
+            border-radius: 50px;
+            border: 1.5px solid #D2DCD0;
+            background: #FFFFFF;
+            color: #55744F;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all var(--trans-fast);
+        }
+        .home-menu-tab:hover, .home-menu-tab.active {
+            background: #2E5227;
+            color: #FFFFFF;
+            border-color: #2E5227;
+            box-shadow: 0 4px 14px rgba(46, 82, 39, 0.2);
+        }
+
+        /* Homepage cards share .drink-card / .drink-pedestal-stage from app.css */
+
+        @media (max-width: 950px) {
+            .hero-container { grid-template-columns: 1fr; text-align: center; }
+            .hero-floating-content { align-items: center; }
+            .hero-actions-group { justify-content: center; }
+            .hero-floating-badges { justify-content: center; }
+            .hero-floating-card-wrap { display: none; }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+
+{# ==================== 1. HERO SECTION ==================== #}
+<section id="home" class="hero-landscape-section">
+    <div class="hero-container">
+
+        <!-- Left: Modern Typography & CTAs -->
+        <div class="hero-floating-content">
+            <div class="hero-floating-pill">
+                <span class="hero-pulse-dot"></span>
+                <span>🍃 100% Ceremonial Grade Kyoto Matcha</span>
+            </div>
+
+            <h1 class="hero-floating-title">
+                PURE MATCHA<br>
+                <span>PURE MOMENTS</span>
+            </h1>
+
+            <p class="hero-floating-sub">
+                Handcrafted stone-ground matcha drinks made fresh daily with organic milk, cold-locked fusions, and zero artificial syrups.
+            </p>
+
+            <div class="hero-floating-badges">
+                <div class="hero-mini-badge">
+                    <span>⭐</span> 4.9/5 Rating (1,200+ Reviews)
+                </div>
+                <div class="hero-mini-badge">
+                    <span>🥢</span> Bamboo Chasen Whisked
+                </div>
+                <div class="hero-mini-badge">
+                    <span>🛵</span> Pickup &amp; Express Delivery
+                </div>
+            </div>
+
+            <div class="hero-actions-group">
+                <a href="{{ path('app_menu') }}" class="btn-hero-deep">
+                    <span>Explore Full Menu</span> &rarr;
+                </a>
+                <button type="button" class="btn-hero-glass" onclick="openCartDrawer()">
+                    <span>🛒 View Order Tray</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right: Floating Glass Cup Showcase -->
+        <div class="hero-floating-card-wrap">
+            <div class="hero-cup-glass-card">
+                <span class="hero-floating-tag-top">★ Bestseller Favorite</span>
+
+                <div class="hero-cup-stage">
+                    <img src="{{ asset('images/drinks/tropical.jpg') }}" alt="Tropical Matcha Signature">
+                </div>
+
+                <div class="hero-floating-tag-bot">
+                    <div style="text-align: left;">
+                        <strong style="color: #2E5227; font-size: 1.05rem; display: block; font-family: var(--font-heading);">Tropical Matcha</strong>
+                        <span style="color: #55744F; font-size: 0.75rem;">Ceremonial Uji + Passionfruit notes</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="color: #2E5227; font-weight: 800; font-size: 1.2rem; font-family: var(--font-heading);">₱185</span>
+                    </div>
+                </div>
+
+                <button type="button"
+                        class="btn-hero-deep"
+                        style="width: 100%; margin-top: 1rem; padding: 0.75rem; font-size: 0.82rem; justify-content: center; background: #2E5227; color: #FFFFFF;"
+                        onclick="openCustomModal({
+                            id: 1,
+                            name: 'Tropical Matcha',
+                            price: '185.00',
+                            imageUrl: 'images/drinks/tropical.jpg',
+                            category: 'Signature Lattes & Bestsellers',
+                            description: 'Refreshing tropical fruit notes infused with ceremonial Japanese matcha.'
+                        })">
+                    Quick Customize &amp; Order
+                </button>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{# ==================== 2. VALUE PROPOSITION RIBBON ==================== #}
+<section class="features-ribbon">
+    <div class="features-ribbon-inner">
+        <div class="ribbon-item">
+            <div class="ribbon-icon">🌱</div>
+            <div class="ribbon-text">
+                <strong>100% Ceremonial Grade</strong>
+                <span>Directly shade-grown in Uji, Kyoto</span>
+            </div>
+        </div>
+
+        <div class="ribbon-item">
+            <div class="ribbon-icon">🥢</div>
+            <div class="ribbon-text">
+                <strong>Bamboo Chasen Whisked</strong>
+                <span>Freshly crafted per cup at 80°C</span>
+            </div>
+        </div>
+
+        <div class="ribbon-item">
+            <div class="ribbon-icon">✨</div>
+            <div class="ribbon-text">
+                <strong>Artisan Fusions</strong>
+                <span>Ube, Sea Salt Cloud &amp; Fresh Fruits</span>
+            </div>
+        </div>
+
+        <div class="ribbon-item">
+            <div class="ribbon-icon">🛵</div>
+            <div class="ribbon-text">
+                <strong>Cold-Locked Delivery</strong>
+                <span>Guaranteed chilled and sealed fresh</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# ==================== 3. SIGNATURE DRINKS SHOWCASE ==================== #}
+<section id="menu-showcase" style="padding: clamp(4rem, 8vw, 6rem) 0; background: #FAFDF9;">
+    <div style="max-width: var(--container); margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem);">
+
+        <div class="section-title-group" style="margin-bottom: 2rem;">
+            <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #4C6B46;">
+                Handcrafted Drink Collection
+            </span>
+            <h2 style="font-family: var(--font-heading); font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 800; color: #2E5227; margin-top: 0.3rem;">
+                OUR SIGNATURE MENU
+            </h2>
+            <p style="color: #55744F; font-size: 1rem;">
+                Filled with genuine Japanese ingredients, velvety textures, and balanced sweetness.
+            </p>
+        </div>
+
+        <!-- Filter Chips -->
+        <div class="home-menu-tabs">
+            <button type="button" class="home-menu-tab active" onclick="filterHomeMenu('all')">All Drinks ({{ products|length }})</button>
+            <button type="button" class="home-menu-tab" onclick="filterHomeMenu('signature')">Signature Lattes &amp; Bestsellers</button>
+            <button type="button" class="home-menu-tab" onclick="filterHomeMenu('fruit')">Fruit &amp; Specialty Fusions</button>
+            <button type="button" class="home-menu-tab" onclick="filterHomeMenu('cake')">Premium Cake Matcha</button>
+        </div>
+
+        <!-- Grid of Perfect Non-Clipped Drink Cards -->
+        <div class="menu-products-grid" id="homeProductsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.8rem;">
+            {% for product in products %}
+                {% set inStock  = product.stockQuantity > 10 %}
+                {% set lowStock = product.stockQuantity > 0 and product.stockQuantity <= 10 %}
+                {% set outStock = product.stockQuantity == 0 %}
+                {% set catClass = 'signature' %}
+                {% if 'Fruit' in product.category %}{% set catClass = 'fruit' %}{% elseif 'Cake' in product.category %}{% set catClass = 'cake' %}{% endif %}
+
+                <article class="drink-card home-drink-card" data-category="{{ catClass }}">
+
+                    <!-- Non-Clipped Drink Pedestal -->
+                    <div class="drink-pedestal-stage"
+                         onclick="openCustomModal({
+                             id: {{ product.id }},
+                             name: '{{ product.name|e('js') }}',
+                             price: '{{ product.price }}',
+                             imageUrl: '{{ (product.imageUrl|drink_image)|e('js') }}',
+                             category: '{{ product.category|e('js') }}',
+                             description: '{{ (product.description ?? 'Ceremonial matcha crafted fresh.')|e('js') }}'
+                         })">
+
+                        {% if inStock %}
+                            <span class="drink-stock-pill badge-instock">In Stock</span>
+                        {% elseif lowStock %}
+                            <span class="drink-stock-pill badge-lowstock">{{ product.stockQuantity }} Left</span>
+                        {% else %}
+                            <span class="drink-stock-pill badge-soldout">Sold Out</span>
+                        {% endif %}
+
+                        <span class="drink-category-tag-float">{{ product.category|split('&')|first }}</span>
+
+                        <img src="{{ asset(product.imageUrl|drink_image) }}"
+                             alt="{{ product.name }}"
+                             loading="lazy">
+                    </div>
+
+                    <div class="drink-card-body">
+                        <h3 class="drink-title">{{ product.name }}</h3>
+                        <p class="drink-desc">
+                            {{ product.description ?? 'Handcrafted Japanese ceremonial matcha beverage.' }}
+                        </p>
+
+                        <div class="drink-card-footer">
+                            <div class="drink-price">
+                                ₱{{ product.price|number_format(0) }}<span>/cup</span>
+                            </div>
+
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <button type="button"
+                                        class="btn-card-customize"
+                                        {% if outStock %}disabled{% endif %}
+                                        onclick="openCustomModal({
+                                            id: {{ product.id }},
+                                            name: '{{ product.name|e('js') }}',
+                                            price: '{{ product.price }}',
+                                            imageUrl: '{{ (product.imageUrl|drink_image)|e('js') }}',
+                                            category: '{{ product.category|e('js') }}',
+                                            description: '{{ (product.description ?? 'Ceremonial matcha crafted fresh.')|e('js') }}'
+                                        })">
+                                    Customize
+                                </button>
+
+                                <button type="button"
+                                        class="btn-quick-add"
+                                        aria-label="Add {{ product.name }} to order"
+                                        title="Quick Add to Tray"
+                                        {% if outStock %}disabled{% endif %}
+                                        onclick="addToCart({
+                                            id: {{ product.id }},
+                                            name: '{{ product.name|e('js') }}',
+                                            imageUrl: '{{ (product.imageUrl|drink_image)|e('js') }}',
+                                            unitPrice: {{ product.price }},
+                                            quantity: 1,
+                                            options: 'Regular • 50% Sugar • Normal Ice'
+                                        }); openCartDrawer();">
+                                    +
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </article>
+            {% endfor %}
+        </div>
+
+        <!-- Full Menu CTA -->
+        <div style="text-align: center; margin-top: 3.5rem;">
+            <a href="{{ path('app_menu') }}" class="btn-hero-deep" style="padding: 1rem 2.8rem; font-size: 0.95rem; background: #2E5227; color: #FFFFFF; display: inline-flex;">
+                View All {{ products|length }} Drinks on Advanced Menu &rarr;
+            </a>
+        </div>
+
+    </div>
+</section>
+
+{# ==================== 4. WHY MATCHA MOMENTS (THE CRAFT) ==================== #}
+<section id="about" class="why-us-section" style="background: #FFFFFF; padding: clamp(4rem, 8vw, 6rem) 0; border-top: 1px solid #D2DCD0;">
+    <div class="why-us-inner" style="max-width: var(--container); margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 3rem; align-items: center;">
+
+        <div class="why-us-content-side">
+            <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #4C6B46;">The Craft Behind Every Cup</span>
+            <h2 style="font-family: var(--font-heading); font-size: clamp(2.2rem, 5vw, 3.2rem); font-weight: 800; color: #2E5227; margin: 0.4rem 0 1.2rem; letter-spacing: -0.02em;">
+                WHY CHOOSE MATCHA MOMENTS?
+            </h2>
+            <p style="color: #55744F; font-size: 0.98rem; line-height: 1.7; margin-bottom: 2rem;">
+                Unlike commercial matcha drinks loaded with refined sugars and artificial coloring, we stay true to authentic Japanese tradition by stone-grinding whole tencha tea leaves and whisking each drink to order.
+            </p>
+
+            <div class="features-list" style="display: flex; flex-direction: column; gap: 0.85rem;">
+                <div style="background: #E8F1E6; padding: 1.15rem 1.35rem; border-radius: 16px; border: 1px solid #D2DCD0; display: flex; align-items: flex-start; gap: 1rem;">
+                    <span style="font-size: 1.5rem;">🍃</span>
+                    <div>
+                        <h3 style="font-size: 1rem; font-weight: 700; color: #2E5227; margin-bottom: 0.2rem;">100% Ceremonial Grade Tencha</h3>
+                        <p style="font-size: 0.82rem; color: #55744F; margin: 0;">Harvested directly from certified farms in Kyoto, Japan with intense natural sweetness.</p>
+                    </div>
+                </div>
+
+                <div style="background: #E8F1E6; padding: 1.15rem 1.35rem; border-radius: 16px; border: 1px solid #D2DCD0; display: flex; align-items: flex-start; gap: 1rem;">
+                    <span style="font-size: 1.5rem;">🥢</span>
+                    <div>
+                        <h3 style="font-size: 1rem; font-weight: 700; color: #2E5227; margin-bottom: 0.2rem;">Handcrafted Fresh Daily</h3>
+                        <p style="font-size: 0.82rem; color: #55744F; margin: 0;">Whisked with traditional 100-prong bamboo chasen at the optimal 80°C for velvety froth.</p>
+                    </div>
+                </div>
+
+                <div style="background: #E8F1E6; padding: 1.15rem 1.35rem; border-radius: 16px; border: 1px solid #D2DCD0; display: flex; align-items: flex-start; gap: 1rem;">
+                    <span style="font-size: 1.5rem;">⚡</span>
+                    <div>
+                        <h3 style="font-size: 1rem; font-weight: 700; color: #2E5227; margin-bottom: 0.2rem;">Calm, Sustained Energy</h3>
+                        <p style="font-size: 0.82rem; color: #55744F; margin: 0;">Rich in natural L-theanine for focused clarity without coffee jitters or sudden crashes.</p>
+                    </div>
+                </div>
+            </div>
+
+            <a href="{{ path('app_about') }}" class="btn-card-customize" style="margin-top: 1.8rem; padding: 0.8rem 1.8rem; font-size: 0.85rem; display: inline-flex;">
+                Learn Our Complete Story &rarr;
+            </a>
+        </div>
+
+        <div class="why-us-image-side" style="position: relative;">
+            <img src="{{ asset('images/bowl.png') }}"
+                 alt="Ceremonial Matcha Bowl and Whisk"
+                 style="width: 100%; height: auto; border-radius: 24px; box-shadow: 0 16px 40px rgba(46, 82, 39, 0.12); border: 1px solid #D2DCD0;">
+            <div style="position: absolute; bottom: 20px; left: 20px; right: 20px; background: rgba(46, 82, 39, 0.92); backdrop-filter: blur(12px); border-radius: 16px; padding: 1.1rem; color: #FFFFFF; border: 1px solid rgba(232, 241, 230, 0.25);">
+                <strong style="color: #E8F1E6; display: block; font-size: 0.95rem; font-family: var(--font-heading);">Kyoto Ceremonial Heritage</strong>
+                <span style="font-size: 0.8rem; color: rgba(232, 241, 230, 0.85);">Slow granite stone-ground for 1 hour to yield just 30 grams of pure green tea powder.</span>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{# ==================== 5. CUSTOMER REVIEWS ==================== #}
+<section id="reviews" class="reviews-section" style="background: #FAFDF9; padding: clamp(4rem, 8vw, 6rem) 0;">
+    <div style="max-width: var(--container); margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem);">
+        <div class="section-title-group">
+            <span style="font-size: 0.8rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #4C6B46;">Verified Customer Feedback</span>
+            <h2 style="font-family: var(--font-heading); font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 800; color: #2E5227; margin-top: 0.3rem;">
+                WHAT OUR CUSTOMERS SAY
+            </h2>
+            <p style="color: #55744F; font-size: 1rem;">
+                Real reviews from our regular matcha visitors
+            </p>
+        </div>
+
+        <div class="reviews-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.8rem;">
+            {% for review in reviews %}
+                <div class="review-card" style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 4px 18px rgba(46, 82, 39, 0.04); border: 1px solid #D2DCD0; padding: 1.8rem; display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem;">
+                        <span style="width: 38px; height: 38px; border-radius: 50%; background: #E8F1E6; color: #2E5227; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center;">
+                            {{- review.customerName|split(' ')|map(w => w|first)|join('')|upper|slice(0,2) -}}
+                        </span>
+                        <span style="color: #55744F; font-size: 1.15rem; letter-spacing: 2px;">
+                            {%- for i in 1..review.rating %}★{% endfor -%}
+                            {%- if review.rating < 5 %}
+                                {%- for i in (review.rating + 1)..5 %}☆{% endfor -%}
+                            {%- endif %}
+                        </span>
+                    </div>
+                    <div style="font-family: var(--font-heading); font-size: 1rem; font-weight: 700; color: #2E5227; margin-bottom: 0.4rem;">
+                        {{ review.customerName }}
+                    </div>
+                    <div style="font-size: 0.88rem; color: #55744F; line-height: 1.6; flex: 1;">
+                        "{{ review.comment }}"
+                    </div>
+                    <div style="font-size: 0.72rem; color: #7D9778; margin-top: 1rem; border-top: 1px solid #E8F1E6; padding-top: 0.6rem;">
+                        ✓ Verified Matcha Order
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div style="text-align: center; margin-top: 2.5rem;">
+            <a href="{{ path('app_reviews') }}" class="btn-card-customize" style="padding: 0.9rem 2.5rem; font-size: 0.88rem; display: inline-flex;">
+                Read All Reviews &amp; Leave Yours &rarr;
+            </a>
+        </div>
+    </div>
+</section>
+
+{# ==================== 6. NEWSLETTER SUBSCRIPTION ==================== #}
+<section id="contact-newsletter" style="background: #2E5227; color: #FFFFFF; padding: clamp(4rem, 8vw, 6rem) 1.5rem; text-align: center;">
+    <div style="max-width: 650px; margin: 0 auto;">
+        <span style="font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #E8F1E6;">Exclusive Member Drops</span>
+        <h2 style="font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; color: #FFFFFF; margin: 0.4rem 0 0.8rem;">
+            STAY IN THE MATCHA LOOP
+        </h2>
+        <p style="color: rgba(232, 241, 230, 0.85); font-size: 0.95rem; margin-bottom: 2rem;">
+            Get seasonal drink secret recipes, member-only tasting invites, and instant discount vouchers directly in your inbox.
+        </p>
+
+        <form class="newsletter-form" id="newsletterForm" action="{{ path('app_newsletter_subscribe') }}" method="POST" style="display: flex; gap: 0.6rem; max-width: 480px; margin: 0 auto; flex-wrap: wrap;">
+            <input
+                id="newsletter-email"
+                type="email"
+                name="email"
+                placeholder="Enter your email address"
+                required
+                style="flex: 1; min-width: 240px; padding: 0.85rem 1.4rem; border-radius: 50px; border: 1.5px solid rgba(232,241,230,0.3); background: #FFFFFF; color: #2E5227; font-size: 0.9rem; font-family: var(--font-body);">
+            <button type="submit"
+                    style="background: #2E5227; color: #FFFFFF; border: none; padding: 0.85rem 1.8rem; border-radius: 50px; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: all var(--trans-fast);">
+                Subscribe
+            </button>
+        </form>
+    </div>
+</section>
+
+<script>
+function filterHomeMenu(cat) {
+    const tabs = document.querySelectorAll('.home-menu-tab');
+    tabs.forEach(t => t.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+
+    const cards = document.querySelectorAll('.home-drink-card');
+    cards.forEach(card => {
+        if (cat === 'all' || card.dataset.category === cat) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+</script>
+
+{% endblock %}

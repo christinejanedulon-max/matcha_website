@@ -1,0 +1,71 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Manage Reviews — Matcha Admin{% endblock %}
+
+{% block content %}
+<div class="admin-topbar">
+    <div>
+        <h1 style="margin: 0;">Customer Reviews Moderation</h1>
+        <p style="color: var(--clr-text-muted); margin: 0.3rem 0 0; font-size: 0.9rem;">
+            Monitor customer feedback, star ratings, and community reviews.
+        </p>
+    </div>
+</div>
+
+<div class="admin-panel-card">
+    <div class="admin-panel-header">
+        <h2>Customer Reviews ({{ reviews|length }})</h2>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Rating</th>
+                    <th>Review Comment</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reviews %}
+                    <tr>
+                        <td>
+                            <strong>{{ r.customerName }}</strong>
+                        </td>
+                        <td>
+                            <span style="color: #55744F; font-size: 1.1rem;">
+                                {%- for i in 1..r.rating %}★{% endfor -%}
+                                {%- if r.rating < 5 %}
+                                    {%- for i in (r.rating + 1)..5 %}☆{% endfor -%}
+                                {%- endif %}
+                            </span>
+                            <span style="font-size: 0.8rem; color: #888; margin-left: 0.3rem;">({{ r.rating }}/5)</span>
+                        </td>
+                        <td>
+                            <div style="font-size: 0.88rem; color: var(--clr-dark); max-width: 450px; line-height: 1.4;">
+                                "{{ r.comment }}"
+                            </div>
+                        </td>
+                        <td>
+                            <span style="font-size: 0.8rem; color: #888;">
+                                {{ r.createdAt|date('M d, Y') }}
+                            </span>
+                        </td>
+                        <td>
+                            <form action="{{ path('admin_review_delete', { id: r.id }) }}" method="POST" onsubmit="return confirm('Delete this review?');">
+                                <button type="submit" class="btn-admin-action btn-danger-action">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem; color: #888;">No reviews yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

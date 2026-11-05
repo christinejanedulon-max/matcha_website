@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sign In — Matcha Moments Café{% endblock %}
+
+{% block body %}
+<section style="
+    min-height: 100vh;
+    background: linear-gradient(135deg, #2E5227 0%, #1A3216 60%, #2E5227 100%);
+    display: flex; align-items: center; justify-content: center;
+    padding: clamp(5rem,10vw,7rem) 1.5rem 3rem;
+    position: relative; overflow: hidden;">
+
+    {# decorative orbs #}
+    <div style="position:absolute;top:-100px;right:-80px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle, rgba(76,107,70,0.4) 0%, transparent 70%);pointer-events:none;"></div>
+    <div style="position:absolute;bottom:-80px;left:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle, rgba(125,151,120,0.3) 0%, transparent 70%);pointer-events:none;"></div>
+
+    <div style="position:relative;width:100%;max-width:460px;">
+        {# Card #}
+        <div style="background:#FFFFFF;border-radius:28px;padding:clamp(2rem,5vw,3rem);box-shadow:0 32px 80px rgba(0,0,0,0.25);">
+
+            {# Logo + heading #}
+            <div style="text-align:center;margin-bottom:2rem;">
+                <img src="{{ asset('images/logo.png') }}" alt="Matcha Moments" style="height:52px;width:auto;margin-bottom:1rem;">
+                <div style="display:inline-block;background:#E8F1E6;border-radius:50px;padding:0.3rem 1rem;font-size:0.72rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#2E5227;margin-bottom:0.8rem;">Account Access</div>
+                <h1 style="font-family:var(--font-heading);font-size:2rem;color:#2E5227;margin:0;font-weight:800;letter-spacing:-0.02em;">Welcome Back</h1>
+                <p style="font-size:0.88rem;color:#7D9778;margin:0.5rem 0 0;">Log in to manage your orders or access the café console.</p>
+            </div>
+
+            {# Form #}
+            <form action="{{ path('app_login') }}" method="POST">
+                <div style="margin-bottom:1.1rem;">
+                    <label style="display:block;font-size:0.8rem;font-weight:700;color:#2E5227;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.4rem;" for="loginEmail">Email Address</label>
+                    <input type="email" name="email" id="loginEmail" class="form-control"
+                           placeholder="admin@matchamoments.com" value="admin@matchamoments.com" required
+                           style="border-radius:14px;border:1.5px solid #D2DCD0;padding:0.85rem 1.1rem;width:100%;font-size:0.92rem;font-family:var(--font-body);transition:border-color 0.2s;box-sizing:border-box;">
+                </div>
+                <div style="margin-bottom:1.5rem;">
+                    <label style="display:block;font-size:0.8rem;font-weight:700;color:#2E5227;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.4rem;" for="loginPass">Password</label>
+                    <input type="password" name="password" id="loginPass" class="form-control"
+                           placeholder="••••••••" value="admin123" required
+                           style="border-radius:14px;border:1.5px solid #D2DCD0;padding:0.85rem 1.1rem;width:100%;font-size:0.92rem;font-family:var(--font-body);transition:border-color 0.2s;box-sizing:border-box;">
+                </div>
+                <button type="submit" class="btn-hero-primary"
+                        style="width:100%;border:none;padding:0.95rem;border-radius:14px;cursor:pointer;font-size:0.98rem;">
+                    Sign In →
+                </button>
+            </form>
+
+            {# Divider #}
+            <div style="display:flex;align-items:center;gap:1rem;margin:1.8rem 0;">
+                <div style="flex:1;height:1px;background:#E8F1E6;"></div>
+                <span style="font-size:0.75rem;color:#A4B9A1;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Quick Demo</span>
+                <div style="flex:1;height:1px;background:#E8F1E6;"></div>
+            </div>
+
+            {# Demo buttons #}
+            <div style="display:flex;flex-direction:column;gap:0.6rem;">
+                <form action="{{ path('app_login') }}" method="POST">
+                    <input type="hidden" name="demo_role" value="admin">
+                    <input type="hidden" name="email" value="admin@matchamoments.com">
+                    <button type="submit" style="width:100%;background:#2E5227;color:#FFFFFF;border:none;padding:0.8rem;border-radius:14px;font-weight:700;font-size:0.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.6rem;">
+                        <span>👑</span> Enter as Administrator
+                    </button>
+                </form>
+                <form action="{{ path('app_login') }}" method="POST">
+                    <input type="hidden" name="demo_role" value="customer">
+                    <input type="hidden" name="email" value="customer@matchamoments.com">
+                    <input type="hidden" name="full_name" value="Valued Customer">
+                    <button type="submit" style="width:100%;background:#E8F1E6;color:#2E5227;border:1.5px solid #D2DCD0;padding:0.8rem;border-radius:14px;font-weight:700;font-size:0.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.6rem;">
+                        <span>🍵</span> Enter as Customer
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

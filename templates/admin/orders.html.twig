@@ -1,0 +1,136 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Manage Orders &amp; Dispatch — Matcha Admin{% endblock %}
+
+{% block content %}
+<div class="admin-topbar">
+    <div>
+        <h1 style="margin: 0;">Customer Orders</h1>
+        <p style="color: var(--clr-text-muted); margin: 0.3rem 0 0; font-size: 0.9rem;">
+            Track customer incoming tickets, update preparation progress, and verify GCash payments.
+        </p>
+    </div>
+    <div>
+        <a href="{{ path('admin_orders') }}" class="btn-hero-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.85rem; border-radius: 8px;">
+            🔄 Refresh Orders
+        </a>
+    </div>
+</div>
+
+<!-- Filter Tabs -->
+<div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+    <a href="{{ path('admin_orders', { status: 'all' }) }}" class="btn-admin-action {% if currentFilter == 'all' %}btn-primary-action{% else %}btn-hero-secondary{% endif %}" style="padding: 0.5rem 1rem; border-radius: 50px;">
+        All ({{ stats.totalOrders }})
+    </a>
+    <a href="{{ path('admin_orders', { status: 'Pending' }) }}" class="btn-admin-action {% if currentFilter == 'Pending' %}btn-primary-action{% else %}btn-hero-secondary{% endif %}" style="padding: 0.5rem 1rem; border-radius: 50px;">
+        Pending ({{ stats.pendingOrders }})
+    </a>
+    <a href="{{ path('admin_orders', { status: 'Preparing' }) }}" class="btn-admin-action {% if currentFilter == 'Preparing' %}btn-primary-action{% else %}btn-hero-secondary{% endif %}" style="padding: 0.5rem 1rem; border-radius: 50px;">
+        Preparing ({{ stats.preparingOrders }})
+    </a>
+    <a href="{{ path('admin_orders', { status: 'Ready' }) }}" class="btn-admin-action {% if currentFilter == 'Ready' %}btn-primary-action{% else %}btn-hero-secondary{% endif %}" style="padding: 0.5rem 1rem; border-radius: 50px;">
+        Ready ({{ stats.readyOrders }})
+    </a>
+    <a href="{{ path('admin_orders', { status: 'Completed' }) }}" class="btn-admin-action {% if currentFilter == 'Completed' %}btn-primary-action{% else %}btn-hero-secondary{% endif %}" style="padding: 0.5rem 1rem; border-radius: 50px;">
+        Completed ({{ stats.completedOrders }})
+    </a>
+</div>
+
+<!-- Orders Table Card -->
+<div class="admin-panel-card">
+    <div style="overflow-x: auto;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Order &amp; Time</th>
+                    <th>Customer Details</th>
+                    <th>Fulfillment &amp; Address</th>
+                    <th>Ordered Drinks</th>
+                    <th>Total &amp; Payment</th>
+                    <th>Status</th>
+                    <th>Update Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    {% set st = order.status|lower %}
+                    <tr>
+                        <td>
+                            <strong style="font-size: 0.95rem;">#{{ order.orderNumber }}</strong>
+                            <div style="font-size: 0.75rem; color: #888;">{{ order.orderDate|date('M d, Y') }}</div>
+                            <div style="font-size: 0.72rem; color: #888;">{{ order.orderDate|date('h:i A') }}</div>
+                        </td>
+                        <td>
+                            <strong style="color: var(--clr-dark);">{{ order.customerName }}</strong>
+                            <div style="font-size: 0.8rem; color: #666;">
+                                <a href="tel:{{ order.phone }}" style="color: var(--clr-matcha-dark);">📞 {{ order.phone }}</a>
+                            </div>
+                        </td>
+                        <td>
+                            <span style="display: inline-block; font-weight: 700; font-size: 0.82rem; margin-bottom: 0.2rem;">
+                                {% if order.fulfillmentMethod == 'Delivery' %}🛵 Delivery{% else %}🏪 Pickup{% endif %}
+                            </span>
+                            {% if order.deliveryAddress %}
+                                <div style="font-size: 0.75rem; color: #666; max-width: 200px; line-height: 1.3;">
+                                    📍 {{ order.deliveryAddress }}
+                                </div>
+                            {% endif %}
+                            {% if order.notes is defined and order.notes %}
+                                <div style="font-size: 0.72rem; color: #55744F; margin-top: 0.2rem;">
+                                    💬 Note: {{ order.notes }}
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                                {% for item in order.items %}
+                                    <div style="font-size: 0.82rem;">
+                                        <strong>{{ item.quantity }}x</strong> {{ item.name }}
+                                        {% if item.options is defined and item.options %}
+                                            <span style="font-size: 0.7rem; color: #888;">({{ item.options }})</span>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-size: 1rem; font-weight: 700; color: var(--clr-matcha-dark);">
+                                ₱{{ order.totalAmount }}
+                            </div>
+                            <div style="font-size: 0.78rem; font-weight: 600; color: #555;">
+                                {{ order.paymentMethod }}
+                            </div>
+                            {% if order.referenceNumber %}
+                                <div style="font-size: 0.72rem; color: #1565c0; font-weight: 600;">
+                                    GCash Ref: {{ order.referenceNumber }}
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-pill status-{{ st }}">{{ order.status }}</span>
+                        </td>
+                        <td>
+                            <form action="{{ path('admin_order_status', { orderNumber: order.orderNumber }) }}" method="POST" style="display: flex; gap: 0.4rem; align-items: center;">
+                                <select name="status" class="status-select">
+                                    <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                    <option value="Preparing" {% if order.status == 'Preparing' %}selected{% endif %}>Preparing</option>
+                                    <option value="Ready" {% if order.status == 'Ready' %}selected{% endif %}>Ready</option>
+                                    <option value="Completed" {% if order.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                    <option value="Cancelled" {% if order.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                                </select>
+                                <button type="submit" class="btn-admin-action btn-primary-action" title="Save status">Save</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 3rem; color: #999;">
+                            No orders found matching the selected status.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

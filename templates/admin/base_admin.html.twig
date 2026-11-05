@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Matcha Moments — Admin Portal{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    {% block stylesheets %}{% endblock %}
+</head>
+<body style="background: #F7FAF6; margin: 0; font-family: var(--font-body);">
+
+<!-- Flash Notifications -->
+{% for label, messages in app.flashes %}
+    <div class="flash-container">
+        {% for message in messages %}
+            <div class="flash-toast flash-{{ label }}">
+                <span>{{ message }}</span>
+                <button type="button" class="flash-close" onclick="this.parentElement.remove()">&times;</button>
+            </div>
+        {% endfor %}
+    </div>
+{% endfor %}
+
+<div class="admin-page-wrap">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-brand">
+            <img src="{{ asset('images/logo.png') }}" alt="Logo">
+            <span>MATCHA ADMIN</span>
+        </div>
+
+        <nav class="admin-nav-list">
+            <a href="{{ path('admin_dashboard') }}" class="admin-nav-link {% if app.request.attributes.get('_route') == 'admin_dashboard' %}active{% endif %}">
+                <span class="nav-icon">📊</span>
+                Dashboard
+            </a>
+            <a href="{{ path('admin_orders') }}" class="admin-nav-link {% if app.request.attributes.get('_route') == 'admin_orders' %}active{% endif %}">
+                <span class="nav-icon">📦</span>
+                Orders &amp; Dispatch
+            </a>
+            <a href="{{ path('admin_products') }}" class="admin-nav-link {% if app.request.attributes.get('_route') == 'admin_products' %}active{% endif %}">
+                <span class="nav-icon">🍵</span>
+                Menu &amp; Stocks
+            </a>
+            <a href="{{ path('admin_reviews') }}" class="admin-nav-link {% if app.request.attributes.get('_route') == 'admin_reviews' %}active{% endif %}">
+                <span class="nav-icon">⭐</span>
+                Reviews
+            </a>
+            <a href="{{ path('admin_subscribers') }}" class="admin-nav-link {% if app.request.attributes.get('_route') == 'admin_subscribers' %}active{% endif %}">
+                <span class="nav-icon">✉️</span>
+                Newsletter List
+            </a>
+        </nav>
+
+        <div class="admin-nav-footer">
+            <a href="{{ path('app_home') }}" class="admin-back-store-btn">
+                <span>🏪</span> View Café Storefront
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main-content">
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+{% block javascripts %}{% endblock %}
+</body>
+</html>

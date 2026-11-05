@@ -1,0 +1,881 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Full Drink Menu — Matcha Moments Café{% endblock %}
+{% block meta_description %}Explore our handcrafted ceremonial matcha drink menu. Signature Lattes, Fruit Fusions, and Premium Cake Matcha Creations. Quick customization and express pickup/delivery.{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    <style>
+        /* ============================================================
+           MATCHA MOMENTS — ADVANCED HIGH-EFFICIENCY MENU
+           Palette: #2E5227, #4C6B46, #FFFFFF, #E8F1E6, #55744F, #7D9778, #A4B9A1, #D2DCD0
+           ============================================================ */
+        :root {
+            --menu-bg: #FAFDF9;
+            --menu-card-bg: #FFFFFF;
+            --menu-border: #D2DCD0;
+            --menu-sage: #E8F1E6;
+            --menu-deep: #2E5227;
+            --menu-matcha: #4C6B46;
+            --menu-brown: #2E5227;
+        }
+
+        /* Hero Header */
+        .menu-hero-modern {
+            background: linear-gradient(135deg, #2E5227 0%, #1E3719 100%);
+            color: #FFFFFF;
+            padding: clamp(6.5rem, 11vw, 8.5rem) 1.5rem clamp(3rem, 5vw, 4.5rem);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+        .menu-hero-modern::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 80% 20%, rgba(76, 107, 70, 0.3) 0%, transparent 60%),
+                        radial-gradient(circle at 20% 80%, rgba(76, 107, 70, 0.35) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .menu-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(232, 241, 230, 0.15);
+            border: 1px solid rgba(232, 241, 230, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 0.4rem 1.1rem;
+            border-radius: 50px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #E8F1E6;
+            margin-bottom: 1rem;
+        }
+        .menu-hero-badge .pulse-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #55744F;
+            box-shadow: 0 0 10px #7D9778;
+        }
+        .menu-hero-title {
+            font-family: var(--font-heading);
+            font-size: clamp(2.4rem, 6vw, 4.2rem);
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            line-height: 1.08;
+            color: #FFFFFF;
+            margin-bottom: 0.8rem;
+        }
+        .menu-hero-title span {
+            color: #E8F1E6;
+            text-decoration: underline;
+            text-decoration-color: #4C6B46;
+            text-underline-offset: 6px;
+        }
+        .menu-hero-desc {
+            font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+            color: rgba(232, 241, 230, 0.85);
+            max-width: 580px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+
+        /* Advanced Menu Sticky Toolbar */
+        .menu-toolbar-sticky {
+            position: sticky;
+            top: 60px;
+            z-index: 120;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid #D2DCD0;
+            box-shadow: 0 4px 20px rgba(46, 82, 39, 0.05);
+            padding: 0.75rem 0;
+            transition: all var(--trans-fast);
+        }
+        .menu-toolbar-inner {
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 clamp(1rem, 4vw, 2rem);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Search Input */
+        .menu-search-box {
+            position: relative;
+            flex: 1;
+            min-width: 240px;
+            max-width: 380px;
+        }
+        .menu-search-box input {
+            width: 100%;
+            padding: 0.65rem 2.2rem 0.65rem 2.4rem;
+            border-radius: 50px;
+            border: 1.5px solid #D2DCD0;
+            background: #FFFFFF;
+            font-size: 0.88rem;
+            font-family: var(--font-body);
+            color: #2E5227;
+            transition: all var(--trans-fast);
+        }
+        .menu-search-box input:focus {
+            outline: none;
+            border-color: #2E5227;
+            box-shadow: 0 0 0 3px rgba(46, 82, 39, 0.12);
+        }
+        .menu-search-icon {
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #55744F;
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+        .menu-search-clear {
+            position: absolute;
+            right: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #7D9778;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: none;
+        }
+
+        /* Category Filter Chips */
+        .menu-category-pills {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding: 0.2rem 0;
+        }
+        .menu-category-pills::-webkit-scrollbar { display: none; }
+        .menu-pill-btn {
+            white-space: nowrap;
+            padding: 0.55rem 1.1rem;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            font-family: var(--font-body);
+            border: 1.5px solid transparent;
+            background: #E8F1E6;
+            color: #2E5227;
+            cursor: pointer;
+            transition: all var(--trans-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .menu-pill-btn:hover {
+            background: #D2DCD0;
+            color: #1E3719;
+        }
+        .menu-pill-btn.active {
+            background: #2E5227;
+            color: #FFFFFF;
+            box-shadow: 0 4px 14px rgba(46, 82, 39, 0.25);
+        }
+        .menu-pill-count {
+            display: inline-block;
+            font-size: 0.72rem;
+            padding: 0.15rem 0.45rem;
+            border-radius: 50px;
+            background: rgba(0,0,0,0.08);
+            font-weight: 700;
+        }
+        .menu-pill-btn.active .menu-pill-count {
+            background: rgba(255,255,255,0.25);
+            color: #FFFFFF;
+        }
+
+        /* Controls Right: Mode Switcher & Quick Toggles */
+        .menu-controls-right {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-left: auto;
+        }
+        .menu-view-switch {
+            display: inline-flex;
+            background: #E8F1E6;
+            padding: 0.2rem;
+            border-radius: 50px;
+            border: 1px solid #D2DCD0;
+        }
+        .view-btn {
+            border: none;
+            background: transparent;
+            padding: 0.4rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #55744F;
+            cursor: pointer;
+            transition: all var(--trans-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .view-btn.active {
+            background: #2E5227;
+            color: #FFFFFF;
+            box-shadow: 0 2px 8px rgba(46, 82, 39, 0.2);
+        }
+
+        /* Main Container */
+        .menu-page-content {
+            background-color: #FAFDF9;
+            min-height: 80vh;
+            padding: clamp(2rem, 5vw, 3.5rem) 0 6rem;
+        }
+        .menu-content-inner {
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 clamp(1rem, 4vw, 2rem);
+        }
+
+        /* Category Title Bar */
+        .category-group-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin: 2.8rem 0 1.4rem;
+            padding-bottom: 0.65rem;
+            border-bottom: 2px solid #E8F1E6;
+        }
+        .category-group-title {
+            font-family: var(--font-heading);
+            font-size: clamp(1.4rem, 3.5vw, 1.9rem);
+            font-weight: 800;
+            color: #2E5227;
+            letter-spacing: -0.015em;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .category-group-title .cat-accent-bar {
+            width: 4px;
+            height: 1.3em;
+            background: #2E5227;
+            border-radius: 2px;
+            display: inline-block;
+        }
+        .category-group-count {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #55744F;
+            background: #E8F1E6;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+        }
+
+        /* ============================================================
+           CARD GRID VIEW — PERFECT NON-CLIPPED PICTURE STAGE
+           ============================================================ */
+        .menu-grid-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.8rem;
+        }
+
+        /* .drink-card styles live in assets/styles/app.css (shared with home) */
+
+        /* ============================================================
+           ADVANCED COMPACT / QUICK-ORDER LIST VIEW
+           ============================================================ */
+        .menu-list-view {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+        .compact-drink-row {
+            background: #FFFFFF;
+            border: 1px solid #D2DCD0;
+            border-radius: 16px;
+            padding: 0.85rem 1.25rem;
+            display: grid;
+            grid-template-columns: 75px 1.5fr 1fr 140px 140px;
+            align-items: center;
+            gap: 1.2rem;
+            transition: all var(--trans-fast);
+            box-shadow: 0 2px 6px rgba(46, 82, 39, 0.03);
+        }
+        .compact-drink-row:hover {
+            border-color: #4C6B46;
+            background: #FAFDF9;
+            box-shadow: 0 6px 18px rgba(46, 82, 39, 0.08);
+            transform: translateX(4px);
+        }
+        .compact-img-wrap {
+            width: 64px;
+            height: 80px;
+            border-radius: 14px;
+            background: #F2F0E9;
+            border: 1px solid #E8F1E6;
+            overflow: hidden;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        .compact-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 45%;
+        }
+        .compact-info-col h4 {
+            font-family: var(--font-heading);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #2E5227;
+            margin-bottom: 0.15rem;
+        }
+        .compact-info-col p {
+            font-size: 0.75rem;
+            color: #55744F;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .compact-cat-col {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #55744F;
+            background: #E8F1E6;
+            padding: 0.25rem 0.65rem;
+            border-radius: 50px;
+            display: inline-block;
+            text-align: center;
+            width: fit-content;
+        }
+        .compact-price-col {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #2E5227;
+            text-align: right;
+        }
+        .compact-actions-col {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        /* Floating Sticky Order Tray Bar */
+        .floating-order-bar {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: #2E5227;
+            color: #FFFFFF;
+            border: 1px solid rgba(232, 241, 230, 0.3);
+            border-radius: 50px;
+            box-shadow: 0 16px 40px rgba(46, 82, 39, 0.4);
+            padding: 0.75rem 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            z-index: 999;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(12px);
+        }
+        .floating-order-bar.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        .floating-bar-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .floating-bar-badge {
+            background: #2E5227;
+            color: #FFFFFF;
+            font-weight: 800;
+            padding: 0.2rem 0.65rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+        }
+        .floating-bar-total {
+            font-family: var(--font-heading);
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #E8F1E6;
+        }
+        .btn-floating-view {
+            background: #FFFFFF;
+            color: #2E5227;
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: all var(--trans-fast);
+        }
+        .btn-floating-view:hover {
+            background: #E8F1E6;
+            transform: scale(1.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 860px) {
+            .compact-drink-row {
+                grid-template-columns: 60px 1fr 90px;
+                gap: 0.75rem;
+            }
+            .compact-cat-col, .compact-info-col p {
+                display: none;
+            }
+            .menu-toolbar-inner {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .menu-search-box {
+                max-width: 100%;
+            }
+            .menu-controls-right {
+                justify-content: space-between;
+                width: 100%;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+
+{# ==================== 1. MODERN MENU HERO ==================== #}
+<section class="menu-hero-modern">
+    <div class="menu-hero-badge">
+        <span class="pulse-dot"></span>
+        <span>100% Ceremonial Uji Matcha Collection</span>
+    </div>
+
+    <h1 class="menu-hero-title">
+        DISCOVER OUR <span>SPECIALTY</span> MENU
+    </h1>
+
+    <p class="menu-hero-desc">
+        Whisked with authentic Japanese bamboo chasen, paired with organic ingredients, fresh milk fusions, and decadent artisan textures.
+    </p>
+</section>
+
+{# ==================== 2. ADVANCED STICKY TOOLBAR ==================== #}
+<div class="menu-toolbar-sticky" id="menuStickyBar">
+    <div class="menu-toolbar-inner">
+
+        <!-- Real-Time Search -->
+        <div class="menu-search-box">
+            <span class="menu-search-icon">🔍</span>
+            <input type="text"
+                   id="advancedSearchInput"
+                   placeholder="Search drinks (e.g. Tropical, Latte, Cloud, Ube)..."
+                   aria-label="Search matcha drinks">
+            <button type="button" id="searchClearBtn" class="menu-search-clear" onclick="clearMenuSearch()">&times;</button>
+        </div>
+
+        <!-- Category Pills Filter -->
+        <div class="menu-category-pills" id="categoryPillBar" role="tablist">
+            <button class="menu-pill-btn active" data-filter="all" onclick="filterCategory('all', this)">
+                <span>All Drinks</span>
+                <span class="menu-pill-count">{{ totalProducts }}</span>
+            </button>
+            {% for category, items in grouped %}
+                {% set filterSlug = loop.index %}
+                <button class="menu-pill-btn" data-filter="cat-{{ filterSlug }}" onclick="filterCategory('cat-{{ filterSlug }}', this)">
+                    <span>{{ category }}</span>
+                    <span class="menu-pill-count">{{ items|length }}</span>
+                </button>
+            {% endfor %}
+        </div>
+
+        <!-- Controls: View Switcher (Grid vs Compact) -->
+        <div class="menu-controls-right">
+            <div class="menu-view-switch" role="group" aria-label="View Mode Switcher">
+                <button type="button" class="view-btn active" id="btnViewGrid" onclick="setMenuViewMode('grid')" title="Grid Cards View">
+                    <span>🔲 Visual Cards</span>
+                </button>
+                <button type="button" class="view-btn" id="btnViewCompact" onclick="setMenuViewMode('compact')" title="Compact Quick Order View">
+                    <span>⚡ Quick Order</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{# ==================== 3. MENU DRINK SECTIONS ==================== #}
+<main class="menu-page-content">
+    <div class="menu-content-inner">
+
+        <!-- Live Results Counter -->
+        <div id="resultsCountBanner" style="font-size: 0.85rem; font-weight: 600; color: #55744F; margin-bottom: 1.2rem; display: none;">
+            Showing <span id="visibleDrinkCount">{{ totalProducts }}</span> matching drinks
+        </div>
+
+        <!-- Empty Results Message -->
+        <div id="noMatchMessage" style="display: none; text-align: center; padding: 4rem 1rem; background: #FFFFFF; border-radius: 20px; border: 1.5px dashed #D2DCD0;">
+            <div style="font-size: 3rem; margin-bottom: 0.8rem;">🍵</div>
+            <h3 style="font-family: var(--font-heading); font-size: 1.4rem; color: #2E5227; margin-bottom: 0.5rem;">No drinks found</h3>
+            <p style="font-size: 0.9rem; color: #55744F; margin-bottom: 1.5rem;">We couldn't find any drinks matching your search.</p>
+            <button type="button" class="btn-card-customize" onclick="clearMenuSearch()">Reset Search Filter</button>
+        </div>
+
+        {% for category, items in grouped %}
+            <section class="menu-category-block" id="cat-{{ loop.index }}" data-cat-title="{{ category|lower }}">
+
+                <div class="category-group-header">
+                    <h2 class="category-group-title">
+                        <span class="cat-accent-bar"></span>
+                        {{ category }}
+                    </h2>
+                    <span class="category-group-count">{{ items|length }} crafted recipes</span>
+                </div>
+
+                <!-- 1. GRID VIEW CONTAINER (Default) -->
+                <div class="menu-grid-view">
+                    {% for product in items %}
+                        {% set inStock  = product.stockQuantity > 10 %}
+                        {% set lowStock = product.stockQuantity > 0 and product.stockQuantity <= 10 %}
+                        {% set outStock = product.stockQuantity == 0 %}
+
+                        <article class="drink-card menu-item-node"
+                                 data-name="{{ product.name|lower }}"
+                                 data-category="{{ product.category|lower }}"
+                                 data-price="{{ product.price }}">
+
+                            <!-- Non-Clipped Drink Pedestal Stage -->
+                            <div class="drink-pedestal-stage"
+                                 onclick="openCustomModal({
+                                     id: {{ product.id }},
+                                     name: '{{ product.name|e('js') }}',
+                                     price: '{{ product.price }}',
+                                     imageUrl: '{{ (product.imageUrl|drink_image)|e('js') }}',
+                                     category: '{{ product.category|e('js') }}',
+                                     description: '{{ (product.description ?? 'Ceremonial Japanese matcha blended fresh.')|e('js') }}'
+                                 })">
+
+                                <!-- Stock Badge -->
+                                {% if inStock %}
+                                    <span class="drink-stock-pill badge-instock">In Stock</span>
+                                {% elseif lowStock %}
+                                    <span class="drink-stock-pill badge-lowstock">{{ product.stockQuantity }} Left</span>
+                                {% else %}
+                                    <span class="drink-stock-pill badge-soldout">Sold Out</span>
+                                {% endif %}
+
+                                <span class="drink-category-tag-float">{{ product.category|split('&')|first }}</span>
+
+                                <img src="{{ asset(product.imageUrl|drink_image) }}"
+                                     alt="{{ product.name }}"
+                                     loading="lazy">
+                            </div>
+
+                            <!-- Content -->
+                            <div class="drink-card-body">
+                                <h3 class="drink-title">{{ product.name }}</h3>
+                                <p class="drink-desc">
+                                    {{ product.description ?? 'Authentic ceremonial grade Japanese matcha prepared per order.' }}
+                                </p>
+
+                                <div class="drink-card-footer">
+                                    <div class="drink-price">
+                                        ₱{{ product.price|number_format(0) }}<span>/cup</span>
+                                    </div>
+
+                                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                        <button type="button"
+                                                class="btn-card-customize"
+                                                {% if outStock %}disabled{% endif %}
+                                                onclick="openCustomModal({
+                                                    id: {{ product.id }},
+                                                    name: '{{ product.name|e('js') }}',
+                                                    price: '{{ product.price }}',
+                                                    imageUrl: '{{ (product.imageUrl|drink_image)|e('js') }}',
+                                                    category: '{{ product.category|e('js') }}',
+                                                    description: '{{ (product.description ?? 'Ceremonial Japanese matcha blended fresh.')|e('js') }}'
+                                                })">
+                                            <span>Customize</span> &rarr;
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn-quick-add"
+                                                aria-label="Add {{ product.name }} to order tray"
+                                                title="Quick Add 1 Cup"
+                                                {% if outStock %}disabled{% endif %}
+                                                onclick="quickAddSingle({{ product.id }}, '{{ product.name|e('js') }}', '{{ (product.imageUrl|drink_image)|e('js') }}', {{ product.price }});">
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </article>
+                    {% endfor %}
+                </div>
+
+                <!-- 2. COMPACT / QUICK-ORDER LIST VIEW (Toggled via Advanced Mode) -->
+                <div class="menu-list-view" style="display: none;">
+                    {% for product in items %}
+                        {% set inStock  = product.stockQuantity > 10 %}
+                        {% set lowStock = product.stockQuantity > 0 and product.stockQuantity <= 10 %}
+                        {% set outStock = product.stockQuantity == 0 %}
+
+                        <div class="compact-drink-row menu-item-node"
+                             data-name="{{ product.name|lower }}"
+                             data-category="{{ product.category|lower }}"
+                             data-price="{{ product.price }}">
+
+                            <!-- Mini Pedestal -->
+                            <div class="compact-img-wrap"
+                                 onclick="openCustomModal({
+                                     id: {{ product.id }},
+                                     name: '{{ product.name|e('js') }}',
+                                     price: '{{ product.price }}',
+                                     imageUrl: '{{ (product.imageUrl|drink_image)|e('js') }}',
+                                     category: '{{ product.category|e('js') }}',
+                                     description: '{{ (product.description ?? 'Ceremonial Japanese matcha blended fresh.')|e('js') }}'
+                                 })">
+                                <img src="{{ asset(product.imageUrl|drink_image) }}" alt="{{ product.name }}" loading="lazy">
+                            </div>
+
+                            <div class="compact-info-col">
+                                <h4>{{ product.name }}</h4>
+                                <p>{{ product.description ?? 'Ceremonial Japanese matcha crafted fresh daily.' }}</p>
+                            </div>
+
+                            <div class="compact-cat-col">
+                                {{ product.category }}
+                            </div>
+
+                            <div class="compact-price-col">
+                                ₱{{ product.price|number_format(0) }}
+                            </div>
+
+                            <div class="compact-actions-col">
+                                <button type="button"
+                                        class="btn-card-customize"
+                                        style="padding: 0.4rem 0.8rem; font-size: 0.74rem;"
+                                        {% if outStock %}disabled{% endif %}
+                                        onclick="openCustomModal({
+                                            id: {{ product.id }},
+                                            name: '{{ product.name|e('js') }}',
+                                            price: '{{ product.price }}',
+                                            imageUrl: '{{ (product.imageUrl|drink_image)|e('js') }}',
+                                            category: '{{ product.category|e('js') }}',
+                                            description: '{{ (product.description ?? 'Ceremonial Japanese matcha blended fresh.')|e('js') }}'
+                                        })">
+                                    Customize
+                                </button>
+                                <button type="button"
+                                        class="btn-quick-add"
+                                        style="width: 32px; height: 32px; font-size: 1rem;"
+                                        title="Quick Add 1 Cup"
+                                        {% if outStock %}disabled{% endif %}
+                                        onclick="quickAddSingle({{ product.id }}, '{{ product.name|e('js') }}', '{{ (product.imageUrl|drink_image)|e('js') }}', {{ product.price }});">
+                                    +
+                                </button>
+                            </div>
+
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </section>
+        {% endfor %}
+
+    </div>
+</main>
+
+{# ==================== 4. FLOATING QUICK TRAY PILL ==================== #}
+<div id="floatingOrderPill" class="floating-order-bar">
+    <div class="floating-bar-info">
+        <span class="floating-bar-badge" id="floatingPillCount">0</span>
+        <span style="font-size: 0.85rem; color: #FFFFFF;">In Tray:</span>
+        <span class="floating-bar-total" id="floatingPillTotal">₱0.00</span>
+    </div>
+    <button type="button" class="btn-floating-view" onclick="openCartDrawer()">
+        View Order Tray &rarr;
+    </button>
+</div>
+
+{# ==================== 5. ENHANCED CLIENT LOGIC ==================== #}
+<script>
+// View Switcher (Grid vs Compact Mode)
+let currentViewMode = 'grid';
+
+function setMenuViewMode(mode) {
+    currentViewMode = mode;
+    const gridViews = document.querySelectorAll('.menu-grid-view');
+    const listViews = document.querySelectorAll('.menu-list-view');
+    const btnGrid = document.getElementById('btnViewGrid');
+    const btnCompact = document.getElementById('btnViewCompact');
+
+    if (mode === 'grid') {
+        gridViews.forEach(el => el.style.display = 'grid');
+        listViews.forEach(el => el.style.display = 'none');
+        btnGrid.classList.add('active');
+        btnCompact.classList.remove('active');
+    } else {
+        gridViews.forEach(el => el.style.display = 'none');
+        listViews.forEach(el => el.style.display = 'flex');
+        btnCompact.classList.add('active');
+        btnGrid.classList.remove('active');
+    }
+}
+
+// Category Filter
+let activeCategoryFilter = 'all';
+
+function filterCategory(catId, btnEl) {
+    activeCategoryFilter = catId;
+    document.querySelectorAll('.menu-pill-btn').forEach(btn => btn.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+
+    const sections = document.querySelectorAll('.menu-category-block');
+    sections.forEach(sec => {
+        if (catId === 'all') {
+            sec.style.display = '';
+        } else {
+            sec.style.display = (sec.id === catId) ? '' : 'none';
+        }
+    });
+
+    if (catId !== 'all') {
+        const targetEl = document.getElementById(catId);
+        if (targetEl) {
+            const offset = 120;
+            const bodyRect = document.body.getBoundingClientRect().top;
+            const elementRect = targetEl.getBoundingClientRect().top;
+            const elementPosition = elementRect - bodyRect;
+            const offsetPosition = elementPosition - offset;
+            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+        }
+    }
+    applyLiveFilter();
+}
+
+// Real-Time Search Filter
+const searchInput = document.getElementById('advancedSearchInput');
+const clearBtn = document.getElementById('searchClearBtn');
+
+if (searchInput) {
+    searchInput.addEventListener('input', () => {
+        applyLiveFilter();
+    });
+}
+
+function clearMenuSearch() {
+    if (searchInput) {
+        searchInput.value = '';
+        applyLiveFilter();
+        searchInput.focus();
+    }
+}
+
+function applyLiveFilter() {
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    if (clearBtn) clearBtn.style.display = query ? 'block' : 'none';
+
+    const allItems = document.querySelectorAll('.menu-item-node');
+    let visibleCount = 0;
+
+    allItems.forEach(item => {
+        const name = item.dataset.name || '';
+        const category = item.dataset.category || '';
+        const matchesQuery = (!query || name.includes(query) || category.includes(query));
+        item.style.display = matchesQuery ? '' : 'none';
+        if (matchesQuery) visibleCount++;
+    });
+
+    // Check category sections
+    const sections = document.querySelectorAll('.menu-category-block');
+    let activeSections = 0;
+    sections.forEach(sec => {
+        if (activeCategoryFilter !== 'all' && sec.id !== activeCategoryFilter) {
+            sec.style.display = 'none';
+            return;
+        }
+        const visibleItems = sec.querySelectorAll('.menu-item-node:not([style*="display: none"])');
+        if (visibleItems.length > 0) {
+            sec.style.display = '';
+            activeSections++;
+        } else {
+            sec.style.display = 'none';
+        }
+    });
+
+    const noMatch = document.getElementById('noMatchMessage');
+    const countBanner = document.getElementById('resultsCountBanner');
+    const countSpan = document.getElementById('visibleDrinkCount');
+
+    if (query) {
+        if (countBanner) countBanner.style.display = 'block';
+        if (countSpan) countSpan.textContent = Math.round(visibleCount / 2); // since we have both grid & list nodes
+        if (noMatch) noMatch.style.display = (activeSections === 0) ? 'block' : 'none';
+    } else {
+        if (countBanner) countBanner.style.display = 'none';
+        if (noMatch) noMatch.style.display = 'none';
+    }
+}
+
+// Quick Add Single Drink Helper
+function quickAddSingle(id, name, imageUrl, price) {
+    addToCart({
+        id: id,
+        name: name,
+        imageUrl: imageUrl,
+        unitPrice: parseFloat(price),
+        quantity: 1,
+        options: 'Regular • 50% Sugar • Normal Ice'
+    });
+    showToast(`Added 1x ${name} to order!`);
+    updateFloatingOrderPill();
+}
+
+// Floating Order Pill Sync
+function updateFloatingOrderPill() {
+    const pill = document.getElementById('floatingOrderPill');
+    const countEl = document.getElementById('floatingPillCount');
+    const totalEl = document.getElementById('floatingPillTotal');
+    if (!pill || !countEl || !totalEl) return;
+
+    const cart = getCart();
+    let totalItems = 0;
+    let totalPrice = 0;
+
+    cart.forEach(item => {
+        totalItems += item.quantity;
+        totalPrice += (parseFloat(item.unitPrice) * item.quantity);
+    });
+
+    if (totalItems > 0) {
+        countEl.textContent = totalItems;
+        totalEl.textContent = '₱' + totalPrice.toFixed(2);
+        pill.classList.add('show');
+    } else {
+        pill.classList.remove('show');
+    }
+}
+
+// Sync on load and cart events
+document.addEventListener('DOMContentLoaded', () => {
+    updateFloatingOrderPill();
+    window.addEventListener('cartUpdated', updateFloatingOrderPill);
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Customer Reviews & Testimonials — Matcha Moments Café{% endblock %}
+{% block meta_description %}Real customer reviews and ratings for Matcha Moments Café. Leave your review today.{% endblock %}
+
+{% block body %}
+
+{# ── HERO ── #}
+<section style="background:linear-gradient(145deg,#2E5227 0%,#1A3216 100%);padding:clamp(7rem,12vw,9rem) 1.5rem clamp(3.5rem,6vw,5rem);text-align:center;position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:radial-gradient(circle at 20% 60%, rgba(76,107,70,0.4) 0%, transparent 55%),radial-gradient(circle at 80% 20%, rgba(125,151,120,0.25) 0%, transparent 50%);pointer-events:none;"></div>
+    <div style="position:relative;max-width:620px;margin:0 auto;">
+        <span style="display:inline-block;background:rgba(232,241,230,0.15);border:1px solid rgba(232,241,230,0.3);backdrop-filter:blur(10px);padding:0.4rem 1.1rem;border-radius:50px;font-size:0.78rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#E8F1E6;margin-bottom:1.2rem;">
+            💚 Community Love
+        </span>
+        <h1 style="font-family:var(--font-heading);font-size:clamp(2.5rem,6vw,4.2rem);font-weight:800;color:#FFFFFF;line-height:1.08;margin:0 0 1rem;letter-spacing:-0.03em;">
+            WHAT OUR CUSTOMERS SAY
+        </h1>
+        <p style="font-size:clamp(0.95rem,2vw,1.1rem);color:rgba(232,241,230,0.85);line-height:1.65;margin-bottom:1.5rem;">
+            Real experiences from genuine matcha enthusiasts.
+        </p>
+        <div style="display:inline-flex;align-items:center;gap:0.6rem;background:rgba(255,255,255,0.1);border:1px solid rgba(232,241,230,0.3);padding:0.55rem 1.4rem;border-radius:50px;backdrop-filter:blur(10px);">
+            <span style="color:#A4B9A1;font-size:1.2rem;">★★★★★</span>
+            <strong style="color:#FFFFFF;font-size:0.95rem;">5.0 / 5.0 Overall Satisfaction</strong>
+        </div>
+    </div>
+</section>
+
+{# ── REVIEWS GRID ── #}
+<section style="background:#F7FAF6;padding:clamp(3rem,6vw,5rem) 1.5rem;">
+    <div style="max-width:var(--container);margin:0 auto;">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1rem;border-bottom:2px solid #E8F1E6;flex-wrap:wrap;gap:1rem;">
+            <h2 style="font-family:var(--font-heading);font-size:1.9rem;color:#2E5227;margin:0;font-weight:800;">
+                All Reviews <span style="font-size:1rem;color:#7D9778;font-weight:600;">({{ reviews|length }})</span>
+            </h2>
+            <a href="#leave-review-box" class="btn-hero-primary" style="padding:0.6rem 1.4rem;font-size:0.82rem;border-radius:50px;">
+                ✍️ Write a Review
+            </a>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem;margin-bottom:5rem;">
+            {% for review in reviews %}
+            <div style="background:#FFFFFF;border-radius:22px;padding:1.8rem;border:1px solid #E8F1E6;box-shadow:0 4px 20px rgba(46,82,39,0.06);display:flex;flex-direction:column;transition:all 0.2s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(46,82,39,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(46,82,39,0.06)'">
+                <div style="display:flex;align-items:center;gap:0.9rem;margin-bottom:0.9rem;">
+                    <div style="width:42px;height:42px;border-radius:50%;background:#2E5227;color:#FFFFFF;font-weight:800;font-size:0.88rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        {{- review.customerName|split(' ')|map(w => w|first)|join('')|upper|slice(0,2) -}}
+                    </div>
+                    <div>
+                        <div style="font-weight:800;font-size:0.95rem;color:#2E5227;">{{ review.customerName|upper }}</div>
+                        <div style="color:#55744F;font-size:1.05rem;letter-spacing:2px;line-height:1;">
+                            {%- for i in 1..review.rating %}★{% endfor -%}
+                            {%- if review.rating < 5 %}{%- for i in (review.rating + 1)..5 %}<span style="opacity:0.3;">★</span>{% endfor -%}{% endif %}
+                        </div>
+                    </div>
+                </div>
+                <p style="color:#4C6B46;font-size:0.93rem;line-height:1.65;font-style:italic;flex:1;">
+                    "{{ review.comment }}"
+                </p>
+                {% if review.createdAt is defined and review.createdAt %}
+                <div style="font-size:0.72rem;color:#A4B9A1;margin-top:1rem;padding-top:0.7rem;border-top:1px solid #E8F1E6;">
+                    Verified Review · {{ review.createdAt|date('M d, Y') }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        {# ── WRITE A REVIEW ── #}
+        <div id="leave-review-box" style="background:#FFFFFF;border-radius:28px;padding:clamp(2rem,5vw,3.5rem);border:1px solid #E8F1E6;box-shadow:0 12px 50px rgba(46,82,39,0.09);max-width:740px;margin:0 auto;">
+            <div style="text-align:center;margin-bottom:2rem;">
+                <span style="font-size:0.72rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4C6B46;">We Value Your Voice</span>
+                <h3 style="font-family:var(--font-heading);font-size:2rem;color:#2E5227;margin:0.4rem 0 0.5rem;font-weight:800;">Share Your Matcha Experience</h3>
+                <p style="font-size:0.9rem;color:#7D9778;max-width:460px;margin:0 auto;">Tried our handcrafted drinks? Leave a rating and review to help other matcha lovers!</p>
+            </div>
+
+            <form action="{{ path('app_reviews_new') }}" method="POST">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.25rem;">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label" for="revName">Your Full Name *</label>
+                        <input type="text" name="customer_name" id="revName" class="form-control" placeholder="e.g. Maria Kristina Gomez" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label">Your Rating *</label>
+                        <div style="display:flex;gap:0.5rem;align-items:center;padding:0.55rem 0;" id="ratingPicker">
+                            {% for r in 5..1 %}
+                            <label style="cursor:pointer;font-size:1.9rem;color:#D2DCD0;transition:color 0.15s;line-height:1;" class="star-label" data-val="{{ r }}">
+                                <input type="radio" name="rating" value="{{ r }}" {% if r == 5 %}checked{% endif %} style="display:none;">★
+                            </label>
+                            {% endfor %}
+                            <span id="ratingWord" style="font-size:0.82rem;font-weight:700;color:#2E5227;margin-left:0.4rem;">5.0 ⭐</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="revComment">Your Review & Tasting Notes *</label>
+                    <textarea name="comment" id="revComment" class="form-control" rows="4" placeholder="How was the flavor, creaminess, and presentation?" required></textarea>
+                </div>
+
+                <div style="text-align:center;margin-top:1.5rem;">
+                    <button type="submit" class="btn-hero-primary" style="padding:0.95rem 3rem;font-size:1rem;border:none;border-radius:50px;cursor:pointer;">
+                        Submit Review →
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</section>
+
+<script>
+const starLabels = document.querySelectorAll('.star-label');
+const ratingWord = document.getElementById('ratingWord');
+const ratingDesc = {5:'5.0 (Loved it!)',4:'4.0 (Really good!)',3:'3.0 (Average)',2:'2.0 (Could be better)',1:'1.0 (Disappointed)'};
+function updateStars(val) {
+    starLabels.forEach(lbl => { lbl.style.color = parseInt(lbl.dataset.val) <= val ? '#55744F' : '#D2DCD0'; });
+    if (ratingWord) ratingWord.textContent = ratingDesc[val] || `${val}.0`;
+}
+starLabels.forEach(lbl => {
+    lbl.addEventListener('click', () => updateStars(parseInt(lbl.dataset.val)));
+    lbl.addEventListener('mouseenter', () => updateStars(parseInt(lbl.dataset.val)));
+});
+document.getElementById('ratingPicker')?.addEventListener('mouseleave', () => {
+    const checked = document.querySelector('input[name="rating"]:checked');
+    if (checked) updateStars(parseInt(checked.value));
+});
+updateStars(5);
+</script>
+
+{% endblock %}

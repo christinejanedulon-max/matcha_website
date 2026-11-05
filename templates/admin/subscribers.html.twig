@@ -1,0 +1,69 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Newsletter Subscribers — Matcha Admin{% endblock %}
+
+{% block content %}
+<div class="admin-topbar">
+    <div>
+        <h1 style="margin: 0;">Newsletter Subscriber List</h1>
+        <p style="color: var(--clr-text-muted); margin: 0.3rem 0 0; font-size: 0.9rem;">
+            Customers who subscribed to Matcha Moments news, offers, and seasonal drops.
+        </p>
+    </div>
+    <div>
+        <button type="button" class="btn-hero-primary" onclick="copyAllEmails()" style="border: none; padding: 0.65rem 1.4rem; font-size: 0.85rem; border-radius: 8px; cursor: pointer;">
+            📋 Copy All Emails
+        </button>
+    </div>
+</div>
+
+<div class="admin-panel-card">
+    <div class="admin-panel-header">
+        <h2>Subscribers ({{ subscribers|length }})</h2>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Email Address</th>
+                    <th>Subscribed On</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in subscribers %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <strong style="color: var(--clr-dark); font-size: 0.95rem;">{{ s.email }}</strong>
+                        </td>
+                        <td>
+                            <span style="font-size: 0.85rem; color: #666;">{{ s.subscribedAt|date('M d, Y • h:i A') }}</span>
+                        </td>
+                        <td>
+                            <span class="status-pill status-ready">{{ s.status }}</span>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 2rem; color: #888;">No subscribers yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function copyAllEmails() {
+    const emails = {{ subscribers|map(s => s.email)|json_encode|raw }};
+    if (emails && emails.length > 0) {
+        navigator.clipboard.writeText(emails.join(', ')).then(() => {
+            alert(`Copied ${emails.length} subscriber email(s) to clipboard!`);
+        });
+    }
+}
+</script>
+{% endblock %}

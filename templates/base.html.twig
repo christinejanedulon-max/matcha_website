@@ -1,24 +1,532 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Matcha Moments Café — Pure Matcha, Pure Moments{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Handcrafted matcha drinks made with premium ingredients for a healthier and happier you.{% endblock %}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍵</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
+<!-- ==================== FLASH NOTIFICATIONS ==================== -->
+{% for label, messages in app.flashes %}
+    <div class="flash-container">
+        {% for message in messages %}
+            <div class="flash-toast flash-{{ label }}">
+                <span>{{ message }}</span>
+                <button type="button" class="flash-close" onclick="this.parentElement.remove()">&times;</button>
+            </div>
+        {% endfor %}
+    </div>
+{% endfor %}
 
-        {% set frankenphp_hot_reload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
-        {% if frankenphp_hot_reload %}
-        <meta name="frankenphp-hot-reload:url" content="{{ frankenphp_hot_reload }}">
-        <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
-        <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
-        {% endif %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+<!-- ==================== NAVBAR ==================== -->
+<header class="navbar" id="navbar">
+    <div class="navbar-inner">
+        <a href="{{ path('app_home') }}" class="navbar-brand">
+            <img src="{{ asset('images/logo.png') }}" alt="Matcha Moments" class="brand-logo-img">
+        </a>
+
+        <nav class="navbar-links" id="navLinks">
+            <a href="{{ path('app_home') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_home' %}active{% endif %}">Home</a>
+            <a href="{{ path('app_menu') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_menu' %}active{% endif %}">Menu</a>
+            <a href="{{ path('app_about') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_about' %}active{% endif %}">About</a>
+            <a href="{{ path('app_reviews') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_reviews' %}active{% endif %}">Reviews</a>
+            <a href="{{ path('app_contact') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_contact' %}active{% endif %}">Contact</a>
+        </nav>
+
+        <div class="navbar-actions">
+            <!-- Cart Button with Counter -->
+            <button class="nav-cart-btn" id="openCartDrawerBtn" aria-label="View Shopping Cart">
+                <span class="cart-icon">🛒</span>
+                <span class="cart-badge" id="cartBadgeCount">0</span>
+            </button>
+
+            <!-- Order Now CTA -->
+            <a href="{{ path('app_menu') }}" class="btn-nav-order">Order Now</a>
+
+            {% set isAdmin = (app.session and app.session.get('user_role') == 'admin') %}
+            {% set isCustomer = (app.session and app.session.get('user_role') == 'customer') %}
+            {% set userName = app.session ? app.session.get('user_name') : null %}
+
+            {% if isAdmin %}
+                <!-- Admin Dashboard (ONLY visible when logged in as Admin) -->
+                <a href="{{ path('admin_dashboard') }}" class="btn-nav-admin" title="Admin Dashboard">
+                    ⚙️ Dashboard
+                </a>
+                <a href="{{ path('app_logout') }}" class="btn-nav-auth" style="padding: 0.45rem 0.85rem; border-radius: 50px; font-size: 0.78rem; font-weight: 600; color: #b91c1c; background: #fee2e2; border: none; text-decoration: none;">
+                    Sign Out
+                </a>
+            {% elseif isCustomer %}
+                <!-- Regular User Logged In (Admin section is HIDDEN) -->
+                <span class="nav-user-chip" style="font-size: 0.82rem; font-weight: 600; color: var(--clr-matcha-dark); background: var(--clr-cream); padding: 0.4rem 0.8rem; border-radius: 50px; border: 1px solid var(--clr-cream-dark);">
+                    👤 {{ userName|split(' ')|first }}
+                </span>
+                <a href="{{ path('app_logout') }}" class="btn-nav-auth" style="padding: 0.45rem 0.85rem; border-radius: 50px; font-size: 0.78rem; font-weight: 600; color: var(--clr-text-muted); background: var(--clr-cream-dark); border: none; text-decoration: none;">
+                    Sign Out
+                </a>
+            {% else %}
+                <!-- Guest / Not Logged In (Admin section is HIDDEN) -->
+                <a href="{{ path('app_login') }}" class="btn-nav-login" style="padding: 0.45rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; text-decoration: none;">
+                    Sign In
+                </a>
+            {% endif %}
+        </div>
+
+        <button class="navbar-hamburger" id="hamburgerBtn" aria-label="Toggle navigation">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</header>
+
+<!-- ==================== PAGE CONTENT ==================== -->
+<main>
+    {% block body %}{% endblock %}
+</main>
+
+<!-- ==================== CART DRAWER ==================== -->
+<div class="cart-drawer-backdrop" id="cartBackdrop"></div>
+<aside class="cart-drawer" id="cartDrawer" aria-labelledby="cartDrawerTitle" role="dialog" aria-modal="true">
+    <div class="cart-drawer-header">
+        <div class="cart-header-title-group">
+            <h3 id="cartDrawerTitle">Your Matcha Cart</h3>
+            <span class="cart-count-pill" id="drawerCartCount">0 items</span>
+        </div>
+        <button class="cart-close-btn" id="closeCartDrawerBtn" aria-label="Close cart">&times;</button>
+    </div>
+
+    <div class="cart-items-container" id="cartItemsContainer">
+        <!-- Injected via JavaScript from localStorage -->
+        <div class="cart-empty-state" id="cartEmptyState">
+            <div class="empty-icon">🍃</div>
+            <h4>Your cart is empty</h4>
+            <p>Explore our handcrafted menu and add your favorite matcha drinks.</p>
+            <a href="{{ path('app_menu') }}" class="btn-hero-primary" onclick="closeCartDrawer()" style="margin-top: 1rem; display: inline-block;">Browse Menu</a>
+        </div>
+    </div>
+
+    <div class="cart-drawer-footer" id="cartDrawerFooter" style="display: none;">
+        <div class="cart-subtotal-row">
+            <span>Subtotal</span>
+            <span class="cart-subtotal-val" id="cartSubtotalText">₱0.00</span>
+        </div>
+        <p class="cart-delivery-note">Fulfillment and payment options selected at checkout.</p>
+        <div class="cart-footer-actions">
+            <a href="{{ path('app_order') }}" class="btn-checkout-primary">Proceed to Checkout &rarr;</a>
+            <button type="button" class="btn-clear-cart" onclick="clearCart()">Clear Cart</button>
+        </div>
+    </div>
+</aside>
+
+<!-- ==================== QUICK DRINK CUSTOMIZE MODAL ==================== -->
+<div class="modal-backdrop" id="customModalBackdrop" style="display: none;">
+    <div class="custom-modal" role="dialog" aria-modal="true">
+        <button class="modal-close-btn" onclick="closeCustomModal()">&times;</button>
+        <div class="modal-body-grid">
+            <div class="modal-img-col">
+                <img id="modalDrinkImg" src="{{ asset('images/drinks/tropical.jpg') }}" alt="Drink Preview">
+            </div>
+            <div class="modal-details-col">
+                <span class="modal-category-eyebrow" id="modalDrinkCategory">Signature Lattes</span>
+                <h3 id="modalDrinkName">Tropical Matcha</h3>
+                <div class="modal-price" id="modalDrinkPrice">₱185.00</div>
+                <p class="modal-desc" id="modalDrinkDesc">Handcrafted Japanese ceremonial matcha with refreshing notes.</p>
+
+                <!-- Options -->
+                <div class="option-group">
+                    <label class="option-label">Cup Size</label>
+                    <div class="option-chips" id="sizeChips">
+                        <button type="button" class="chip active" data-size="Regular" data-add="0">Regular (16oz)</button>
+                        <button type="button" class="chip" data-size="Large" data-add="25">Large (+₱25)</button>
+                    </div>
+                </div>
+
+                <div class="option-group">
+                    <label class="option-label">Sweetness Level</label>
+                    <div class="option-chips" id="sweetnessChips">
+                        <button type="button" class="chip" data-sweet="0%">0%</button>
+                        <button type="button" class="chip" data-sweet="25%">25%</button>
+                        <button type="button" class="chip active" data-sweet="50%">50%</button>
+                        <button type="button" class="chip" data-sweet="75%">75%</button>
+                        <button type="button" class="chip" data-sweet="100%">100%</button>
+                    </div>
+                </div>
+
+                <div class="option-group">
+                    <label class="option-label">Ice Level</label>
+                    <div class="option-chips" id="iceChips">
+                        <button type="button" class="chip" data-ice="No Ice">No Ice</button>
+                        <button type="button" class="chip" data-ice="Less Ice">Less Ice</button>
+                        <button type="button" class="chip active" data-ice="Normal Ice">Normal Ice</button>
+                    </div>
+                </div>
+
+                <div class="modal-footer-row">
+                    <div class="qty-stepper">
+                        <button type="button" class="qty-btn" onclick="adjustModalQty(-1)">-</button>
+                        <span class="qty-num" id="modalQtyVal">1</span>
+                        <button type="button" class="qty-btn" onclick="adjustModalQty(1)">+</button>
+                    </div>
+                    <button type="button" class="btn-add-modal-cart" id="confirmAddToCartBtn">
+                        Add to Order • <span id="modalTotalBtnPrice">₱185.00</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== TOAST NOTIFICATIONS ==================== -->
+<div id="toastNotification" class="toast-popup" style="display: none;">
+    <span class="toast-icon">🍵</span>
+    <span id="toastMessage">Added to cart!</span>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="footer" id="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <a href="{{ path('app_home') }}">
+                <img src="{{ asset('images/logo.png') }}" alt="Matcha Moments" class="footer-logo-img">
+            </a>
+            <p class="footer-tagline">Pure Matcha. Pure Moments.</p>
+            <p class="footer-address">
+                <img src="{{ asset('images/place.png') }}" alt="" class="footer-mini-icon">
+                Authentic Japanese Matcha Experience
+            </p>
+        </div>
+
+        <div class="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="{{ path('app_home') }}">Home</a></li>
+                <li><a href="{{ path('app_menu') }}">Menu</a></li>
+                <li><a href="{{ path('app_about') }}">About Us</a></li>
+                <li><a href="{{ path('app_order') }}">Order Checkout</a></li>
+                <li><a href="{{ path('app_reviews') }}">Customer Reviews</a></li>
+                <li><a href="{{ path('app_contact') }}">Contact Us</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-links">
+            <h4>Our Menu</h4>
+            <ul>
+                <li><a href="{{ path('app_menu') }}#cat-1">Tropical Matcha</a></li>
+                <li><a href="{{ path('app_menu') }}#cat-1">Matcha Foam Latte</a></li>
+                <li><a href="{{ path('app_menu') }}#cat-1">Choco Matcha Fusion</a></li>
+                <li><a href="{{ path('app_menu') }}#cat-2">Strawberry & Mango Cloud</a></li>
+                <li><a href="{{ path('app_menu') }}#cat-3">Cake Matcha Creations</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-contact">
+            <h4>Contact Us</h4>
+            <p>
+                <a href="tel:09653994962">
+                    <img src="{{ asset('images/phone.png') }}" alt="" class="footer-contact-icon">
+                    09653994962
+                </a>
+            </p>
+            <p>
+                <a href="mailto:matchamoments@gmail.com">
+                    <img src="{{ asset('images/mail.png') }}" alt="" class="footer-contact-icon">
+                    matchamoments@gmail.com
+                </a>
+            </p>
+            <div class="social-links" style="margin-top: 0.75rem;">
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Facebook">
+                    <img src="{{ asset('images/face.png') }}" alt="Facebook">
+                </a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
+                    <img src="{{ asset('images/gram.png') }}" alt="Instagram">
+                </a>
+            </div>
+            {% if isAdmin %}
+                <div class="admin-link-box" style="margin-top: 1.5rem;">
+                    <a href="{{ path('admin_dashboard') }}" class="footer-admin-btn">
+                        ⚙️ Store Administrator
+                    </a>
+                </div>
+            {% else %}
+                <div class="admin-link-box" style="margin-top: 1.5rem;">
+                    <a href="{{ path('app_login') }}" style="font-size: 0.72rem; color: rgba(255,255,255,0.4); text-decoration: none;">
+                        🔒 Staff Login
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; {{ "now"|date("Y") }} Matcha Moments. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- ==================== GLOBAL CLIENT-SIDE SCRIPTS ==================== -->
+<script>
+// ---------- Shopping Cart State Management (localStorage) ----------
+const CART_STORAGE_KEY = 'matcha_moments_cart_v1';
+
+function resolveDrinkImg(url) {
+    if (!url) return 'images/drinks/latte.jpg';
+    return url.replace(/^images\/([a-z0-9_-]+)\.png$/i, 'images/drinks/$1.jpg');
+}
+
+function getCart() {
+    try {
+        const stored = localStorage.getItem(CART_STORAGE_KEY);
+        return stored ? JSON.parse(stored) : [];
+    } catch(e) {
+        return [];
+    }
+}
+
+function saveCart(cart) {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+    updateCartUI();
+}
+
+function addToCart(item) {
+    const cart = getCart();
+    // Check if identical item (id + options) already exists
+    const existingIndex = cart.findIndex(c => c.id === item.id && c.options === item.options);
+    if (existingIndex > -1) {
+        cart[existingIndex].quantity += (item.quantity || 1);
+    } else {
+        cart.push(item);
+    }
+    saveCart(cart);
+    showToast(`Added ${item.name} to cart!`);
+}
+
+function updateCartItemQty(index, delta) {
+    const cart = getCart();
+    if (cart[index]) {
+        cart[index].quantity += delta;
+        if (cart[index].quantity <= 0) {
+            cart.splice(index, 1);
+        }
+        saveCart(cart);
+    }
+}
+
+function removeCartItem(index) {
+    const cart = getCart();
+    cart.splice(index, 1);
+    saveCart(cart);
+}
+
+function clearCart() {
+    saveCart([]);
+    showToast('Cart cleared.');
+}
+
+function updateCartUI() {
+    const cart = getCart();
+    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const subtotal = cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+
+    // Badges
+    const badge = document.getElementById('cartBadgeCount');
+    if (badge) badge.innerText = count;
+
+    const drawerCount = document.getElementById('drawerCartCount');
+    if (drawerCount) drawerCount.innerText = `${count} ${count === 1 ? 'item' : 'items'}`;
+
+    const subtotalText = document.getElementById('cartSubtotalText');
+    if (subtotalText) subtotalText.innerText = `₱${subtotal.toFixed(2)}`;
+
+    // Drawer Items container
+    const container = document.getElementById('cartItemsContainer');
+    const emptyState = document.getElementById('cartEmptyState');
+    const footer = document.getElementById('cartDrawerFooter');
+
+    if (container && emptyState && footer) {
+        if (cart.length === 0) {
+            emptyState.style.display = 'block';
+            footer.style.display = 'none';
+            // Remove previous item rows
+            container.querySelectorAll('.cart-item-row').forEach(el => el.remove());
+        } else {
+            emptyState.style.display = 'none';
+            footer.style.display = 'block';
+
+            let html = '';
+            cart.forEach((item, idx) => {
+                const itemTotal = (item.unitPrice * item.quantity).toFixed(2);
+                html += `
+                    <div class="cart-item-row" data-index="${idx}">
+                        <img src="{{ asset('') }}${resolveDrinkImg(item.imageUrl)}" alt="${item.name}" class="cart-item-thumb">
+                        <div class="cart-item-info">
+                            <div class="cart-item-title">${item.name}</div>
+                            <div class="cart-item-opts">${item.options || 'Regular'}</div>
+                            <div class="cart-item-price-row">
+                                <span class="cart-item-price">₱${itemTotal}</span>
+                                <div class="cart-item-stepper">
+                                    <button type="button" onclick="updateCartItemQty(${idx}, -1)">-</button>
+                                    <span>${item.quantity}</span>
+                                    <button type="button" onclick="updateCartItemQty(${idx}, 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="cart-item-remove" onclick="removeCartItem(${idx})" title="Remove item">&times;</button>
+                    </div>
+                `;
+            });
+            // Replace old rows
+            container.querySelectorAll('.cart-item-row').forEach(el => el.remove());
+            container.insertAdjacentHTML('beforeend', html);
+        }
+    }
+
+    // Trigger custom event so standalone checkout page can update
+    window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { cart, subtotal, count } }));
+}
+
+// Drawer Controls
+const cartDrawer = document.getElementById('cartDrawer');
+const cartBackdrop = document.getElementById('cartBackdrop');
+const openCartBtn = document.getElementById('openCartDrawerBtn');
+const closeCartBtn = document.getElementById('closeCartDrawerBtn');
+
+function openCartDrawer() {
+    updateCartUI();
+    if (cartDrawer) cartDrawer.classList.add('open');
+    if (cartBackdrop) cartBackdrop.classList.add('active');
+}
+function closeCartDrawer() {
+    if (cartDrawer) cartDrawer.classList.remove('open');
+    if (cartBackdrop) cartBackdrop.classList.remove('active');
+}
+
+if (openCartBtn) openCartBtn.addEventListener('click', openCartDrawer);
+if (closeCartBtn) closeCartBtn.addEventListener('click', closeCartDrawer);
+if (cartBackdrop) cartBackdrop.addEventListener('click', closeCartDrawer);
+
+// Toast display
+function showToast(msg) {
+    const toast = document.getElementById('toastNotification');
+    const toastMsg = document.getElementById('toastMessage');
+    if (toast && toastMsg) {
+        toastMsg.innerText = msg;
+        toast.style.display = 'flex';
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => { toast.style.display = 'none'; }, 300);
+        }, 3000);
+    }
+}
+
+// ---------- Quick Drink Customization Modal ----------
+let currentModalDrink = null;
+let modalBasePrice = 0;
+let modalExtra = 0;
+let modalQty = 1;
+
+function openCustomModal(drink) {
+    currentModalDrink = drink;
+    modalBasePrice = parseFloat(drink.price || 180);
+    modalExtra = 0;
+    modalQty = 1;
+
+    document.getElementById('modalDrinkName').innerText = drink.name;
+    document.getElementById('modalDrinkCategory').innerText = drink.category || 'Matcha Drink';
+    document.getElementById('modalDrinkDesc').innerText = drink.description || 'Pure Japanese ceremonial matcha handcrafted with fresh ingredients.';
+    document.getElementById('modalDrinkImg').src = `{{ asset('') }}${resolveDrinkImg(drink.imageUrl)}`;
+    document.getElementById('modalQtyVal').innerText = '1';
+
+    // Reset chips
+    document.querySelectorAll('#sizeChips .chip').forEach((c, i) => c.classList.toggle('active', i === 0));
+    document.querySelectorAll('#sweetnessChips .chip').forEach((c) => c.classList.toggle('active', c.dataset.sweet === '50%'));
+    document.querySelectorAll('#iceChips .chip').forEach((c) => c.classList.toggle('active', c.dataset.ice === 'Normal Ice'));
+
+    recalcModalPrice();
+
+    document.getElementById('customModalBackdrop').style.display = 'flex';
+}
+
+function closeCustomModal() {
+    document.getElementById('customModalBackdrop').style.display = 'none';
+}
+
+function adjustModalQty(delta) {
+    modalQty = Math.max(1, modalQty + delta);
+    document.getElementById('modalQtyVal').innerText = modalQty;
+    recalcModalPrice();
+}
+
+function recalcModalPrice() {
+    const sizeChip = document.querySelector('#sizeChips .chip.active');
+    modalExtra = sizeChip ? parseFloat(sizeChip.dataset.add || 0) : 0;
+    const unitPrice = modalBasePrice + modalExtra;
+    const total = (unitPrice * modalQty).toFixed(2);
+    document.getElementById('modalDrinkPrice').innerText = `₱${unitPrice.toFixed(2)}`;
+    document.getElementById('modalTotalBtnPrice').innerText = `₱${total}`;
+}
+
+// Chip click listeners in modal
+document.addEventListener('click', function(e) {
+    const chip = e.target.closest('.option-chips .chip');
+    if (chip) {
+        const parent = chip.parentElement;
+        parent.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        recalcModalPrice();
+    }
+});
+
+// Confirm Add To Cart from Modal
+const confirmAddBtn = document.getElementById('confirmAddToCartBtn');
+if (confirmAddBtn) {
+    confirmAddBtn.addEventListener('click', function() {
+        if (!currentModalDrink) return;
+
+        const size = document.querySelector('#sizeChips .chip.active')?.dataset.size || 'Regular';
+        const sweet = document.querySelector('#sweetnessChips .chip.active')?.dataset.sweet || '50%';
+        const ice = document.querySelector('#iceChips .chip.active')?.dataset.ice || 'Normal Ice';
+        const unitPrice = modalBasePrice + modalExtra;
+
+        addToCart({
+            id: currentModalDrink.id,
+            name: currentModalDrink.name,
+            imageUrl: currentModalDrink.imageUrl || 'images/drinks/latte.jpg',
+            unitPrice: unitPrice,
+            quantity: modalQty,
+            options: `${size} • ${sweet} Sugar • ${ice}`
+        });
+
+        closeCustomModal();
+        openCartDrawer();
+    });
+}
+
+// Mobile Hamburger
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const navLinks = document.getElementById('navLinks');
+if (hamburgerBtn && navLinks) {
+    hamburgerBtn.addEventListener('click', () => {
+        navLinks.classList.toggle('open');
+        hamburgerBtn.classList.toggle('active');
+    });
+}
+
+// Navbar scroll shadow
+window.addEventListener('scroll', () => {
+    const nav = document.getElementById('navbar');
+    if (nav) nav.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// Initial Cart Render
+document.addEventListener('DOMContentLoaded', updateCartUI);
+</script>
+
+{% block javascripts %}{% endblock %}
+
+</body>
 </html>
