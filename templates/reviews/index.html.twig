@@ -6,7 +6,7 @@
 {% block body %}
 
 {# ── HERO ── #}
-<section style="background:linear-gradient(145deg,#2E5227 0%,#1A3216 100%);padding:clamp(7rem,12vw,9rem) 1.5rem clamp(3.5rem,6vw,5rem);text-align:center;position:relative;overflow:hidden;">
+<section style="background:linear-gradient(145deg,rgba(46,82,39,0.93) 0%,rgba(26,50,22,0.95) 100%), url('{{ asset('images/about/cafe-interior.jpg') }}') center/cover no-repeat;padding:clamp(6.5rem,11vw,8.5rem) 1.5rem clamp(3.5rem,6vw,5rem);text-align:center;position:relative;overflow:hidden;">
     <div style="position:absolute;inset:0;background:radial-gradient(circle at 20% 60%, rgba(76,107,70,0.4) 0%, transparent 55%),radial-gradient(circle at 80% 20%, rgba(125,151,120,0.25) 0%, transparent 50%);pointer-events:none;"></div>
     <div style="position:relative;max-width:620px;margin:0 auto;">
         <span style="display:inline-block;background:rgba(232,241,230,0.15);border:1px solid rgba(232,241,230,0.3);backdrop-filter:blur(10px);padding:0.4rem 1.1rem;border-radius:50px;font-size:0.78rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#E8F1E6;margin-bottom:1.2rem;">
@@ -42,14 +42,17 @@
             {% for review in reviews %}
             <div style="background:#FFFFFF;border-radius:22px;padding:1.8rem;border:1px solid #E8F1E6;box-shadow:0 4px 20px rgba(46,82,39,0.06);display:flex;flex-direction:column;transition:all 0.2s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(46,82,39,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(46,82,39,0.06)'">
                 <div style="display:flex;align-items:center;gap:0.9rem;margin-bottom:0.9rem;">
-                    <div style="width:42px;height:42px;border-radius:50%;background:#2E5227;color:#FFFFFF;font-weight:800;font-size:0.88rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <div style="width:44px;height:44px;border-radius:50%;background:#2E5227;color:#FFFFFF;font-weight:800;font-size:0.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(46,82,39,0.15);">
                         {{- review.customerName|split(' ')|map(w => w|first)|join('')|upper|slice(0,2) -}}
                     </div>
                     <div>
-                        <div style="font-weight:800;font-size:0.95rem;color:#2E5227;">{{ review.customerName|upper }}</div>
-                        <div style="color:#55744F;font-size:1.05rem;letter-spacing:2px;line-height:1;">
-                            {%- for i in 1..review.rating %}★{% endfor -%}
-                            {%- if review.rating < 5 %}{%- for i in (review.rating + 1)..5 %}<span style="opacity:0.3;">★</span>{% endfor -%}{% endif %}
+                        <div style="font-weight:800;font-size:0.98rem;color:#2E5227;">{{ review.customerName }}</div>
+                        <div style="display:flex;align-items:center;gap:0.35rem;margin-top:0.15rem;">
+                            <span style="color:#4C6B46;font-size:1rem;letter-spacing:1px;line-height:1;">
+                                {%- for i in 1..review.rating %}★{% endfor -%}
+                                {%- if review.rating < 5 %}{%- for i in (review.rating + 1)..5 %}<span style="opacity:0.3;">★</span>{% endfor -%}{% endif %}
+                            </span>
+                            <span style="font-size:0.72rem;font-weight:700;color:#2E5227;background:#E8F1E6;padding:0.1rem 0.45rem;border-radius:4px;">{{ review.rating }}.0</span>
                         </div>
                     </div>
                 </div>

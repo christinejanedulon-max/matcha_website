@@ -1,149 +1,320 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Our Story & Philosophy — Matcha Moments Café{% endblock %}
-{% block meta_description %}Matcha Moments Café — ceremonial grade Uji matcha, handcrafted daily. Discover our story, sourcing philosophy, and pillars of excellence.{% endblock %}
+{% block title %}Our Story & Craftsmanship — Matcha Moments Café{% endblock %}
+{% block meta_description %}Discover the story behind Matcha Moments Café: 100% ceremonial Uji tencha, granite stone-milling, and fresh bamboo chasen whisking in our modern café sanctuary.{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    <style>
+        .about-story-img-card {
+            border-radius: 26px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(46, 82, 39, 0.14);
+            border: 1px solid #D2DCD0;
+            position: relative;
+            background: #F7FAF6;
+        }
+        .about-story-img-card img {
+            width: 100%;
+            height: 100%;
+            max-height: 420px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .about-story-img-card:hover img {
+            transform: scale(1.03);
+        }
+        .about-img-tag {
+            position: absolute;
+            bottom: 18px;
+            left: 18px;
+            right: 18px;
+            background: rgba(46, 82, 39, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(232, 241, 230, 0.28);
+            border-radius: 14px;
+            padding: 0.85rem 1.1rem;
+            color: #FFFFFF;
+        }
+        .about-step-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: #E8F1E6;
+            border: 1px solid #D2DCD0;
+            border-radius: 14px;
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #2E5227;
+        }
+        .about-step-pill span.num {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #2E5227;
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
 
-{# ── HERO ── #}
+{# ── 1. HERO SECTION WITH CAFÉ AMBIANCE BACKDROP ── #}
 <section style="
-    background: linear-gradient(145deg, #2E5227 0%, #1A3216 100%);
-    padding: clamp(7rem,12vw,9rem) 1.5rem clamp(4rem,7vw,6rem);
-    text-align: center; position: relative; overflow: hidden;">
-    <div style="position:absolute;inset:0;
-        background: radial-gradient(circle at 15% 50%, rgba(76,107,70,0.4) 0%, transparent 55%),
-                    radial-gradient(circle at 85% 20%, rgba(125,151,120,0.25) 0%, transparent 50%);
-        pointer-events:none;"></div>
-    <div style="position:relative;max-width:720px;margin:0 auto;">
-        <span style="display:inline-block;background:rgba(232,241,230,0.15);border:1px solid rgba(232,241,230,0.3);backdrop-filter:blur(10px);padding:0.4rem 1.2rem;border-radius:50px;font-size:0.78rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#E8F1E6;margin-bottom:1.2rem;">
-            🍃 Our Journey & Heritage
+    background: linear-gradient(135deg, rgba(46,82,39,0.92) 0%, rgba(26,50,22,0.94) 100%), url('{{ asset('images/about/cafe-interior.jpg') }}') center/cover no-repeat;
+    padding: clamp(6.5rem, 10vw, 8.5rem) 1.5rem clamp(3.5rem, 6vw, 5rem);
+    text-align: center;
+    position: relative;
+    overflow: hidden;">
+    <div style="position: absolute; inset: 0; background: radial-gradient(circle at 15% 50%, rgba(76,107,70,0.45) 0%, transparent 60%); pointer-events: none;"></div>
+    
+    <div style="position: relative; max-width: 760px; margin: 0 auto;">
+        <span style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(232,241,230,0.18); border: 1px solid rgba(232,241,230,0.35); backdrop-filter: blur(10px); padding: 0.45rem 1.25rem; border-radius: 50px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #E8F1E6; margin-bottom: 1.2rem;">
+            <span>🍃</span> Kyoto Ceremonial Heritage • Est. 2024
         </span>
-        <h1 style="font-family:var(--font-heading);font-size:clamp(2.8rem,7vw,5rem);font-weight:800;color:#FFFFFF;line-height:1.05;margin:0 0 1.2rem;letter-spacing:-0.03em;">
-            THE ART OF<br><span style="color:#A4B9A1;">PURE MATCHA</span>
+        
+        <h1 style="font-family: var(--font-heading); font-size: clamp(2.4rem, 5.5vw, 4rem); font-weight: 800; color: #FFFFFF; line-height: 1.12; margin: 0 0 1.2rem; letter-spacing: -0.02em;">
+            THE ART OF<br><span style="color: #E8F1E6;">PURE MATCHA</span>
         </h1>
-        <p style="font-size:clamp(1rem,2vw,1.15rem);color:rgba(232,241,230,0.85);line-height:1.7;max-width:580px;margin:0 auto 2.5rem;">
-            Founded with a single sacred intention — to bring authentic, mindful Japanese green tea culture to modern café lovers without compromise.
+        
+        <p style="font-size: clamp(0.98rem, 1.8vw, 1.15rem); color: rgba(232,241,230,0.9); line-height: 1.7; max-width: 620px; margin: 0 auto 2.2rem;">
+            Founded with a singular sacred intention: bringing centuries-old Japanese tea craftsmanship to modern café lovers without artificial syrups, compromise, or shortcuts.
         </p>
-        <a href="{{ path('app_menu') }}" style="display:inline-flex;align-items:center;gap:0.6rem;background:#FFFFFF;color:#2E5227;font-weight:700;font-size:0.95rem;padding:0.85rem 2rem;border-radius:50px;text-decoration:none;transition:all 0.2s;">
-            Explore Our Menu →
-        </a>
+        
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ path('app_menu') }}" class="btn-hero-deep" style="background: #FFFFFF; color: #2E5227; font-weight: 800; padding: 0.95rem 2.2rem; border-radius: 50px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                Explore Handcrafted Menu &rarr;
+            </a>
+            <a href="#uji-farm" class="btn-hero-glass" style="background: rgba(232,241,230,0.15); color: #FFFFFF; border: 1.5px solid rgba(232,241,230,0.4); font-weight: 600; padding: 0.95rem 2rem; border-radius: 50px; text-decoration: none; display: inline-flex; align-items: center;">
+                Discover Our Craft &darr;
+            </a>
+        </div>
     </div>
 </section>
 
-{# ── STAT BAR ── #}
-<section style="background:#F7FAF6;border-bottom:1px solid #E8F1E6;">
-    <div style="max-width:var(--container);margin:0 auto;padding:2rem clamp(1rem,4vw,2rem);display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0;text-align:center;">
+{# ── 2. STAT BAR ── #}
+<section style="background: #FFFFFF; border-bottom: 1px solid #D2DCD0; box-shadow: 0 2px 12px rgba(46,82,39,0.03);">
+    <div style="max-width: var(--container); margin: 0 auto; padding: 1.8rem clamp(1rem, 4vw, 2rem); display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1.5rem; text-align: center;">
         {% for stat in [
-            {num:'100%',label:'Ceremonial Grade'},
-            {num:'14+', label:'Handcrafted Recipes'},
-            {num:'3',   label:'Exclusive Collections'},
-            {num:'∞',   label:'Mindful Moments'}
+            {num: '100%', label: 'Ceremonial Grade Uji Tencha'},
+            {num: '80°C', label: 'Precise Chasen Whisking'},
+            {num: '14+', label: 'Handcrafted Drink Creations'},
+            {num: '5.0 ★', label: 'Loved by 1,200+ Guests'}
         ] %}
-        <div style="padding:1.5rem 1rem;border-right:1px solid #E8F1E6;">
-            <div style="font-family:var(--font-heading);font-size:2.2rem;font-weight:800;color:#2E5227;line-height:1;">{{ stat.num }}</div>
-            <div style="font-size:0.8rem;font-weight:600;color:#55744F;text-transform:uppercase;letter-spacing:0.08em;margin-top:0.3rem;">{{ stat.label }}</div>
+        <div style="padding: 0.8rem 1rem; border-right: 1px solid #E8F1E6;">
+            <div style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 800; color: #2E5227; line-height: 1;">{{ stat.num }}</div>
+            <div style="font-size: 0.78rem; font-weight: 700; color: #55744F; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.4rem;">{{ stat.label }}</div>
         </div>
         {% endfor %}
     </div>
 </section>
 
-{# ── STORY SECTION 1 ── #}
-<section style="background:#FFFFFF;padding:clamp(4rem,8vw,6rem) 1.5rem;">
-    <div style="max-width:var(--container);margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:4rem;align-items:center;">
+{# ── 3. STORY CHAPTER 1: DIRECT FARM SOURCING (TEA FARM) ── #}
+<section id="uji-farm" style="background: #FAFDF9; padding: clamp(3.5rem, 6vw, 5rem) 1.5rem; border-bottom: 1px solid #D2DCD0;">
+    <div style="max-width: var(--container); margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: clamp(2rem, 5vw, 4rem); align-items: center;">
+        
         <div>
-            <span style="font-size:0.75rem;font-weight:700;color:#4C6B46;text-transform:uppercase;letter-spacing:0.12em;">Direct Farm Sourcing</span>
-            <h2 style="font-family:var(--font-heading);font-size:clamp(2rem,4vw,2.8rem);color:#2E5227;margin:0.6rem 0 1.2rem;line-height:1.15;font-weight:800;">
-                100% Ceremonial Grade<br>Sourced from Uji, Japan
+            <span style="font-size: 0.78rem; font-weight: 700; color: #4C6B46; text-transform: uppercase; letter-spacing: 0.14em; display: inline-block; margin-bottom: 0.4rem;">
+                Chapter I • Terroir &amp; Origin
+            </span>
+            <h2 style="font-family: var(--font-heading); font-size: clamp(2rem, 4.5vw, 3rem); color: #2E5227; margin: 0 0 1.2rem; line-height: 1.15; font-weight: 800;">
+                Misty Hills of Uji, Kyoto:<br>Where Green Tea Was Born
             </h2>
-            <p style="color:#4C6B46;line-height:1.85;margin-bottom:1.2rem;font-size:1.02rem;">
-                Our <em>tencha</em> tea leaves are shade-grown under bamboo reed screens for weeks before harvesting in the misty hills of Uji, Kyoto. This ancient shading technique concentrates natural chlorophyll and L-theanine, yielding that signature emerald color, rich umami depth, and calm sustained alertness.
+            <p style="color: #4C6B46; line-height: 1.8; margin-bottom: 1rem; font-size: 1rem;">
+                Our <em>tencha</em> tea leaves thrive in the legendary microclimate of Uji, Kyoto, surrounded by morning river mists and mineral-rich volcanic soil. For three weeks before harvest, tea bushes are enveloped under traditional bamboo screen shades (*honzu*).
             </p>
-            <p style="color:#7D9778;line-height:1.8;font-size:0.95rem;">
-                Each batch is slow stone-ground into an ultra-fine powder that dissolves into silky, fragrant froth with zero artificial additives.
+            <p style="color: #55744F; line-height: 1.8; font-size: 0.95rem; margin-bottom: 1.8rem;">
+                Deprived of direct sunlight, the leaves surge with natural chlorophyll and L-theanine amino acids — creating our signature electric-jade emerald color, silky umami sweetness, and zero harsh bitterness.
             </p>
-            <div style="display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;">
-                <div style="background:#E8F1E6;border-radius:14px;padding:1rem 1.4rem;text-align:center;min-width:120px;">
-                    <div style="font-size:1.5rem;">🌱</div>
-                    <div style="font-size:0.78rem;font-weight:700;color:#2E5227;margin-top:0.3rem;">Shade Grown</div>
+            
+            <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
+                <div class="about-step-pill">
+                    <span class="num">1</span>
+                    <span>21-Day Honzu Shading</span>
                 </div>
-                <div style="background:#E8F1E6;border-radius:14px;padding:1rem 1.4rem;text-align:center;min-width:120px;">
-                    <div style="font-size:1.5rem;">🏯</div>
-                    <div style="font-size:0.78rem;font-weight:700;color:#2E5227;margin-top:0.3rem;">Uji, Kyoto</div>
+                <div class="about-step-pill">
+                    <span class="num">2</span>
+                    <span>Spring First Harvest</span>
                 </div>
-                <div style="background:#E8F1E6;border-radius:14px;padding:1rem 1.4rem;text-align:center;min-width:120px;">
-                    <div style="font-size:1.5rem;">⚗️</div>
-                    <div style="font-size:0.78rem;font-weight:700;color:#2E5227;margin-top:0.3rem;">Stone Ground</div>
+                <div class="about-step-pill">
+                    <span class="num">3</span>
+                    <span>Single-Estate Kyoto Farms</span>
                 </div>
             </div>
         </div>
-        <div style="border-radius:28px;overflow:hidden;box-shadow:0 24px 60px rgba(46,82,39,0.14);position:relative;">
-            <div style="background:linear-gradient(135deg,#E8F1E6,#D2DCD0);padding:2rem;border-radius:28px;text-align:center;">
-                <img src="{{ asset('images/bowl.png') }}" alt="Matcha Bowl and Bamboo Whisk"
-                     style="width:100%;max-height:380px;object-fit:contain;filter:drop-shadow(0 16px 30px rgba(46,82,39,0.2));">
+
+        <div class="about-story-img-card">
+            <img src="{{ asset('images/about/tea-farm.jpg') }}" alt="Uji Kyoto Terraced Green Tea Plantation in Morning Mist">
+            <div class="about-img-tag">
+                <strong style="display: block; font-size: 0.95rem; font-family: var(--font-heading); color: #E8F1E6;">Kyoto Shaded Tea Terraces</strong>
+                <span style="font-size: 0.78rem; color: rgba(232, 241, 230, 0.85);">Pure tencha leaves shade-grown under natural mist and bamboo screens.</span>
             </div>
         </div>
+
     </div>
 </section>
 
-{# ── STORY SECTION 2 ── #}
-<section style="background:#F7FAF6;padding:clamp(4rem,8vw,6rem) 1.5rem;">
-    <div style="max-width:var(--container);margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:4rem;align-items:center;">
-        <div style="border-radius:28px;overflow:hidden;box-shadow:0 24px 60px rgba(46,82,39,0.14);">
-            <div style="background:linear-gradient(135deg,#D2DCD0,#E8F1E6);padding:2rem;text-align:center;">
-                <img src="{{ asset('images/whisk.png') }}" alt="Bamboo Chasen Whisking"
-                     style="width:100%;max-height:380px;object-fit:contain;filter:drop-shadow(0 16px 30px rgba(46,82,39,0.2));">
+{# ── 4. STORY CHAPTER 2: SLOW GRANITE STONE MILLING ── #}
+<section style="background: #FFFFFF; padding: clamp(3.5rem, 6vw, 5rem) 1.5rem; border-bottom: 1px solid #D2DCD0;">
+    <div style="max-width: var(--container); margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: clamp(2rem, 5vw, 4rem); align-items: center;">
+        
+        <div class="about-story-img-card">
+            <img src="{{ asset('images/about/stone-mill.jpg') }}" alt="Artisanal Granite Stone Mill Grinding Vibrant Matcha Powder">
+            <div class="about-img-tag">
+                <strong style="display: block; font-size: 0.95rem; font-family: var(--font-heading); color: #E8F1E6;">Traditional Ishi-Usu Stone Mill</strong>
+                <span style="font-size: 0.78rem; color: rgba(232, 241, 230, 0.85);">Hand-grooved granite turning at 60 RPM to yield 30 grams per hour.</span>
             </div>
         </div>
+
         <div>
-            <span style="font-size:0.75rem;font-weight:700;color:#4C6B46;text-transform:uppercase;letter-spacing:0.12em;">Tradition Meets Innovation</span>
-            <h2 style="font-family:var(--font-heading);font-size:clamp(2rem,4vw,2.8rem);color:#2E5227;margin:0.6rem 0 1.2rem;line-height:1.15;font-weight:800;">
-                Handcrafted Fresh Daily<br>with Bamboo Chasen
+            <span style="font-size: 0.78rem; font-weight: 700; color: #4C6B46; text-transform: uppercase; letter-spacing: 0.14em; display: inline-block; margin-bottom: 0.4rem;">
+                Chapter II • The Lost Craft
+            </span>
+            <h2 style="font-family: var(--font-heading); font-size: clamp(2rem, 4.5vw, 3rem); color: #2E5227; margin: 0 0 1.2rem; line-height: 1.15; font-weight: 800;">
+                Slow Granite Stone Milling:<br>30 Grams per Hour
             </h2>
-            <p style="color:#4C6B46;line-height:1.85;margin-bottom:1.2rem;font-size:1.02rem;">
-                We never use pre-mixed powders or industrial dispensers. Every drink is freshly whisked to order using an authentic bamboo <em>chasen</em> at 80°C spring water — coaxing out gentle floral aromatics without bitter astringency.
+            <p style="color: #4C6B46; line-height: 1.8; margin-bottom: 1rem; font-size: 1rem;">
+                Commercial matcha brands use high-speed industrial pulverizers that heat and oxidize tea leaves, turning the powder dull olive and bitter. We preserve the centuries-old Japanese practice of stone-milling.
             </p>
-            <p style="color:#7D9778;line-height:1.8;font-size:0.95rem;">
-                Whether paired with creamy oat milk, decadent ube, tropical fruit purees, or our signature sea salt cloud foam — every sip is balanced to perfection.
+            <p style="color: #55744F; line-height: 1.8; font-size: 0.95rem; margin-bottom: 1.8rem;">
+                Using authentic granite stone mills (*ishi-usu*), whole tencha is gently ground into microscopic 5-micron particles. The slow friction produces powder so fine it dissolves instantly into velvet creaminess.
             </p>
+
+            <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
+                <div class="about-step-pill">
+                    <span class="num">⚡</span>
+                    <span>Zero Friction Heat</span>
+                </div>
+                <div class="about-step-pill">
+                    <span class="num">✨</span>
+                    <span>5-Micron Silk Texture</span>
+                </div>
+                <div class="about-step-pill">
+                    <span class="num">🛡️</span>
+                    <span>No Fillers or Additives</span>
+                </div>
+            </div>
         </div>
+
     </div>
 </section>
 
-{# ── PILLARS OF EXCELLENCE ── #}
-<section style="background:#2E5227;padding:clamp(4rem,8vw,6rem) 1.5rem;">
-    <div style="max-width:var(--container);margin:0 auto;">
-        <div style="text-align:center;margin-bottom:3rem;">
-            <span style="font-size:0.78rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#A4B9A1;">What We Stand For</span>
-            <h2 style="font-family:var(--font-heading);font-size:clamp(2.2rem,5vw,3.2rem);color:#FFFFFF;margin:0.5rem 0 0;font-weight:800;">OUR PILLARS OF EXCELLENCE</h2>
+{# ── 5. STORY CHAPTER 3: BAMBOO CHASEN WHISKING RITUAL ── #}
+<section style="background: #FAFDF9; padding: clamp(3.5rem, 6vw, 5rem) 1.5rem; border-bottom: 1px solid #D2DCD0;">
+    <div style="max-width: var(--container); margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: clamp(2rem, 5vw, 4rem); align-items: center;">
+        
+        <div>
+            <span style="font-size: 0.78rem; font-weight: 700; color: #4C6B46; text-transform: uppercase; letter-spacing: 0.14em; display: inline-block; margin-bottom: 0.4rem;">
+                Chapter III • The Whisking Ritual
+            </span>
+            <h2 style="font-family: var(--font-heading); font-size: clamp(2rem, 4.5vw, 3rem); color: #2E5227; margin: 0 0 1.2rem; line-height: 1.15; font-weight: 800;">
+                Whisked Fresh per Cup<br>with 100-Prong Bamboo Chasen
+            </h2>
+            <p style="color: #4C6B46; line-height: 1.8; margin-bottom: 1rem; font-size: 1rem;">
+                We never pre-batch or pump matcha from dispensers. Every single drink is whisked by hand in a ceramic <em>chawan</em> using an authentic 100-prong bamboo whisk (*chasen*).
+            </p>
+            <p style="color: #55744F; line-height: 1.8; font-size: 0.95rem; margin-bottom: 1.8rem;">
+                Filtered water heated to precisely 80°C unlocks delicate floral aromas without burning the antioxidants. A vigorous W-shaped whisking motion creates micro-bubbles that yield a heavenly, cloud-like foam.
+            </p>
+
+            <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
+                <div class="about-step-pill">
+                    <span class="num">🥢</span>
+                    <span>100-Prong Chasen</span>
+                </div>
+                <div class="about-step-pill">
+                    <span class="num">🌡️</span>
+                    <span>80°C Optimal Heat</span>
+                </div>
+                <div class="about-step-pill">
+                    <span class="num">🍵</span>
+                    <span>Velvety Micro-Foam</span>
+                </div>
+            </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;">
+
+        <div class="about-story-img-card">
+            <img src="{{ asset('images/about/tea-ceremony.jpg') }}" alt="Authentic Japanese Ceramic Chawan Bowl with Whisked Matcha and Bamboo Chasen">
+            <div class="about-img-tag">
+                <strong style="display: block; font-size: 0.95rem; font-family: var(--font-heading); color: #E8F1E6;">The Sacred Chawan Whisking</strong>
+                <span style="font-size: 0.78rem; color: rgba(232, 241, 230, 0.85);">Handcrafted freshly per guest to create authentic, creamy micro-foam.</span>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{# ── 6. PILLARS OF EXCELLENCE ── #}
+<section style="background: #2E5227; padding: clamp(4rem, 7vw, 5.5rem) 1.5rem; color: #FFFFFF;">
+    <div style="max-width: var(--container); margin: 0 auto;">
+        
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <span style="font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #A4B9A1;">
+                Our Philosophy
+            </span>
+            <h2 style="font-family: var(--font-heading); font-size: clamp(2.2rem, 5vw, 3.2rem); color: #FFFFFF; margin: 0.4rem 0 0.8rem; font-weight: 800;">
+                OUR PILLARS OF EXCELLENCE
+            </h2>
+            <p style="color: #D2DCD0; font-size: 0.98rem; max-width: 540px; margin: 0 auto;">
+                Four guiding promises behind every drink served at Matcha Moments Café
+            </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem;">
             {% for pillar in [
-                {icon:'🍃', title:'Purity First',       desc:'No artificial colorings, sweeteners, or fillers. Just authentic ceremonial-grade tea.'},
-                {icon:'⚡', title:'Clean Energy',       desc:'High in L-theanine for jitter-free, serene focus and all-day calm vitality.'},
-                {icon:'✨', title:'Artisan Fusions',    desc:'Beloved local flavors like Philippine Ube and Mango blended with Japanese tea.'},
-                {icon:'💚', title:'Community Love',     desc:'Crafting warm memories and comforting moments for every guest who visits.'}
+                {icon: '🍃', title: '100% Purity First', desc: 'Zero artificial colorings, corn syrups, or fillers. Just authentic ceremonial-grade Kyoto tencha.'},
+                {icon: '⚡', title: 'Calm Sustained Clarity', desc: 'Abundant in natural L-theanine amino acids for peaceful focus without caffeine jitters or crashes.'},
+                {icon: '✨', title: 'Artisan Culinary Fusions', desc: 'Thoughtful harmony of Japanese tea culture with organic oat milk, real Philippine ube, and sea salt cloud.'},
+                {icon: '💚', title: 'Mindful Café Hospitality', desc: 'Crafting warm daily rituals, peaceful ambiance, and comforting memories for every guest who walks in.'}
             ] %}
-            <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(232,241,230,0.2);border-radius:22px;padding:2rem;text-align:center;backdrop-filter:blur(10px);">
-                <div style="font-size:2.5rem;margin-bottom:0.8rem;">{{ pillar.icon }}</div>
-                <h3 style="font-family:var(--font-heading);font-size:1.2rem;color:#E8F1E6;margin-bottom:0.6rem;font-weight:700;">{{ pillar.title }}</h3>
-                <p style="font-size:0.88rem;color:#A4B9A1;line-height:1.6;">{{ pillar.desc }}</p>
+            <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(232, 241, 230, 0.2); border-radius: 22px; padding: 2rem 1.6rem; text-align: center; backdrop-filter: blur(10px); transition: transform 0.2s;">
+                <div style="font-size: 2.4rem; margin-bottom: 0.8rem;">{{ pillar.icon }}</div>
+                <h3 style="font-family: var(--font-heading); font-size: 1.15rem; color: #E8F1E6; margin-bottom: 0.6rem; font-weight: 700;">{{ pillar.title }}</h3>
+                <p style="font-size: 0.88rem; color: #A4B9A1; line-height: 1.65; margin: 0;">{{ pillar.desc }}</p>
             </div>
             {% endfor %}
         </div>
+
     </div>
 </section>
 
-{# ── DRINK LINEUP BANNER ── #}
-<section style="background:#F7FAF6;padding:clamp(3rem,6vw,5rem) 1.5rem;">
-    <div style="max-width:var(--container);margin:0 auto;">
-        <div style="border-radius:28px;overflow:hidden;box-shadow:0 12px 40px rgba(46,82,39,0.1);">
-            <img src="{{ asset('images/col.png') }}" alt="Matcha Moments Drinks Lineup" style="width:100%;display:block;object-fit:cover;max-height:420px;">
+{# ── 7. MODERN CAFÉ SANCTUARY INVITATION ── #}
+<section style="background: #FAFDF9; padding: clamp(3.5rem, 6vw, 5rem) 1.5rem;">
+    <div style="max-width: var(--container); margin: 0 auto;">
+        
+        <div style="background: #FFFFFF; border: 1px solid #D2DCD0; border-radius: 28px; overflow: hidden; box-shadow: 0 16px 45px rgba(46, 82, 39, 0.08); display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); align-items: center;">
+            <div style="padding: clamp(2rem, 5vw, 3.5rem);">
+                <span style="font-size: 0.78rem; font-weight: 700; color: #4C6B46; text-transform: uppercase; letter-spacing: 0.14em; display: inline-block; margin-bottom: 0.4rem;">
+                    Visit Our Café
+                </span>
+                <h3 style="font-family: var(--font-heading); font-size: clamp(1.8rem, 3.5vw, 2.5rem); color: #2E5227; font-weight: 800; margin: 0 0 1rem; line-height: 1.2;">
+                    Step into Your Daily Moment of Calm
+                </h3>
+                <p style="color: #55744F; line-height: 1.7; font-size: 0.95rem; margin-bottom: 1.8rem;">
+                    Escape the bustle of the city and immerse yourself in our tranquil wabi-sabi sanctuary. Natural blonde cedar, gentle ambient light, and freshly whisked ceremonial matcha await you.
+                </p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <a href="{{ path('app_menu') }}" class="btn-hero-deep" style="background: #2E5227; color: #FFFFFF; padding: 0.95rem 2.2rem; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.92rem; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 8px 24px rgba(46, 82, 39, 0.2);">
+                        Browse Drinks Menu &rarr;
+                    </a>
+                    <a href="{{ path('app_contact') }}" class="btn-card-customize" style="padding: 0.95rem 2rem; border-radius: 50px; text-decoration: none; font-size: 0.92rem; display: inline-flex; align-items: center;">
+                        Find Store Location
+                    </a>
+                </div>
+            </div>
+
+            <div style="height: 100%; min-height: 340px;">
+                <img src="{{ asset('images/about/cafe-interior.jpg') }}" alt="Matcha Moments Modern Café Sanctuary" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+            </div>
         </div>
-        <div style="text-align:center;margin-top:3rem;">
-            <a href="{{ path('app_menu') }}" class="btn-hero-primary" style="padding:1rem 2.8rem;font-size:1.05rem;">
-                Taste the Difference — Explore Menu →
-            </a>
-        </div>
+
     </div>
 </section>
 

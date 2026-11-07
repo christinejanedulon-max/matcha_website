@@ -846,10 +846,16 @@ ul { list-style: none; }
     gap: 0.5rem;
 }
 .footer-logo-img {
-    height: 50px;
+    height: 52px;
     width: auto;
-    filter: brightness(0) invert(1);
-    margin-bottom: 0.5rem;
+    max-width: 220px;
+    display: block;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+    transition: opacity var(--trans-fast);
+}
+.footer-logo-img:hover {
+    opacity: 0.9;
 }
 .footer-logo { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
 .footer-brand-name {
@@ -893,6 +899,15 @@ ul { list-style: none; }
     flex-shrink: 0;
     filter: brightness(0) invert(1);
     opacity: 0.7;
+}
+.footer-mini-icon {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    vertical-align: middle;
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+    margin-right: 0.35rem;
 }
 
 .social-links { display: flex; gap: 0.75rem; }
@@ -1808,8 +1823,9 @@ ul { list-style: none; }
     margin-bottom: 1.5rem;
 }
 .admin-sidebar-brand img {
-    height: 32px;
-    filter: brightness(0) invert(1);
+    height: 36px;
+    width: auto;
+    object-fit: contain;
 }
 .admin-sidebar-brand span {
     font-family: var(--font-heading);
