@@ -52,3 +52,4 @@ Save-OptimizedJpeg (Join-Path $imagesDir "banner.png") (Join-Path $imagesDir "ba
 Save-OptimizedJpeg (Join-Path $imagesDir "col.png") (Join-Path $imagesDir "col.jpg") 85 1400
 
 Write-Output "Asset optimization finished."
+

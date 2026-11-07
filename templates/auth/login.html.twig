@@ -195,7 +195,7 @@
         <div style="text-align:center;margin-bottom:1.4rem;">
             <img src="{{ asset('images/logo-transparent.png') }}" alt="Matcha Moments" style="height:50px;width:auto;margin-bottom:0.7rem;">
             <div style="display:inline-flex;align-items:center;gap:0.4rem;background:#E8F1E6;border-radius:50px;padding:0.28rem 0.95rem;font-size:0.7rem;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;color:#2E5227;">
-                🍵 Member Portal • Required to Order
+                <i class="bi bi-shield-lock-fill"></i> Member Portal • Required to Order
             </div>
         </div>
 
@@ -227,8 +227,8 @@
             </div>
 
             {% if prefillEmail is defined and prefillEmail %}
-                <div style="background:#E8F1E6;border:1px solid #A4B9A1;border-radius:12px;padding:0.7rem 1rem;margin-bottom:1.1rem;font-size:0.82rem;color:#2E5227;font-weight:600;text-align:center;">
-                    ✅ Account ready! Enter your password below to sign in.
+                <div style="background:#E8F1E6;border:1px solid #A4B9A1;border-radius:12px;padding:0.7rem 1rem;margin-bottom:1.1rem;font-size:0.82rem;color:#2E5227;font-weight:600;text-align:center;display:flex;align-items:center;justify-content:center;gap:0.4rem;">
+                    <i class="bi bi-check-circle-fill" style="color:#2E5227;"></i> Account ready! Enter your password below to sign in.
                 </div>
             {% endif %}
 
@@ -253,7 +253,7 @@
                                class="auth-input"
                                placeholder="Enter your password"
                                required>
-                        <button type="button" class="pw-toggle-btn" onclick="togglePassword('loginPass', this)" aria-label="Show password">👁️</button>
+                        <button type="button" class="pw-toggle-btn" onclick="togglePassword('loginPass', this)" aria-label="Show password"><i class="bi bi-eye"></i></button>
                     </div>
                 </div>
 
@@ -279,15 +279,15 @@
                     <input type="hidden" name="demo_role" value="customer">
                     <input type="hidden" name="email" value="customer@matchamoments.com">
                     <input type="hidden" name="full_name" value="Valued Customer">
-                    <button type="submit" class="demo-role-btn" style="background:#E8F1E6;color:#2E5227;border:1.5px solid #A4B9A1;">
-                        <span>🍵</span> Quick Sign In as Customer
+                    <button type="submit" class="demo-role-btn" style="background:#E8F1E6;color:#2E5227;border:1.5px solid #A4B9A1;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+                        <i class="bi bi-cup-hot-fill"></i> Quick Sign In as Customer
                     </button>
                 </form>
                 <form action="{{ path('app_login') }}" method="POST">
                     <input type="hidden" name="demo_role" value="admin">
                     <input type="hidden" name="email" value="admin@matchamoments.com">
-                    <button type="submit" class="demo-role-btn" style="background:#2E5227;color:#FFFFFF;border:none;">
-                        <span>👑</span> Quick Sign In as Administrator
+                    <button type="submit" class="demo-role-btn" style="background:#2E5227;color:#FFFFFF;border:none;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+                        <i class="bi bi-shield-shaded"></i> Quick Sign In as Administrator
                     </button>
                 </form>
             </div>
@@ -381,10 +381,10 @@ function togglePassword(inputId, btn) {
     if (!input) return;
     if (input.type === 'password') {
         input.type = 'text';
-        btn.textContent = '🙈';
+        btn.innerHTML = '<i class="bi bi-eye-slash"></i>';
     } else {
         input.type = 'password';
-        btn.textContent = '👁️';
+        btn.innerHTML = '<i class="bi bi-eye"></i>';
     }
 }
 </script>

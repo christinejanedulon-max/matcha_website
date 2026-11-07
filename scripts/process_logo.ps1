@@ -49,3 +49,4 @@ $transparentBmp.Dispose()
 $lightBmp.Dispose()
 
 Write-Output "Successfully generated: $transPath and $lightPath"
+

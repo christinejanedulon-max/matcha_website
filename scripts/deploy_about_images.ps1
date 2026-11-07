@@ -57,3 +57,4 @@ foreach ($key in $mapping.Keys) {
 }
 
 Write-Output "About images ready in $aboutImagesDir"
+

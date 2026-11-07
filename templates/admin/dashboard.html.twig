@@ -23,7 +23,7 @@
 <!-- Stats Grid -->
 <div class="admin-stats-grid">
     <div class="admin-stat-card">
-        <div class="stat-icon-wrap stat-icon-green">💰</div>
+        <div class="stat-icon-wrap stat-icon-green"><i class="bi bi-cash-stack"></i></div>
         <div class="stat-info-wrap">
             <span class="stat-label">Total Revenue</span>
             <span class="stat-value">₱{{ stats.totalRevenue }}</span>
@@ -31,7 +31,7 @@
     </div>
 
     <div class="admin-stat-card">
-        <div class="stat-icon-wrap stat-icon-blue">📦</div>
+        <div class="stat-icon-wrap stat-icon-blue"><i class="bi bi-receipt"></i></div>
         <div class="stat-info-wrap">
             <span class="stat-label">Total Orders</span>
             <span class="stat-value">{{ stats.totalOrders }}</span>
@@ -39,7 +39,7 @@
     </div>
 
     <div class="admin-stat-card">
-        <div class="stat-icon-wrap stat-icon-gold">⏳</div>
+        <div class="stat-icon-wrap stat-icon-gold"><i class="bi bi-hourglass-split"></i></div>
         <div class="stat-info-wrap">
             <span class="stat-label">Pending Orders</span>
             <span class="stat-value">{{ stats.pendingOrders }}</span>
@@ -47,7 +47,7 @@
     </div>
 
     <div class="admin-stat-card">
-        <div class="stat-icon-wrap stat-icon-green">🍵</div>
+        <div class="stat-icon-wrap stat-icon-green"><i class="bi bi-cup-straw"></i></div>
         <div class="stat-info-wrap">
             <span class="stat-label">Menu Drinks</span>
             <span class="stat-value">{{ stats.totalProducts }}</span>
@@ -59,7 +59,7 @@
 {% if stats.lowStockCount > 0 %}
     <div style="background: #fff8e1; border: 1px solid #ffe082; border-radius: 12px; padding: 1rem 1.4rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between;">
         <div style="display: flex; align-items: center; gap: 0.8rem;">
-            <span style="font-size: 1.5rem;">⚠️</span>
+            <i class="bi bi-exclamation-triangle-fill" style="color: #b78103; font-size: 1.4rem;"></i>
             <div>
                 <strong style="color: #b78103;">Low Stock Alert:</strong>
                 <span style="color: #6d4c00; font-size: 0.9rem;">
@@ -119,7 +119,7 @@
                         </td>
                         <td>
                             <span style="font-size: 0.82rem; font-weight: 600;">
-                                {% if order.fulfillmentMethod == 'Delivery' %}🛵 Delivery{% else %}🏪 Pickup{% endif %}
+                                {% if order.fulfillmentMethod == 'Delivery' %}<i class="bi bi-truck me-1"></i>Delivery{% else %}<i class="bi bi-shop me-1"></i>Pickup{% endif %}
                             </span>
                         </td>
                         <td>
@@ -144,7 +144,7 @@
                                     <input type="hidden" name="status" value="Completed">
                                     <button type="submit" class="btn-admin-action btn-primary-action">Complete</button>
                                 {% else %}
-                                    <span style="font-size: 0.78rem; color: #999;">✓ Done</span>
+                                    <span style="font-size: 0.78rem; color: #4C6B46; display: inline-flex; align-items: center; gap: 0.25rem;"><i class="bi bi-check2-circle"></i> Done</span>
                                 {% endif %}
                             </form>
                         </td>

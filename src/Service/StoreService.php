@@ -7,6 +7,7 @@ use App\Entity\OrderItem;
 use App\Entity\Product;
 use App\Entity\Review;
 use App\Entity\NewsletterSubscription;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -444,20 +445,65 @@ class StoreService
     }
 
     /**
+     * Helper to map Order entity to template-friendly array
+     */
+    private function mapOrderEntityToArray(Order $o): array
+    {
+        $items = [];
+        foreach ($o->getOrderItems() as $item) {
+            $items[] = [
+                'name' => $item->getProductName() ?? $item->getProduct()?->getName() ?? 'Matcha Drink',
+                'quantity' => $item->getQuantity(),
+                'unitPrice' => (string) $item->getUnitPrice(),
+                'options' => $item->getOptions() ?? 'Regular',
+                'imageUrl' => $item->getProduct()?->getImageUrl() ?? 'images/latte.png',
+            ];
+        }
+
+        return [
+            'id' => $o->getId(),
+            'orderNumber' => $o->getOrderNumber() ?? ('MM-' . $o->getId()),
+            'customerName' => $o->getCustomerName() ?? 'Valued Customer',
+            'customerEmail' => $o->getCustomerEmail() ?? ($o->getUser()?->getEmail()),
+            'phone' => $o->getPhone() ?? '',
+            'totalAmount' => (string) $o->getTotalAmount(),
+            'fulfillmentMethod' => $o->getFulfillmentMethod() ?? 'Pickup',
+            'deliveryAddress' => $o->getDeliveryAddress(),
+            'paymentMethod' => $o->getPaymentMethod() ?? 'Cash',
+            'referenceNumber' => $o->getReferenceNumber(),
+            'notes' => $o->getNotes() ?? '',
+            'status' => $o->getStatus() ?? 'Pending',
+            'orderDate' => $o->getOrderDate()?->format('Y-m-d H:i:s') ?? date('Y-m-d H:i:s'),
+            'statusUpdatedAt' => $o->getStatusUpdatedAt()?->format('Y-m-d H:i:s') ?? date('Y-m-d H:i:s'),
+            'items' => $items,
+        ];
+    }
+
+    /**
      * Get all orders
      */
     public function getOrders(): array
     {
+        if ($this->em) {
+            try {
+                $dbOrders = $this->em->getRepository(Order::class)->findBy([], ['orderDate' => 'DESC', 'id' => 'DESC']);
+                if (!empty($dbOrders)) {
+                    $list = [];
+                    foreach ($dbOrders as $o) {
+                        $list[] = $this->mapOrderEntityToArray($o);
+                    }
+                    return $list;
+                }
+            } catch (\Throwable) {
+            }
+        }
+
         $session = $this->getSession();
         if ($session && $session->has('store_orders')) {
             return $session->get('store_orders');
         }
 
-        $orders = self::DEFAULT_ORDERS;
-        if ($session) {
-            $session->set('store_orders', $orders);
-        }
-        return $orders;
+        return self::DEFAULT_ORDERS;
     }
 
     /**
@@ -465,8 +511,22 @@ class StoreService
      */
     public function getOrder(string $orderNumber): ?array
     {
+        if ($this->em) {
+            try {
+                $orderRepo = $this->em->getRepository(Order::class);
+                $entity = $orderRepo->findOneBy(['orderNumber' => $orderNumber]);
+                if (!$entity && is_numeric($orderNumber)) {
+                    $entity = $orderRepo->find((int)$orderNumber);
+                }
+                if ($entity) {
+                    return $this->mapOrderEntityToArray($entity);
+                }
+            } catch (\Throwable) {
+            }
+        }
+
         foreach ($this->getOrders() as $order) {
-            if (strcasecmp($order['orderNumber'], $orderNumber) === 0 || (string)$order['id'] === $orderNumber) {
+            if (strcasecmp($order['orderNumber'] ?? '', $orderNumber) === 0 || (string)($order['id'] ?? '') === $orderNumber) {
                 return $order;
             }
         }
@@ -474,37 +534,156 @@ class StoreService
     }
 
     /**
+     * Get all orders for a specific customer email
+     */
+    public function getOrdersForEmail(string $email): array
+    {
+        $email = strtolower(trim($email));
+        if ($email === '') {
+            return [];
+        }
+
+        if ($this->em) {
+            try {
+                $qb = $this->em->createQueryBuilder();
+                $qb->select('o')
+                   ->from(Order::class, 'o')
+                   ->leftJoin('o.user', 'u')
+                   ->where('LOWER(o.customerEmail) = :email OR LOWER(u.email) = :email')
+                   ->setParameter('email', $email)
+                   ->orderBy('o.orderDate', 'DESC')
+                   ->addOrderBy('o.id', 'DESC');
+
+                $dbOrders = $qb->getQuery()->getResult();
+                $list = [];
+                foreach ($dbOrders as $o) {
+                    $list[] = $this->mapOrderEntityToArray($o);
+                }
+                if (!empty($list)) {
+                    return $list;
+                }
+            } catch (\Throwable) {
+            }
+        }
+
+        $filtered = [];
+        foreach ($this->getOrders() as $o) {
+            $orderEmail = strtolower(trim($o['customerEmail'] ?? ''));
+            if ($orderEmail === $email) {
+                $filtered[] = $o;
+            }
+        }
+        return $filtered;
+    }
+
+    /**
      * Create a new order
      */
     public function createOrder(array $data): array
     {
-        $this->inMemoryOrders = null;
-        $orders = $this->getOrders();
-        $orderNum = 'MM-' . rand(2000, 9999);
+        $session = $this->getSession();
+        $userEmail = strtolower(trim($data['customerEmail'] ?? $session?->get('user_email', '') ?? ''));
 
+        // Generate unique order number: MM-XXXX
+        $orderNum = null;
+        for ($attempt = 0; $attempt < 10; $attempt++) {
+            $candidate = 'MM-' . rand(2000, 9999);
+            if ($this->em) {
+                $existing = $this->em->getRepository(Order::class)->findOneBy(['orderNumber' => $candidate]);
+                if (!$existing) {
+                    $orderNum = $candidate;
+                    break;
+                }
+            } else {
+                $orderNum = $candidate;
+                break;
+            }
+        }
+        $orderNum = $orderNum ?: ('MM-' . uniqid());
+
+        $customerName = trim($data['customerName'] ?? 'Valued Customer');
+        $phone = trim($data['phone'] ?? '');
+        $totalAmount = number_format((float) ($data['totalAmount'] ?? 0), 2, '.', '');
+        $fulfillment = $data['fulfillmentMethod'] ?? 'Pickup';
+        $deliveryAddress = ($fulfillment === 'Delivery') ? ($data['deliveryAddress'] ?? null) : null;
+        $paymentMethod = $data['paymentMethod'] ?? 'Cash';
+        $referenceNumber = ($paymentMethod === 'GCash') ? ($data['referenceNumber'] ?? null) : null;
+        $notes = $data['notes'] ?? '';
+        $items = $data['items'] ?? [];
+
+        // Save to Database
+        if ($this->em) {
+            try {
+                $orderEntity = new Order();
+                $orderEntity->setOrderNumber($orderNum);
+                $orderEntity->setCustomerName($customerName);
+                $orderEntity->setCustomerEmail($userEmail ?: null);
+                $orderEntity->setPhone($phone);
+                $orderEntity->setTotalAmount($totalAmount);
+                $orderEntity->setFulfillmentMethod($fulfillment);
+                $orderEntity->setDeliveryAddress($deliveryAddress);
+                $orderEntity->setPaymentMethod($paymentMethod);
+                $orderEntity->setReferenceNumber($referenceNumber);
+                $orderEntity->setNotes($notes);
+                $orderEntity->setStatus('Pending');
+
+                if ($userEmail) {
+                    $user = $this->em->getRepository(User::class)->findOneBy(['email' => $userEmail]);
+                    if ($user) {
+                        $orderEntity->setUser($user);
+                    }
+                }
+
+                $productRepo = $this->em->getRepository(Product::class);
+                foreach ($items as $itemData) {
+                    $orderItem = new OrderItem();
+                    $orderItem->setProductName($itemData['name'] ?? 'Matcha Drink');
+                    $orderItem->setQuantity((int)($itemData['quantity'] ?? 1));
+                    $orderItem->setUnitPrice(number_format((float)($itemData['unitPrice'] ?? 0), 2, '.', ''));
+                    $orderItem->setOptions($itemData['options'] ?? 'Regular');
+
+                    if (!empty($itemData['id'])) {
+                        $prod = $productRepo->find((int)$itemData['id']);
+                        if ($prod) {
+                            $orderItem->setProduct($prod);
+                        }
+                    }
+
+                    $orderEntity->addOrderItem($orderItem);
+                }
+
+                $this->em->persist($orderEntity);
+                $this->em->flush();
+
+                return $this->mapOrderEntityToArray($orderEntity);
+            } catch (\Throwable $e) {
+                // Fallback to session
+            }
+        }
+
+        // Session fallback
+        $orders = $this->getOrders();
         $order = [
             'id' => count($orders) + 200,
             'orderNumber' => $orderNum,
-            'customerName' => trim($data['customerName'] ?? 'Valued Customer'),
-            'phone' => trim($data['phone'] ?? '09000000000'),
-            'totalAmount' => number_format((float) ($data['totalAmount'] ?? 0), 2, '.', ''),
-            'fulfillmentMethod' => $data['fulfillmentMethod'] ?? 'Pickup',
-            'deliveryAddress' => $data['deliveryAddress'] ?? null,
-            'paymentMethod' => $data['paymentMethod'] ?? 'Cash',
-            'referenceNumber' => $data['referenceNumber'] ?? null,
-            'notes' => $data['notes'] ?? '',
+            'customerName' => $customerName,
+            'customerEmail' => $userEmail,
+            'phone' => $phone,
+            'totalAmount' => $totalAmount,
+            'fulfillmentMethod' => $fulfillment,
+            'deliveryAddress' => $deliveryAddress,
+            'paymentMethod' => $paymentMethod,
+            'referenceNumber' => $referenceNumber,
+            'notes' => $notes,
             'status' => 'Pending',
             'orderDate' => (new \DateTime())->format('Y-m-d H:i:s'),
-            'items' => $data['items'] ?? []
+            'statusUpdatedAt' => (new \DateTime())->format('Y-m-d H:i:s'),
+            'items' => $items
         ];
-
         array_unshift($orders, $order);
-
-        $session = $this->getSession();
         if ($session) {
             $session->set('store_orders', $orders);
         }
-
         return $order;
     }
 
@@ -513,23 +692,38 @@ class StoreService
      */
     public function updateOrderStatus(string $orderNumber, string $newStatus): bool
     {
-        $this->inMemoryOrders = null;
-        $orders = $this->getOrders();
-        $found = false;
-        foreach ($orders as &$order) {
-            if ($order['orderNumber'] === $orderNumber || (string)$order['id'] === $orderNumber) {
-                $order['status'] = $newStatus;
-                $found = true;
-                break;
+        $updated = false;
+        if ($this->em) {
+            try {
+                $orderRepo = $this->em->getRepository(Order::class);
+                $entity = $orderRepo->findOneBy(['orderNumber' => $orderNumber]);
+                if (!$entity && is_numeric($orderNumber)) {
+                    $entity = $orderRepo->find((int)$orderNumber);
+                }
+                if ($entity) {
+                    $entity->setStatus($newStatus);
+                    $this->em->flush();
+                    $updated = true;
+                }
+            } catch (\Throwable) {
             }
         }
-        if ($found) {
-            $session = $this->getSession();
-            if ($session) {
-                $session->set('store_orders', $orders);
+
+        $session = $this->getSession();
+        if ($session && $session->has('store_orders')) {
+            $orders = $session->get('store_orders');
+            foreach ($orders as &$o) {
+                if (($o['orderNumber'] ?? '') === $orderNumber || (string)($o['id'] ?? '') === $orderNumber) {
+                    $o['status'] = $newStatus;
+                    $o['statusUpdatedAt'] = (new \DateTime())->format('Y-m-d H:i:s');
+                    $updated = true;
+                    break;
+                }
             }
+            $session->set('store_orders', $orders);
         }
-        return $found;
+
+        return $updated;
     }
 
     /**

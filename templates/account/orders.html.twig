@@ -1,0 +1,284 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Matcha Orders & Tracking — Matcha Moments Café{% endblock %}
+{% block meta_description %}View your past and active Matcha Moments orders, real-time preparation status, and delivery tracking.{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .order-history-wrap {
+        padding: clamp(3rem, 6vw, 4.5rem) 0;
+        background: #FAFDF9;
+        min-height: 65vh;
+    }
+    .order-card {
+        background: #FFFFFF;
+        border: 1px solid #D2DCD0;
+        border-radius: 20px;
+        padding: 1.5rem 1.8rem;
+        box-shadow: 0 4px 18px rgba(46, 82, 39, 0.05);
+        margin-bottom: 1.5rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .order-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 26px rgba(46, 82, 39, 0.09);
+    }
+    .order-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #E8F1E6;
+        margin-bottom: 1.1rem;
+    }
+    .order-num-pill {
+        font-family: var(--font-heading);
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #2E5227;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .order-date-text {
+        font-size: 0.8rem;
+        color: #7D9778;
+        font-weight: 500;
+    }
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0.35rem 0.95rem;
+        border-radius: 50px;
+    }
+    .badge-status-pending   { background: #E8F1E6; color: #2E5227; border: 1px solid #A4B9A1; }
+    .badge-status-preparing { background: #2E5227; color: #FFFFFF; box-shadow: 0 0 10px rgba(46,82,39,0.3); }
+    .badge-status-ready     { background: #4C6B46; color: #FFFFFF; }
+    .badge-status-completed { background: #E8F1E6; color: #2E5227; border: 1px solid #D2DCD0; }
+    .badge-status-cancelled { background: #FDE8E8; color: #8E3030; border: 1px solid #F8B4B4; }
+    .order-item-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        background: #F7FAF6;
+        border: 1px solid #E8F1E6;
+        padding: 0.3rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        color: #2E5227;
+        margin: 0.2rem 0.3rem 0.2rem 0;
+    }
+    .order-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1.2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #E8F1E6;
+    }
+    .order-total-amount {
+        font-family: var(--font-heading);
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #2E5227;
+    }
+    .btn-track-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #2E5227;
+        color: #FFFFFF;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 0.65rem 1.4rem;
+        border-radius: 50px;
+        text-decoration: none;
+        transition: all 0.2s;
+        box-shadow: 0 4px 14px rgba(46,82,39,0.18);
+    }
+    .btn-track-action:hover {
+        background: #4C6B46;
+        color: #FFFFFF;
+        transform: translateY(-1px);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+{# ── HERO ── #}
+<section class="page-hero" style="--hero-img: url('{{ asset('images/about/tea-ceremony.jpg') }}')">
+    <div class="container text-center">
+        <span class="badge-status badge-status-pending mb-3" style="background: rgba(232,241,230,0.18); color: #E8F1E6; border-color: rgba(232,241,230,0.35);">
+            <i class="bi bi-clock-history"></i> Customer Order Portal
+        </span>
+        <h1 class="page-hero-title">MY ORDERS &amp; TRACKING</h1>
+        <p class="page-hero-subtitle">
+            Follow live preparation progress, check delivery status, and review past handcrafted orders.
+        </p>
+    </div>
+</section>
+
+{# ── CONTENT ── #}
+<div class="order-history-wrap">
+    <div class="container" style="max-width: 900px;">
+
+        {# ── ACTIVE ORDERS ── #}
+        <div class="mb-5">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h2 style="font-family: var(--font-heading); font-size: 1.45rem; font-weight: 800; color: #2E5227; margin: 0;">
+                    <i class="bi bi-hourglass-split me-1"></i> Active Orders
+                    <span style="font-size: 0.9rem; font-weight: 600; color: #55744F;">({{ activeOrders|length }})</span>
+                </h2>
+                <a href="{{ path('app_menu') }}" class="btn-track-action" style="background: #E8F1E6; color: #2E5227; box-shadow: none; border: 1px solid #A4B9A1;">
+                    <i class="bi bi-plus-circle"></i> New Order
+                </a>
+            </div>
+
+            {% if activeOrders is empty %}
+                <div class="order-card text-center py-5">
+                    <div style="font-size: 2.5rem; color: #A4B9A1; margin-bottom: 0.75rem;">
+                        <i class="bi bi-cup-hot"></i>
+                    </div>
+                    <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 700; color: #2E5227; margin-bottom: 0.4rem;">
+                        No Active Orders Right Now
+                    </h3>
+                    <p style="color: #55744F; font-size: 0.92rem; max-width: 440px; margin: 0 auto 1.5rem;">
+                        Craving a velvety ceremonial latte, cloud foam, or signature ube fusion?
+                    </p>
+                    <a href="{{ path('app_menu') }}" class="btn-track-action">
+                        <i class="bi bi-bag"></i> Browse Handcrafted Menu
+                    </a>
+                </div>
+            {% else %}
+                {% for order in activeOrders %}
+                    {% set st = order.status|lower %}
+                    <div class="order-card">
+                        <div class="order-card-header">
+                            <div>
+                                <div class="order-num-pill">
+                                    <i class="bi bi-receipt"></i> {{ order.orderNumber }}
+                                </div>
+                                <div class="order-date-text mt-1">
+                                    <i class="bi bi-calendar3 me-1"></i> {{ order.orderDate|date('M d, Y • h:i A') }}
+                                </div>
+                            </div>
+                            <div>
+                                <span class="badge-status badge-status-{{ st }}">
+                                    {% if st == 'preparing' %}
+                                        <i class="bi bi-arrow-repeat spin-icon"></i>
+                                    {% elseif st == 'ready' %}
+                                        <i class="bi bi-bell-fill"></i>
+                                    {% else %}
+                                        <i class="bi bi-check-circle"></i>
+                                    {% endif %}
+                                    {{ order.status }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="font-size: 0.85rem; font-weight: 700; color: #55744F; margin-bottom: 0.4rem;">
+                                ORDER ITEMS ({{ order.items|length }}):
+                            </div>
+                            <div class="d-flex flex-wrap">
+                                {% for item in order.items %}
+                                    <span class="order-item-chip">
+                                        <strong>{{ item.quantity }}x</strong> {{ item.name }}
+                                        <span style="color: #7D9778; font-size: 0.75rem;">({{ item.options|default('Regular') }})</span>
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="order-card-footer">
+                            <div>
+                                <div style="font-size: 0.75rem; color: #7D9778; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">
+                                    {{ order.fulfillmentMethod }} • {{ order.paymentMethod }}
+                                </div>
+                                <div class="order-total-amount">
+                                    ₱{{ order.totalAmount|number_format(2) }}
+                                </div>
+                            </div>
+                            <div>
+                                <a href="{{ path('app_account_order_track', {orderNumber: order.orderNumber}) }}" class="btn-track-action">
+                                    <i class="bi bi-compass"></i> Track Live Status &rarr;
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        {# ── PAST ORDERS ── #}
+        {% if pastOrders is not empty %}
+        <div>
+            <h2 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; color: #2E5227; margin: 0 0 1rem;">
+                <i class="bi bi-archive me-1"></i> Past Orders
+                <span style="font-size: 0.85rem; font-weight: 600; color: #7D9778;">({{ pastOrders|length }})</span>
+            </h2>
+
+            {% for order in pastOrders %}
+                {% set st = order.status|lower %}
+                <div class="order-card" style="opacity: 0.95;">
+                    <div class="order-card-header">
+                        <div>
+                            <div class="order-num-pill" style="font-size: 1.05rem;">
+                                <i class="bi bi-receipt"></i> {{ order.orderNumber }}
+                            </div>
+                            <div class="order-date-text mt-1">
+                                <i class="bi bi-calendar3 me-1"></i> {{ order.orderDate|date('M d, Y • h:i A') }}
+                            </div>
+                        </div>
+                        <div>
+                            <span class="badge-status badge-status-{{ st }}">
+                                {% if st == 'completed' %}
+                                    <i class="bi bi-check2-all"></i>
+                                {% else %}
+                                    <i class="bi bi-x-circle"></i>
+                                {% endif %}
+                                {{ order.status }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap">
+                        {% for item in order.items %}
+                            <span class="order-item-chip">
+                                <strong>{{ item.quantity }}x</strong> {{ item.name }}
+                            </span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="order-card-footer">
+                        <div>
+                            <span style="font-size: 0.78rem; color: #7D9778;">Total Paid:</span>
+                            <span style="font-weight: 800; color: #2E5227; font-size: 1.1rem; margin-left: 0.3rem;">
+                                ₱{{ order.totalAmount|number_format(2) }}
+                            </span>
+                        </div>
+                        <div>
+                            <a href="{{ path('app_account_order_track', {orderNumber: order.orderNumber}) }}" class="btn-track-action" style="background: #E8F1E6; color: #2E5227; border: 1px solid #D2DCD0; box-shadow: none;">
+                                <i class="bi bi-receipt-cutoff"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

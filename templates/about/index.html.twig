@@ -66,31 +66,24 @@
 
 {% block body %}
 
-{# ── 1. HERO SECTION WITH CAFÉ AMBIANCE BACKDROP ── #}
-<section style="
-    background: linear-gradient(135deg, rgba(46,82,39,0.92) 0%, rgba(26,50,22,0.94) 100%), url('{{ asset('images/about/cafe-interior.jpg') }}') center/cover no-repeat;
-    padding: clamp(6.5rem, 10vw, 8.5rem) 1.5rem clamp(3.5rem, 6vw, 5rem);
-    text-align: center;
-    position: relative;
-    overflow: hidden;">
-    <div style="position: absolute; inset: 0; background: radial-gradient(circle at 15% 50%, rgba(76,107,70,0.45) 0%, transparent 60%); pointer-events: none;"></div>
-    
-    <div style="position: relative; max-width: 760px; margin: 0 auto;">
-        <span style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(232,241,230,0.18); border: 1px solid rgba(232,241,230,0.35); backdrop-filter: blur(10px); padding: 0.45rem 1.25rem; border-radius: 50px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #E8F1E6; margin-bottom: 1.2rem;">
-            <span>🍃</span> Kyoto Ceremonial Heritage • Est. 2024
+{# ── 1. HERO SECTION WITH ARTISANAL CEREMONIAL BACKDROP ── #}
+<section class="page-hero" style="background-image: url('{{ asset('images/banner.jpg') }}');">
+    <div class="page-hero-inner">
+        <span class="page-hero-eyebrow">
+            <i class="bi bi-flower1" style="color: #A4B9A1;"></i> Kyoto Ceremonial Heritage • Est. 2024
         </span>
         
-        <h1 style="font-family: var(--font-heading); font-size: clamp(2.4rem, 5.5vw, 4rem); font-weight: 800; color: #FFFFFF; line-height: 1.12; margin: 0 0 1.2rem; letter-spacing: -0.02em;">
+        <h1 class="page-hero-title">
             THE ART OF<br><span style="color: #E8F1E6;">PURE MATCHA</span>
         </h1>
         
-        <p style="font-size: clamp(0.98rem, 1.8vw, 1.15rem); color: rgba(232,241,230,0.9); line-height: 1.7; max-width: 620px; margin: 0 auto 2.2rem;">
+        <p class="page-hero-subtitle">
             Founded with a singular sacred intention: bringing centuries-old Japanese tea craftsmanship to modern café lovers without artificial syrups, compromise, or shortcuts.
         </p>
         
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
             <a href="{{ path('app_menu') }}" class="btn-hero-deep" style="background: #FFFFFF; color: #2E5227; font-weight: 800; padding: 0.95rem 2.2rem; border-radius: 50px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
-                Explore Handcrafted Menu &rarr;
+                <i class="bi bi-cup-straw"></i> Explore Handcrafted Menu &rarr;
             </a>
             <a href="#uji-farm" class="btn-hero-glass" style="background: rgba(232,241,230,0.15); color: #FFFFFF; border: 1.5px solid rgba(232,241,230,0.4); font-weight: 600; padding: 0.95rem 2rem; border-radius: 50px; text-decoration: none; display: inline-flex; align-items: center;">
                 Discover Our Craft &darr;
@@ -189,15 +182,15 @@
 
             <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
                 <div class="about-step-pill">
-                    <span class="num">⚡</span>
+                    <span class="num"><i class="bi bi-shield-check"></i></span>
                     <span>Zero Friction Heat</span>
                 </div>
                 <div class="about-step-pill">
-                    <span class="num">✨</span>
+                    <span class="num"><i class="bi bi-award-fill"></i></span>
                     <span>5-Micron Silk Texture</span>
                 </div>
                 <div class="about-step-pill">
-                    <span class="num">🛡️</span>
+                    <span class="num"><i class="bi bi-check-circle-fill"></i></span>
                     <span>No Fillers or Additives</span>
                 </div>
             </div>
@@ -226,15 +219,15 @@
 
             <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
                 <div class="about-step-pill">
-                    <span class="num">🥢</span>
+                    <span class="num"><i class="bi bi-cup-hot-fill"></i></span>
                     <span>100-Prong Chasen</span>
                 </div>
                 <div class="about-step-pill">
-                    <span class="num">🌡️</span>
+                    <span class="num"><i class="bi bi-thermometer-half"></i></span>
                     <span>80°C Optimal Heat</span>
                 </div>
                 <div class="about-step-pill">
-                    <span class="num">🍵</span>
+                    <span class="num"><i class="bi bi-flower1"></i></span>
                     <span>Velvety Micro-Foam</span>
                 </div>
             </div>
@@ -269,13 +262,13 @@
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem;">
             {% for pillar in [
-                {icon: '🍃', title: '100% Purity First', desc: 'Zero artificial colorings, corn syrups, or fillers. Just authentic ceremonial-grade Kyoto tencha.'},
-                {icon: '⚡', title: 'Calm Sustained Clarity', desc: 'Abundant in natural L-theanine amino acids for peaceful focus without caffeine jitters or crashes.'},
-                {icon: '✨', title: 'Artisan Culinary Fusions', desc: 'Thoughtful harmony of Japanese tea culture with organic oat milk, real Philippine ube, and sea salt cloud.'},
-                {icon: '💚', title: 'Mindful Café Hospitality', desc: 'Crafting warm daily rituals, peaceful ambiance, and comforting memories for every guest who walks in.'}
+                {icon: '<i class="bi bi-patch-check-fill"></i>', title: '100% Purity First', desc: 'Zero artificial colorings, corn syrups, or fillers. Just authentic ceremonial-grade Kyoto tencha.'},
+                {icon: '<i class="bi bi-lightning-charge-fill"></i>', title: 'Calm Sustained Clarity', desc: 'Abundant in natural L-theanine amino acids for peaceful focus without caffeine jitters or crashes.'},
+                {icon: '<i class="bi bi-stars"></i>', title: 'Artisan Culinary Fusions', desc: 'Thoughtful harmony of Japanese tea culture with organic oat milk, real Philippine ube, and sea salt cloud.'},
+                {icon: '<i class="bi bi-heart-fill"></i>', title: 'Mindful Café Hospitality', desc: 'Crafting warm daily rituals, peaceful ambiance, and comforting memories for every guest who walks in.'}
             ] %}
             <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(232, 241, 230, 0.2); border-radius: 22px; padding: 2rem 1.6rem; text-align: center; backdrop-filter: blur(10px); transition: transform 0.2s;">
-                <div style="font-size: 2.4rem; margin-bottom: 0.8rem;">{{ pillar.icon }}</div>
+                <div style="font-size: 2.2rem; margin-bottom: 0.8rem; color: #E8F1E6;">{{ pillar.icon|raw }}</div>
                 <h3 style="font-family: var(--font-heading); font-size: 1.15rem; color: #E8F1E6; margin-bottom: 0.6rem; font-weight: 700;">{{ pillar.title }}</h3>
                 <p style="font-size: 0.88rem; color: #A4B9A1; line-height: 1.65; margin: 0;">{{ pillar.desc }}</p>
             </div>

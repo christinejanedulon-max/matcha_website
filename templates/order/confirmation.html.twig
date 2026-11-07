@@ -1,69 +1,70 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Order Confirmed #{{ order.orderNumber }} — Matcha Moments Café{% endblock %}
+{% block meta_description %}Your Matcha Moments order #{{ order.orderNumber }} has been received and is being prepared with ceremonial grade matcha.{% endblock %}
 
 {% block body %}
-<section style="background:linear-gradient(145deg,#2E5227 0%,#1A3216 60%,#2E5227 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:clamp(6rem,10vw,8rem) 1.5rem 3rem;position:relative;overflow:hidden;">
-    <div style="position:absolute;inset:0;background:radial-gradient(circle at 10% 50%, rgba(76,107,70,0.4) 0%, transparent 55%),radial-gradient(circle at 90% 20%, rgba(125,151,120,0.3) 0%, transparent 50%);pointer-events:none;"></div>
+<section style="background: linear-gradient(145deg, #2E5227 0%, #1A3216 60%, #2E5227 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: clamp(6.5rem, 10vw, 8.5rem) 1.5rem 3.5rem; position: relative; overflow: hidden;">
+    <div style="position: absolute; inset: 0; background: radial-gradient(circle at 10% 50%, rgba(76,107,70,0.4) 0%, transparent 55%), radial-gradient(circle at 90% 20%, rgba(125,151,120,0.3) 0%, transparent 50%); pointer-events: none;"></div>
 
-    <div style="position:relative;width:100%;max-width:580px;">
-        <div style="background:#FFFFFF;border-radius:28px;padding:clamp(2rem,5vw,3rem);box-shadow:0 32px 80px rgba(0,0,0,0.25);">
+    <div style="position: relative; width: 100%; max-width: 600px;">
+        <div style="background: #FFFFFF; border-radius: 28px; padding: clamp(2rem, 5vw, 3rem); box-shadow: 0 32px 80px rgba(0,0,0,0.25); border: 1px solid #D2DCD0;">
 
             {# Success Header #}
-            <div style="text-align:center;margin-bottom:2rem;">
-                <div style="width:72px;height:72px;border-radius:50%;background:#E8F1E6;display:flex;align-items:center;justify-content:center;font-size:2.2rem;margin:0 auto 1rem;">✅</div>
-                <div style="display:inline-block;background:#E8F1E6;color:#2E5227;font-size:0.72rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:0.3rem 1rem;border-radius:50px;margin-bottom:0.8rem;">Order Confirmed</div>
-                <h1 style="font-family:var(--font-heading);font-size:clamp(1.8rem,5vw,2.5rem);color:#2E5227;font-weight:800;margin:0 0 0.5rem;letter-spacing:-0.02em;">ORDER PLACED! 🍵</h1>
-                <p style="color:#55744F;font-size:0.95rem;">Thank you, <strong style="color:#2E5227;">{{ order.customerName }}</strong>! Your handcrafted matcha is being prepared.</p>
-                <div style="display:inline-block;background:#2E5227;color:#FFFFFF;font-weight:800;font-size:0.95rem;padding:0.5rem 1.4rem;border-radius:50px;margin-top:0.8rem;">
-                    Order #{{ order.orderNumber }}
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="width: 72px; height: 72px; border-radius: 50%; background: #E8F1E6; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: #2E5227; margin: 0 auto 1rem; border: 2px solid #A4B9A1;">
+                    <i class="bi bi-check2-circle"></i>
+                </div>
+                <div style="display: inline-block; background: #E8F1E6; color: #2E5227; font-size: 0.74rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; padding: 0.35rem 1rem; border-radius: 50px; margin-bottom: 0.75rem;">
+                    Order Confirmed
+                </div>
+                <h1 style="font-family: var(--font-heading); font-size: clamp(1.8rem, 5vw, 2.4rem); color: #2E5227; font-weight: 800; margin: 0 0 0.5rem; letter-spacing: -0.02em;">
+                    ORDER RECEIVED
+                </h1>
+                <p style="color: #55744F; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem;">
+                    Thank you, <strong style="color: #2E5227;">{{ order.customerName }}</strong>! Your ceremonial matcha order is now in our barista queue.
+                </p>
+                <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #2E5227; color: #FFFFFF; font-weight: 800; font-size: 0.95rem; padding: 0.55rem 1.5rem; border-radius: 50px; box-shadow: 0 4px 14px rgba(46,82,39,0.25);">
+                    <i class="bi bi-receipt"></i> Order #{{ order.orderNumber }}
                 </div>
             </div>
 
-            {# Status Stepper #}
-            <div style="background:#F7FAF6;border-radius:18px;padding:1.5rem;margin-bottom:1.8rem;">
-                {% set st = order.status|lower %}
-                <div style="display:flex;align-items:center;justify-content:space-between;position:relative;">
-                    <div style="position:absolute;top:16px;left:0;right:0;height:2px;background:#E8F1E6;z-index:0;"></div>
-                    {% for step in [
-                        {label:'Placed',   icon:'✓',  done:true},
-                        {label:'Preparing',icon:'2',  done: st in ['preparing','ready','completed']},
-                        {label:(order.fulfillmentMethod == 'Delivery' ? 'Delivery' : 'Pickup'), icon:'3', done: st in ['ready','completed']},
-                        {label:'Done!',    icon:'🎉', done: st == 'completed'}
-                    ] %}
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;position:relative;z-index:1;flex:1;">
-                        <div style="width:34px;height:34px;border-radius:50%;background:{% if step.done %}#2E5227{% else %}#D2DCD0{% endif %};color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:800;box-shadow:0 3px 10px rgba(46,82,39,0.2);">{{ step.icon }}</div>
-                        <span style="font-size:0.72rem;font-weight:700;color:{% if step.done %}#2E5227{% else %}#A4B9A1{% endif %};text-align:center;line-height:1.2;">{{ step.label }}</span>
-                    </div>
-                    {% endfor %}
+            {# Live Track Banner #}
+            <div class="p-3 mb-4 rounded-4 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: #FAFDF9; border: 1.5px solid #A4B9A1;">
+                <div>
+                    <strong style="color: #2E5227; font-size: 0.92rem; display: block;">Track Live Preparation</strong>
+                    <span style="color: #55744F; font-size: 0.78rem;">Follow your cup from stone-grinding to pickup</span>
                 </div>
+                <a href="{{ path('app_account_order_track', {orderNumber: order.orderNumber}) }}" style="display: inline-flex; align-items: center; gap: 0.4rem; background: #2E5227; color: #FFFFFF; padding: 0.55rem 1.25rem; border-radius: 50px; font-weight: 700; font-size: 0.82rem; text-decoration: none;">
+                    <i class="bi bi-compass"></i> Live Tracker &rarr;
+                </a>
             </div>
 
             {# Receipt #}
-            <div style="background:#F7FAF6;border-radius:18px;padding:1.5rem;margin-bottom:1.8rem;">
-                <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:#7D9778;margin-bottom:1rem;padding-bottom:0.6rem;border-bottom:1px solid #E8F1E6;">
-                    <span>{{ order.orderDate|date('M d, Y • h:i A') }}</span>
-                    <span style="font-weight:700;color:#2E5227;">{{ order.status|upper }}</span>
+            <div style="background: #F7FAF6; border-radius: 18px; padding: 1.5rem; margin-bottom: 1.8rem; border: 1px solid #E8F1E6;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: #7D9778; margin-bottom: 1rem; padding-bottom: 0.6rem; border-bottom: 1px solid #E8F1E6;">
+                    <span><i class="bi bi-calendar3 me-1"></i> {{ order.orderDate|date('M d, Y • h:i A') }}</span>
+                    <span style="font-weight: 700; color: #2E5227; text-transform: uppercase;">{{ order.status }}</span>
                 </div>
 
                 {% for item in order.items %}
-                <div style="display:flex;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid #F0F7EE;font-size:0.9rem;">
+                <div style="display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid #E8F1E6; font-size: 0.9rem;">
                     <div>
-                        <strong style="color:#2E5227;">{{ item.quantity }}× {{ item.name }}</strong>
+                        <strong style="color: #2E5227;">{{ item.quantity }}× {{ item.name }}</strong>
                         {% if item.options is defined and item.options %}
-                            <div style="font-size:0.72rem;color:#A4B9A1;">{{ item.options }}</div>
+                            <div style="font-size: 0.75rem; color: #7D9778;">{{ item.options }}</div>
                         {% endif %}
                     </div>
-                    <div style="font-weight:700;color:#2E5227;">₱{{ (item.unitPrice * item.quantity)|number_format(2) }}</div>
+                    <div style="font-weight: 700; color: #2E5227;">₱{{ (item.unitPrice * item.quantity)|number_format(2) }}</div>
                 </div>
                 {% endfor %}
 
-                <div style="margin-top:0.8rem;padding-top:0.8rem;border-top:2px dashed #D2DCD0;">
-                    <div style="display:flex;justify-content:space-between;font-size:0.85rem;color:#55744F;margin-bottom:0.3rem;">
+                <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 2px dashed #D2DCD0;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #55744F; margin-bottom: 0.3rem;">
                         <span>Fulfillment ({{ order.fulfillmentMethod }})</span>
                         <span>{% if order.fulfillmentMethod == 'Delivery' %}₱50.00{% else %}Free Pickup{% endif %}</span>
                     </div>
-                    <div style="display:flex;justify-content:space-between;font-family:var(--font-heading);font-size:1.3rem;font-weight:800;color:#2E5227;margin-top:0.5rem;">
+                    <div style="display: flex; justify-content: space-between; font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; color: #2E5227; margin-top: 0.5rem;">
                         <span>Total</span>
                         <span>₱{{ order.totalAmount|number_format(2) }}</span>
                     </div>
@@ -71,17 +72,25 @@
             </div>
 
             {# Customer details #}
-            <div style="background:#E8F1E6;border-radius:14px;padding:1rem 1.2rem;font-size:0.82rem;color:#2E5227;margin-bottom:1.8rem;">
-                <p style="margin:0 0 0.3rem;"><strong>📞</strong> {{ order.phone }}</p>
-                {% if order.deliveryAddress %}<p style="margin:0 0 0.3rem;"><strong>📍</strong> {{ order.deliveryAddress }}</p>{% endif %}
-                <p style="margin:0;"><strong>💳</strong> {{ order.paymentMethod }}{% if order.referenceNumber %} (Ref: {{ order.referenceNumber }}){% endif %}</p>
-                {% if order.notes is defined and order.notes %}<p style="margin:0.3rem 0 0;"><strong>📝</strong> {{ order.notes }}</p>{% endif %}
+            <div style="background: #E8F1E6; border-radius: 14px; padding: 1.1rem 1.3rem; font-size: 0.85rem; color: #2E5227; margin-bottom: 1.8rem; border: 1px solid #D2DCD0;">
+                <p style="margin: 0 0 0.35rem;"><i class="bi bi-telephone me-2"></i> {{ order.phone|default('No phone provided') }}</p>
+                {% if order.deliveryAddress %}
+                    <p style="margin: 0 0 0.35rem;"><i class="bi bi-geo-alt me-2"></i> {{ order.deliveryAddress }}</p>
+                {% endif %}
+                <p style="margin: 0;"><i class="bi bi-credit-card me-2"></i> {{ order.paymentMethod }}{% if order.referenceNumber %} (Ref: {{ order.referenceNumber }}){% endif %}</p>
+                {% if order.notes is defined and order.notes %}
+                    <p style="margin: 0.35rem 0 0;"><i class="bi bi-chat-left-text me-2"></i> {{ order.notes }}</p>
+                {% endif %}
             </div>
 
             {# CTAs #}
-            <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
-                <a href="{{ path('app_menu') }}" class="btn-hero-primary" style="padding:0.8rem 2rem;">Order More →</a>
-                <a href="{{ path('admin_orders') }}" style="display:inline-flex;align-items:center;padding:0.8rem 2rem;border-radius:50px;border:2px solid #2E5227;color:#2E5227;font-weight:700;font-size:0.9rem;text-decoration:none;">Admin View</a>
+            <div style="display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap;">
+                <a href="{{ path('app_account_orders') }}" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.8rem 1.8rem; border-radius: 50px; background: #2E5227; color: #FFFFFF; font-weight: 700; font-size: 0.88rem; text-decoration: none; box-shadow: 0 4px 14px rgba(46,82,39,0.2);">
+                    <i class="bi bi-clock-history"></i> My Order History
+                </a>
+                <a href="{{ path('app_menu') }}" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.8rem 1.8rem; border-radius: 50px; border: 1.5px solid #2E5227; color: #2E5227; font-weight: 700; font-size: 0.88rem; text-decoration: none; background: #FFFFFF;">
+                    <i class="bi bi-cup-straw"></i> Browse Menu
+                </a>
             </div>
 
         </div>

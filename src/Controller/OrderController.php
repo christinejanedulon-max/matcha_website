@@ -80,6 +80,7 @@ final class OrderController extends AbstractController
 
         $order = $store->createOrder([
             'customerName' => $customerName,
+            'customerEmail' => $session->get('user_email'),
             'phone' => $phone,
             'totalAmount' => $totalAmount,
             'fulfillmentMethod' => $fulfillment,

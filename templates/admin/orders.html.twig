@@ -11,8 +11,8 @@
         </p>
     </div>
     <div>
-        <a href="{{ path('admin_orders') }}" class="btn-hero-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.85rem; border-radius: 8px;">
-            🔄 Refresh Orders
+        <a href="{{ path('admin_orders') }}" class="btn-hero-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.85rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <i class="bi bi-arrow-clockwise"></i> Refresh Orders
         </a>
     </div>
 </div>
@@ -63,21 +63,21 @@
                         <td>
                             <strong style="color: var(--clr-dark);">{{ order.customerName }}</strong>
                             <div style="font-size: 0.8rem; color: #666;">
-                                <a href="tel:{{ order.phone }}" style="color: var(--clr-matcha-dark);">📞 {{ order.phone }}</a>
+                                <a href="tel:{{ order.phone }}" style="color: var(--clr-matcha-dark);"><i class="bi bi-telephone-fill me-1"></i>{{ order.phone }}</a>
                             </div>
                         </td>
                         <td>
                             <span style="display: inline-block; font-weight: 700; font-size: 0.82rem; margin-bottom: 0.2rem;">
-                                {% if order.fulfillmentMethod == 'Delivery' %}🛵 Delivery{% else %}🏪 Pickup{% endif %}
+                                {% if order.fulfillmentMethod == 'Delivery' %}<i class="bi bi-truck me-1"></i>Delivery{% else %}<i class="bi bi-shop me-1"></i>Pickup{% endif %}
                             </span>
                             {% if order.deliveryAddress %}
                                 <div style="font-size: 0.75rem; color: #666; max-width: 200px; line-height: 1.3;">
-                                    📍 {{ order.deliveryAddress }}
+                                    <i class="bi bi-geo-alt-fill me-1"></i>{{ order.deliveryAddress }}
                                 </div>
                             {% endif %}
                             {% if order.notes is defined and order.notes %}
                                 <div style="font-size: 0.72rem; color: #55744F; margin-top: 0.2rem;">
-                                    💬 Note: {{ order.notes }}
+                                    <i class="bi bi-chat-left-text me-1"></i>Note: {{ order.notes }}
                                 </div>
                             {% endif %}
                         </td>

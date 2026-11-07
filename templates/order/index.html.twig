@@ -232,14 +232,14 @@
 
         {# Header #}
         <div class="checkout-page-header">
-            <div class="eyebrow">🛒 Order Checkout</div>
+            <div class="eyebrow"><i class="bi bi-bag-check-fill me-1"></i> Order Checkout</div>
             <h1>COMPLETE YOUR ORDER</h1>
             <p>Confirm your drink choices, delivery details, and payment method.</p>
         </div>
 
         {# Empty cart notice #}
         <div id="checkoutEmptyNotice" style="display:none;text-align:center;background:#FFFFFF;border-radius:24px;padding:4rem 2rem;border:1px solid #E8F1E6;box-shadow:0 4px 24px rgba(46,82,39,0.07);max-width:500px;margin:0 auto;">
-            <div style="font-size:4rem;margin-bottom:1rem;">🍃</div>
+            <div style="margin-bottom:1rem;"><i class="bi bi-cup-hot" style="font-size:3.5rem;color:#7D9778;display:inline-block;"></i></div>
             <h2 style="font-family:var(--font-heading);color:#2E5227;margin:0 0 0.5rem;font-weight:800;">Your tray is empty</h2>
             <p style="color:#7D9778;margin-bottom:1.8rem;">Pick some of our signature matcha creations first.</p>
             <a href="{{ path('app_menu') }}" class="btn-hero-primary" style="display:inline-block;">Explore Menu</a>
@@ -257,8 +257,8 @@
                     <div class="form-group">
                         <label class="form-label">Fulfillment Method</label>
                         <div class="toggle-pills">
-                            <button type="button" class="toggle-pill active" id="pillPickup" onclick="setFulfillment('Pickup')">🏪 In-Store Pickup</button>
-                            <button type="button" class="toggle-pill" id="pillDelivery" onclick="setFulfillment('Delivery')">🛵 Express Delivery (+₱50)</button>
+                            <button type="button" class="toggle-pill active" id="pillPickup" onclick="setFulfillment('Pickup')"><i class="bi bi-shop me-1"></i> In-Store Pickup</button>
+                            <button type="button" class="toggle-pill" id="pillDelivery" onclick="setFulfillment('Delivery')"><i class="bi bi-truck me-1"></i> Express Delivery (+₱50)</button>
                         </div>
                         <input type="hidden" name="fulfillment_method" id="fulfillmentInput" value="Pickup">
                     </div>
@@ -282,12 +282,12 @@
 
                     <div class="payment-methods-grid">
                         <div class="payment-option-card active" id="payCardCash" onclick="setPayment('Cash')">
-                            <div style="font-size:1.6rem;margin-bottom:0.3rem;">💵</div>
+                            <div style="margin-bottom:0.3rem;"><i class="bi bi-cash-stack" style="font-size:1.6rem;color:#2E5227;display:block;"></i></div>
                             <strong>Cash / COD</strong>
                             <div style="font-size:0.76rem;color:#7D9778;margin-top:0.2rem;">Pay upon pickup or delivery</div>
                         </div>
                         <div class="payment-option-card" id="payCardGcash" onclick="setPayment('GCash')">
-                            <div style="font-size:1.6rem;margin-bottom:0.3rem;">📱</div>
+                            <div style="margin-bottom:0.3rem;"><i class="bi bi-phone" style="font-size:1.6rem;color:#2E5227;display:block;"></i></div>
                             <strong>GCash Express</strong>
                             <div style="font-size:0.76rem;color:#7D9778;margin-top:0.2rem;">Fast mobile transfer</div>
                         </div>

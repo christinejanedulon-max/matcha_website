@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Matcha Moments Café — Pure Matcha, Pure Moments{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Handcrafted matcha drinks made with premium ingredients for a healthier and happier you.{% endblock %}">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍵</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%232E5227%22/><text y=%2268%22 x=%2222%22 font-size=%2250%22 fill=%22%23E8F1E6%22 font-family=%22sans-serif%22 font-weight=%22bold%22>M</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
     {% block stylesheets %}{% endblock %}
 </head>
@@ -26,6 +27,11 @@
     </div>
 {% endfor %}
 
+{% set isAdmin = (app.session and app.session.get('user_role') == 'admin') %}
+{% set isCustomer = (app.session and app.session.get('user_role') == 'customer') %}
+{% set isLoggedIn = (isAdmin or isCustomer) %}
+{% set userName = app.session ? app.session.get('user_name') : null %}
+
 <!-- ==================== NAVBAR ==================== -->
 <header class="navbar" id="navbar">
     <div class="navbar-inner">
@@ -39,57 +45,139 @@
             <a href="{{ path('app_about') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_about' %}active{% endif %}">About</a>
             <a href="{{ path('app_reviews') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_reviews' %}active{% endif %}">Reviews</a>
             <a href="{{ path('app_contact') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_contact' %}active{% endif %}">Contact</a>
+            {% if isCustomer %}
+                <a href="{{ path('app_account_orders') }}" class="nav-link {% if 'app_account' in (app.request.attributes.get('_route')|default('')) %}active{% endif %}">
+                    <i class="bi bi-clock-history"></i> My Orders
+                </a>
+            {% endif %}
         </nav>
 
         <div class="navbar-actions">
-            <!-- Cart Button with Counter -->
+            <!-- Cart Button with Counter (ALWAYS visible on desktop & mobile) -->
             <button class="nav-cart-btn" id="openCartDrawerBtn" aria-label="View Shopping Cart">
-                <span class="cart-icon">🛒</span>
+                <i class="bi bi-bag"></i>
                 <span class="cart-badge" id="cartBadgeCount">0</span>
             </button>
 
-            {% set isAdmin = (app.session and app.session.get('user_role') == 'admin') %}
-            {% set isCustomer = (app.session and app.session.get('user_role') == 'customer') %}
-            {% set isLoggedIn = (isAdmin or isCustomer) %}
-            {% set userName = app.session ? app.session.get('user_name') : null %}
-
-            <!-- Order Now CTA -->
-            {% if isLoggedIn %}
-                <a href="{{ path('app_menu') }}" class="btn-nav-order">Order Now</a>
-            {% else %}
-                <button type="button" class="btn-nav-order" onclick="openAuthGateModal()" style="border: none; cursor: pointer;">Order Now</button>
-            {% endif %}
+            <!-- Order Now CTA (Desktop) -->
+            <div class="desktop-only-action">
+                {% if isLoggedIn %}
+                    <a href="{{ path('app_menu') }}" class="btn-nav-order"><i class="bi bi-cup-straw"></i> Order Now</a>
+                {% else %}
+                    <button type="button" class="btn-nav-order" onclick="openAuthGateModal()" style="border: none; cursor: pointer;"><i class="bi bi-cup-straw"></i> Order Now</button>
+                {% endif %}
+            </div>
 
             {% if isAdmin %}
-                <!-- Admin Dashboard (ONLY visible when logged in as Admin) -->
-                <a href="{{ path('admin_dashboard') }}" class="btn-nav-admin" title="Admin Dashboard">
-                    ⚙️ Dashboard
+                <!-- Admin Dashboard (Desktop) -->
+                <a href="{{ path('admin_dashboard') }}" class="btn-nav-admin desktop-only-action" title="Admin Dashboard">
+                    <i class="bi bi-speedometer2"></i> Dashboard
                 </a>
-                <a href="{{ path('app_logout') }}" onclick="localStorage.removeItem('matcha_moments_cart_v1');" class="btn-nav-auth" style="padding: 0.45rem 0.85rem; border-radius: 50px; font-size: 0.78rem; font-weight: 600; color: #b91c1c; background: #fee2e2; border: none; text-decoration: none;">
+                <a href="{{ path('app_logout') }}" onclick="localStorage.removeItem('matcha_moments_cart_v1');" class="btn-nav-auth desktop-only-action" style="padding: 0.45rem 0.85rem; border-radius: 50px; font-size: 0.78rem; font-weight: 600; color: #b91c1c; background: #fee2e2; border: none; text-decoration: none;">
                     Sign Out
                 </a>
             {% elseif isCustomer %}
-                <!-- Regular User Logged In (Admin section is HIDDEN) -->
-                <span class="nav-user-chip" style="font-size: 0.82rem; font-weight: 600; color: var(--clr-matcha-dark); background: var(--clr-cream); padding: 0.4rem 0.8rem; border-radius: 50px; border: 1px solid var(--clr-cream-dark);">
-                    👤 {{ userName|split(' ')|first }}
+                <!-- Regular User Logged In (Desktop) -->
+                <a href="{{ path('app_account_orders') }}" class="btn-nav-orders desktop-only-action" title="View order history and live tracking">
+                    <i class="bi bi-receipt"></i> Orders
+                </a>
+                <span class="nav-user-chip desktop-only-action" style="font-size: 0.82rem; font-weight: 600; color: var(--clr-matcha-dark); background: var(--clr-cream); padding: 0.4rem 0.8rem; border-radius: 50px; border: 1px solid var(--clr-cream-dark); display: inline-flex; align-items: center; gap: 0.35rem;">
+                    <i class="bi bi-person-fill"></i> {{ userName|split(' ')|first }}
                 </span>
-                <a href="{{ path('app_logout') }}" onclick="localStorage.removeItem('matcha_moments_cart_v1');" class="btn-nav-auth" style="padding: 0.45rem 0.85rem; border-radius: 50px; font-size: 0.78rem; font-weight: 600; color: var(--clr-text-muted); background: var(--clr-cream-dark); border: none; text-decoration: none;">
+                <a href="{{ path('app_logout') }}" onclick="localStorage.removeItem('matcha_moments_cart_v1');" class="btn-nav-auth desktop-only-action" style="padding: 0.45rem 0.85rem; border-radius: 50px; font-size: 0.78rem; font-weight: 600; color: var(--clr-text-muted); background: var(--clr-cream-dark); border: none; text-decoration: none;">
                     Sign Out
                 </a>
             {% else %}
-                <!-- Guest / Not Logged In -->
-                <a href="{{ path('app_login') }}" class="btn-nav-login" style="padding: 0.45rem 0.95rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; text-decoration: none;">
+                <!-- Guest / Not Logged In (Desktop) -->
+                <a href="{{ path('app_login') }}" class="btn-nav-login desktop-only-action">
                     Sign In
                 </a>
-                <a href="{{ path('app_register') }}" style="padding: 0.45rem 0.95rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; background: #E8F1E6; color: #2E5227; border: 1.5px solid #A4B9A1; text-decoration: none; transition: all 0.2s;">
+                <a href="{{ path('app_register') }}" class="btn-nav-register desktop-only-action">
                     Register
                 </a>
             {% endif %}
-        </div>
 
-        <button class="navbar-hamburger" id="hamburgerBtn" aria-label="Toggle navigation">
-            <span></span><span></span><span></span>
-        </button>
+            <!-- Hamburger Button (Mobile & Tablet) -->
+            <button class="navbar-hamburger" id="hamburgerBtn" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileNavDrawer">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Slide-Down Drawer (Visible on <= 991px) -->
+    <div class="mobile-nav-drawer" id="mobileNavDrawer">
+        <nav class="mobile-nav-links">
+            <a href="{{ path('app_home') }}" class="mobile-nav-link {% if app.request.attributes.get('_route') == 'app_home' %}active{% endif %}" onclick="closeMobileMenu()">
+                <i class="bi bi-house-door"></i> Home
+            </a>
+            <a href="{{ path('app_menu') }}" class="mobile-nav-link {% if app.request.attributes.get('_route') == 'app_menu' %}active{% endif %}" onclick="closeMobileMenu()">
+                <i class="bi bi-cup-straw"></i> Menu
+            </a>
+            <a href="{{ path('app_about') }}" class="mobile-nav-link {% if app.request.attributes.get('_route') == 'app_about' %}active{% endif %}" onclick="closeMobileMenu()">
+                <i class="bi bi-flower1"></i> About Us
+            </a>
+            <a href="{{ path('app_reviews') }}" class="mobile-nav-link {% if app.request.attributes.get('_route') == 'app_reviews' %}active{% endif %}" onclick="closeMobileMenu()">
+                <i class="bi bi-chat-heart"></i> Customer Reviews
+            </a>
+            <a href="{{ path('app_contact') }}" class="mobile-nav-link {% if app.request.attributes.get('_route') == 'app_contact' %}active{% endif %}" onclick="closeMobileMenu()">
+                <i class="bi bi-geo-alt"></i> Contact Us
+            </a>
+        </nav>
+
+        <div class="mobile-nav-divider"></div>
+
+        <div class="mobile-nav-account">
+            {% if isAdmin %}
+                <div class="mobile-user-banner">
+                    <i class="bi bi-shield-check"></i>
+                    <div>
+                        <strong>Administrator</strong>
+                        <small>{{ userName|default('Store Admin') }}</small>
+                    </div>
+                </div>
+                <a href="{{ path('admin_dashboard') }}" class="mobile-btn-action" style="background: #2E5227; color: #FFFFFF;" onclick="closeMobileMenu()">
+                    <i class="bi bi-speedometer2"></i> Admin Dashboard
+                </a>
+                <a href="{{ path('admin_orders') }}" class="mobile-btn-action" onclick="closeMobileMenu()">
+                    <i class="bi bi-receipt"></i> Customer Orders
+                </a>
+                <a href="{{ path('app_logout') }}" onclick="localStorage.removeItem('matcha_moments_cart_v1'); closeMobileMenu();" class="mobile-btn-action logout-btn">
+                    <i class="bi bi-box-arrow-right"></i> Sign Out
+                </a>
+            {% elseif isCustomer %}
+                <div class="mobile-user-banner">
+                    <i class="bi bi-person-circle"></i>
+                    <div>
+                        <strong>Hello, {{ userName|split(' ')|first }}!</strong>
+                        <small>{{ app.session.get('user_email') }}</small>
+                    </div>
+                </div>
+                <a href="{{ path('app_account_orders') }}" class="mobile-btn-action orders-highlight-btn" onclick="closeMobileMenu()">
+                    <i class="bi bi-clock-history"></i> My Orders & Live Tracking
+                </a>
+                <a href="{{ path('app_menu') }}" class="mobile-btn-action primary-btn" onclick="closeMobileMenu()">
+                    <i class="bi bi-cup-straw"></i> Order Now
+                </a>
+                <button type="button" class="mobile-btn-action" onclick="openCartDrawer(); closeMobileMenu();">
+                    <i class="bi bi-bag"></i> View Cart (<span class="mobile-cart-count">0</span>)
+                </button>
+                <a href="{{ path('app_logout') }}" onclick="localStorage.removeItem('matcha_moments_cart_v1'); closeMobileMenu();" class="mobile-btn-action logout-btn">
+                    <i class="bi bi-box-arrow-right"></i> Sign Out
+                </a>
+            {% else %}
+                <button type="button" class="mobile-btn-action primary-btn" onclick="openAuthGateModal(); closeMobileMenu();">
+                    <i class="bi bi-cup-straw"></i> Order Now
+                </button>
+                <div class="mobile-guest-auth-row">
+                    <a href="{{ path('app_login') }}" class="mobile-btn-action login-btn" onclick="closeMobileMenu()">
+                        <i class="bi bi-box-arrow-in-right"></i> Sign In
+                    </a>
+                    <a href="{{ path('app_register') }}" class="mobile-btn-action register-btn" onclick="closeMobileMenu()">
+                        <i class="bi bi-person-plus"></i> Register
+                    </a>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </header>
 
@@ -112,7 +200,7 @@
     <div class="cart-items-container" id="cartItemsContainer">
         <!-- Injected via JavaScript from localStorage -->
         <div class="cart-empty-state" id="cartEmptyState">
-            <div class="empty-icon">🍃</div>
+            <div class="empty-icon"><i class="bi bi-cup-hot" style="font-size: 2.8rem; color: #7D9778; display: inline-block;"></i></div>
             <h4>Your cart is empty</h4>
             <p>Explore our handcrafted menu and add your favorite matcha drinks.</p>
             <a href="{{ path('app_menu') }}" class="btn-hero-primary" onclick="closeCartDrawer()" style="margin-top: 1rem; display: inline-block;">Browse Menu</a>
@@ -194,8 +282,8 @@
 <div class="modal-backdrop" id="authGateModalBackdrop" style="display: none;">
     <div class="custom-modal" role="dialog" aria-modal="true" style="max-width: 440px; padding: 2.4rem 2rem; text-align: center; border-radius: 26px;">
         <button class="modal-close-btn" onclick="closeAuthGateModal()">&times;</button>
-        <div style="width: 68px; height: 68px; border-radius: 50%; background: #E8F1E6; border: 2px solid #A4B9A1; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1.1rem; animation: pulseBadgeGlow 2.4s infinite;">
-            🍵
+        <div style="width: 68px; height: 68px; border-radius: 50%; background: #E8F1E6; border: 2px solid #A4B9A1; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #2E5227; margin: 0 auto 1.1rem; animation: pulseBadgeGlow 2.4s infinite;">
+            <i class="bi bi-shield-lock-fill"></i>
         </div>
         <span style="display: inline-block; background: #E8F1E6; color: #2E5227; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; padding: 0.28rem 0.9rem; border-radius: 50px; margin-bottom: 0.65rem;">
             Member Ordering
@@ -208,10 +296,10 @@
         </p>
         <div style="display: flex; flex-direction: column; gap: 0.65rem;">
             <a href="{{ path('app_login') }}" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #2E5227; color: #FFFFFF; padding: 0.9rem 1.4rem; border-radius: 14px; font-family: var(--font-heading); font-weight: 800; font-size: 0.95rem; text-decoration: none; box-shadow: 0 8px 20px rgba(46, 82, 39, 0.22); transition: all 0.2s;">
-                Sign In to Your Account &rarr;
+                <i class="bi bi-box-arrow-in-right"></i> Sign In to Your Account &rarr;
             </a>
             <a href="{{ path('app_register') }}" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #E8F1E6; color: #2E5227; border: 1.5px solid #A4B9A1; padding: 0.85rem 1.4rem; border-radius: 14px; font-family: var(--font-heading); font-weight: 800; font-size: 0.92rem; text-decoration: none; transition: all 0.2s;">
-                ✨ Create a Free Account
+                <i class="bi bi-person-plus-fill"></i> Create a Free Account
             </a>
         </div>
     </div>
@@ -219,7 +307,7 @@
 
 <!-- ==================== TOAST NOTIFICATIONS ==================== -->
 <div id="toastNotification" class="toast-popup" style="display: none;">
-    <span class="toast-icon">🍵</span>
+    <span class="toast-icon"><i class="bi bi-check-circle-fill" style="color: #4C6B46; font-size: 1.25rem;"></i></span>
     <span id="toastMessage">Added to cart!</span>
 </div>
 
@@ -243,7 +331,7 @@
                 <li><a href="{{ path('app_home') }}">Home</a></li>
                 <li><a href="{{ path('app_menu') }}">Menu</a></li>
                 <li><a href="{{ path('app_about') }}">About Us</a></li>
-                <li><a href="{{ path('app_order') }}">Order Checkout</a></li>
+                <li><a href="{{ path('app_account_orders') }}">Track Orders & History</a></li>
                 <li><a href="{{ path('app_reviews') }}">Customer Reviews</a></li>
                 <li><a href="{{ path('app_contact') }}">Contact Us</a></li>
             </ul>
@@ -255,7 +343,7 @@
                 <li><a href="{{ path('app_menu') }}#cat-1">Tropical Matcha</a></li>
                 <li><a href="{{ path('app_menu') }}#cat-1">Matcha Foam Latte</a></li>
                 <li><a href="{{ path('app_menu') }}#cat-1">Choco Matcha Fusion</a></li>
-                <li><a href="{{ path('app_menu') }}#cat-2">Strawberry & Mango Cloud</a></li>
+                <li><a href="{{ path('app_menu') }}#cat-2">Strawberry &amp; Mango Cloud</a></li>
                 <li><a href="{{ path('app_menu') }}#cat-3">Cake Matcha Creations</a></li>
             </ul>
         </div>
@@ -285,13 +373,13 @@
             {% if isAdmin %}
                 <div class="admin-link-box" style="margin-top: 1.5rem;">
                     <a href="{{ path('admin_dashboard') }}" class="footer-admin-btn">
-                        ⚙️ Store Administrator
+                        <i class="bi bi-speedometer2"></i> Store Administrator
                     </a>
                 </div>
             {% else %}
                 <div class="admin-link-box" style="margin-top: 1.5rem;">
-                    <a href="{{ path('app_login') }}" style="font-size: 0.72rem; color: rgba(255,255,255,0.4); text-decoration: none;">
-                        🔒 Staff Login
+                    <a href="{{ path('app_login') }}" style="font-size: 0.72rem; color: rgba(255,255,255,0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+                        <i class="bi bi-shield-lock"></i> Staff Login
                     </a>
                 </div>
             {% endif %}
@@ -393,6 +481,8 @@ function updateCartUI() {
     // Badges
     const badge = document.getElementById('cartBadgeCount');
     if (badge) badge.innerText = count;
+
+    document.querySelectorAll('.mobile-cart-count').forEach(el => { el.innerText = count; });
 
     const drawerCount = document.getElementById('drawerCartCount');
     if (drawerCount) drawerCount.innerText = `${count} ${count === 1 ? 'item' : 'items'}`;
@@ -571,14 +661,28 @@ if (confirmAddBtn) {
     });
 }
 
-// Mobile Hamburger
+// Mobile Hamburger & Responsive Drawer
 const hamburgerBtn = document.getElementById('hamburgerBtn');
-const navLinks = document.getElementById('navLinks');
-if (hamburgerBtn && navLinks) {
-    hamburgerBtn.addEventListener('click', () => {
-        navLinks.classList.toggle('open');
-        hamburgerBtn.classList.toggle('active');
-    });
+const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+
+function toggleMobileMenu() {
+    if (!mobileNavDrawer || !hamburgerBtn) return;
+    const isOpen = mobileNavDrawer.classList.toggle('open');
+    hamburgerBtn.classList.toggle('active', isOpen);
+    hamburgerBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+}
+
+function closeMobileMenu() {
+    if (!mobileNavDrawer || !hamburgerBtn) return;
+    mobileNavDrawer.classList.remove('open');
+    hamburgerBtn.classList.remove('active');
+    hamburgerBtn.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+}
+
+if (hamburgerBtn) {
+    hamburgerBtn.addEventListener('click', toggleMobileMenu);
 }
 
 // Navbar scroll shadow

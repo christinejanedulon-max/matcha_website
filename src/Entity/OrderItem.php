@@ -20,8 +20,14 @@ class OrderItem
     private ?Order $order = null;
 
     #[ORM\ManyToOne(targetEntity: Product::class, inversedBy: 'orderItems')]
-    #[ORM\JoinColumn(name: 'product_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'product_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     private ?Product $product = null;
+
+    #[ORM\Column(name: 'product_name', length: 255, nullable: true)]
+    private ?string $productName = null;
+
+    #[ORM\Column(name: 'options', length: 255, nullable: true)]
+    private ?string $options = null;
 
     #[ORM\Column(name: 'quantity', options: ['default' => 1])]
     private ?int $quantity = 1;
@@ -54,6 +60,30 @@ class OrderItem
     public function setProduct(?Product $product): static
     {
         $this->product = $product;
+
+        return $this;
+    }
+
+    public function getProductName(): ?string
+    {
+        return $this->productName;
+    }
+
+    public function setProductName(?string $productName): static
+    {
+        $this->productName = $productName;
+
+        return $this;
+    }
+
+    public function getOptions(): ?string
+    {
+        return $this->options;
+    }
+
+    public function setOptions(?string $options): static
+    {
+        $this->options = $options;
 
         return $this;
     }

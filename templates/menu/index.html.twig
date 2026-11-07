@@ -479,7 +479,7 @@
 
         <!-- Real-Time Search -->
         <div class="menu-search-box">
-            <span class="menu-search-icon">🔍</span>
+            <span class="menu-search-icon"><i class="bi bi-search"></i></span>
             <input type="text"
                    id="advancedSearchInput"
                    placeholder="Search drinks (e.g. Tropical, Latte, Cloud, Ube)..."
@@ -506,10 +506,10 @@
         <div class="menu-controls-right">
             <div class="menu-view-switch" role="group" aria-label="View Mode Switcher">
                 <button type="button" class="view-btn active" id="btnViewGrid" onclick="setMenuViewMode('grid')" title="Grid Cards View">
-                    <span>🔲 Visual Cards</span>
+                    <span><i class="bi bi-grid-fill"></i> Visual Cards</span>
                 </button>
                 <button type="button" class="view-btn" id="btnViewCompact" onclick="setMenuViewMode('compact')" title="Compact Quick Order View">
-                    <span>⚡ Quick Order</span>
+                    <span><i class="bi bi-list-ul"></i> Quick Order</span>
                 </button>
             </div>
         </div>
@@ -528,7 +528,7 @@
 
         <!-- Empty Results Message -->
         <div id="noMatchMessage" style="display: none; text-align: center; padding: 4rem 1rem; background: #FFFFFF; border-radius: 20px; border: 1.5px dashed #D2DCD0;">
-            <div style="font-size: 3rem; margin-bottom: 0.8rem;">🍵</div>
+            <div style="font-size: 3rem; margin-bottom: 0.8rem;"><i class="bi bi-cup-hot" style="font-size: 3rem; color: #7D9778; display: inline-block;"></i></div>
             <h3 style="font-family: var(--font-heading); font-size: 1.4rem; color: #2E5227; margin-bottom: 0.5rem;">No drinks found</h3>
             <p style="font-size: 0.9rem; color: #55744F; margin-bottom: 1.5rem;">We couldn't find any drinks matching your search.</p>
             <button type="button" class="btn-card-customize" onclick="clearMenuSearch()">Reset Search Filter</button>

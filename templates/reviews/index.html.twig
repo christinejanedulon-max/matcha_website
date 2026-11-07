@@ -6,20 +6,19 @@
 {% block body %}
 
 {# ── HERO ── #}
-<section style="background:linear-gradient(145deg,rgba(46,82,39,0.93) 0%,rgba(26,50,22,0.95) 100%), url('{{ asset('images/about/cafe-interior.jpg') }}') center/cover no-repeat;padding:clamp(6.5rem,11vw,8.5rem) 1.5rem clamp(3.5rem,6vw,5rem);text-align:center;position:relative;overflow:hidden;">
-    <div style="position:absolute;inset:0;background:radial-gradient(circle at 20% 60%, rgba(76,107,70,0.4) 0%, transparent 55%),radial-gradient(circle at 80% 20%, rgba(125,151,120,0.25) 0%, transparent 50%);pointer-events:none;"></div>
-    <div style="position:relative;max-width:620px;margin:0 auto;">
-        <span style="display:inline-block;background:rgba(232,241,230,0.15);border:1px solid rgba(232,241,230,0.3);backdrop-filter:blur(10px);padding:0.4rem 1.1rem;border-radius:50px;font-size:0.78rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#E8F1E6;margin-bottom:1.2rem;">
-            💚 Community Love
+<section class="page-hero" style="background-image: url('{{ asset('images/about/cafe-interior.jpg') }}');">
+    <div class="page-hero-inner">
+        <span class="page-hero-eyebrow">
+            <i class="bi bi-heart-fill" style="color: #A4B9A1;"></i> Verified Community Reviews
         </span>
-        <h1 style="font-family:var(--font-heading);font-size:clamp(2.5rem,6vw,4.2rem);font-weight:800;color:#FFFFFF;line-height:1.08;margin:0 0 1rem;letter-spacing:-0.03em;">
+        <h1 class="page-hero-title">
             WHAT OUR CUSTOMERS SAY
         </h1>
-        <p style="font-size:clamp(0.95rem,2vw,1.1rem);color:rgba(232,241,230,0.85);line-height:1.65;margin-bottom:1.5rem;">
-            Real experiences from genuine matcha enthusiasts.
+        <p class="page-hero-subtitle">
+            Real tasting notes and genuine experiences from our community of matcha lovers.
         </p>
-        <div style="display:inline-flex;align-items:center;gap:0.6rem;background:rgba(255,255,255,0.1);border:1px solid rgba(232,241,230,0.3);padding:0.55rem 1.4rem;border-radius:50px;backdrop-filter:blur(10px);">
-            <span style="color:#A4B9A1;font-size:1.2rem;">★★★★★</span>
+        <div style="display:inline-flex;align-items:center;gap:0.6rem;background:rgba(255,255,255,0.12);border:1px solid rgba(232,241,230,0.35);padding:0.55rem 1.4rem;border-radius:50px;backdrop-filter:blur(10px);">
+            <span style="color:#A4B9A1;font-size:1.1rem;letter-spacing:2px;">★★★★★</span>
             <strong style="color:#FFFFFF;font-size:0.95rem;">5.0 / 5.0 Overall Satisfaction</strong>
         </div>
     </div>
@@ -33,8 +32,8 @@
             <h2 style="font-family:var(--font-heading);font-size:1.9rem;color:#2E5227;margin:0;font-weight:800;">
                 All Reviews <span style="font-size:1rem;color:#7D9778;font-weight:600;">({{ reviews|length }})</span>
             </h2>
-            <a href="#leave-review-box" class="btn-hero-primary" style="padding:0.6rem 1.4rem;font-size:0.82rem;border-radius:50px;">
-                ✍️ Write a Review
+            <a href="#leave-review-box" class="btn-hero-primary" style="padding:0.6rem 1.4rem;font-size:0.82rem;border-radius:50px;display:inline-flex;align-items:center;gap:0.4rem;">
+                <i class="bi bi-pencil-square"></i> Write a Review
             </a>
         </div>
 
@@ -90,7 +89,7 @@
                                 <input type="radio" name="rating" value="{{ r }}" {% if r == 5 %}checked{% endif %} style="display:none;">★
                             </label>
                             {% endfor %}
-                            <span id="ratingWord" style="font-size:0.82rem;font-weight:700;color:#2E5227;margin-left:0.4rem;">5.0 ⭐</span>
+                            <span id="ratingWord" style="font-size:0.82rem;font-weight:700;color:#2E5227;margin-left:0.4rem;">5.0 ★</span>
                         </div>
                     </div>
                 </div>
@@ -101,8 +100,8 @@
                 </div>
 
                 <div style="text-align:center;margin-top:1.5rem;">
-                    <button type="submit" class="btn-hero-primary" style="padding:0.95rem 3rem;font-size:1rem;border:none;border-radius:50px;cursor:pointer;">
-                        Submit Review →
+                    <button type="submit" class="btn-hero-primary" style="padding:0.95rem 3rem;font-size:1rem;border:none;border-radius:50px;cursor:pointer;display:inline-flex;align-items:center;gap:0.5rem;">
+                        <i class="bi bi-send-check"></i> Submit Review &rarr;
                     </button>
                 </div>
             </form>

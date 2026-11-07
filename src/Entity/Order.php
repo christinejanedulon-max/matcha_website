@@ -10,12 +10,17 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: 'orders')]
+#[ORM\Index(name: 'idx_orders_customer_email', columns: ['customer_email'])]
+#[ORM\Index(name: 'idx_orders_order_number', columns: ['order_number'])]
 class Order
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id')]
     private ?int $id = null;
+
+    #[ORM\Column(name: 'order_number', length: 50, unique: true, nullable: true)]
+    private ?string $orderNumber = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'orders')]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
@@ -24,17 +29,29 @@ class Order
     #[ORM\Column(name: 'customer_name', length: 100)]
     private ?string $customerName = null;
 
+    #[ORM\Column(name: 'customer_email', length: 180, nullable: true)]
+    private ?string $customerEmail = null;
+
+    #[ORM\Column(name: 'phone', length: 50, nullable: true)]
+    private ?string $phone = null;
+
     #[ORM\Column(name: 'total_amount', type: Types::DECIMAL, precision: 10, scale: 2, options: ['default' => '0.00'])]
     private ?string $totalAmount = '0.00';
 
     #[ORM\Column(name: 'fulfillment_method', length: 50, nullable: true, options: ['default' => 'Pickup'])]
     private ?string $fulfillmentMethod = 'Pickup';
 
+    #[ORM\Column(name: 'delivery_address', type: Types::TEXT, nullable: true)]
+    private ?string $deliveryAddress = null;
+
     #[ORM\Column(name: 'payment_method', length: 50, nullable: true, options: ['default' => 'Cash'])]
     private ?string $paymentMethod = 'Cash';
 
     #[ORM\Column(name: 'reference_number', length: 100, nullable: true)]
     private ?string $referenceNumber = null;
+
+    #[ORM\Column(name: 'notes', type: Types::TEXT, nullable: true)]
+    private ?string $notes = null;
 
     #[ORM\Column(name: 'product_name', length: 255, nullable: true)]
     private ?string $productName = null;
@@ -45,6 +62,9 @@ class Order
     #[ORM\Column(name: 'status', length: 50, nullable: true, options: ['default' => 'Pending'])]
     private ?string $status = 'Pending';
 
+    #[ORM\Column(name: 'status_updated_at', type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $statusUpdatedAt = null;
+
     #[ORM\Column(name: 'order_date', type: Types::DATETIME_MUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeInterface $orderDate = null;
 
@@ -54,12 +74,25 @@ class Order
     public function __construct()
     {
         $this->orderItems = new ArrayCollection();
-        $this->orderDate = new \DateTimeImmutable();
+        $this->orderDate = new \DateTime();
+        $this->statusUpdatedAt = new \DateTime();
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getOrderNumber(): ?string
+    {
+        return $this->orderNumber;
+    }
+
+    public function setOrderNumber(?string $orderNumber): static
+    {
+        $this->orderNumber = $orderNumber;
+
+        return $this;
     }
 
     public function getUser(): ?User
@@ -82,6 +115,30 @@ class Order
     public function setCustomerName(string $customerName): static
     {
         $this->customerName = $customerName;
+
+        return $this;
+    }
+
+    public function getCustomerEmail(): ?string
+    {
+        return $this->customerEmail;
+    }
+
+    public function setCustomerEmail(?string $customerEmail): static
+    {
+        $this->customerEmail = $customerEmail;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): static
+    {
+        $this->phone = $phone;
 
         return $this;
     }
@@ -110,6 +167,18 @@ class Order
         return $this;
     }
 
+    public function getDeliveryAddress(): ?string
+    {
+        return $this->deliveryAddress;
+    }
+
+    public function setDeliveryAddress(?string $deliveryAddress): static
+    {
+        $this->deliveryAddress = $deliveryAddress;
+
+        return $this;
+    }
+
     public function getPaymentMethod(): ?string
     {
         return $this->paymentMethod;
@@ -130,6 +199,18 @@ class Order
     public function setReferenceNumber(?string $referenceNumber): static
     {
         $this->referenceNumber = $referenceNumber;
+
+        return $this;
+    }
+
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    public function setNotes(?string $notes): static
+    {
+        $this->notes = $notes;
 
         return $this;
     }
@@ -166,6 +247,19 @@ class Order
     public function setStatus(?string $status): static
     {
         $this->status = $status;
+        $this->statusUpdatedAt = new \DateTime();
+
+        return $this;
+    }
+
+    public function getStatusUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->statusUpdatedAt;
+    }
+
+    public function setStatusUpdatedAt(?\DateTimeInterface $statusUpdatedAt): static
+    {
+        $this->statusUpdatedAt = $statusUpdatedAt;
 
         return $this;
     }
@@ -203,7 +297,6 @@ class Order
     public function removeOrderItem(OrderItem $orderItem): static
     {
         if ($this->orderItems->removeElement($orderItem)) {
-            // set the owning side to null (unless already changed)
             if ($orderItem->getOrder() === $this) {
                 $orderItem->setOrder(null);
             }
