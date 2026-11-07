@@ -10,9 +10,27 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class OrderController extends AbstractController
 {
-    #[Route('/order', name: 'app_order')]
-    public function index(StoreService $store): Response
+    private function requireAuthenticatedUser(Request $request): ?Response
     {
+        $session = $request->getSession();
+        $userRole = $session?->get('user_role');
+
+        if (!$userRole && !$this->isGranted('ROLE_USER')) {
+            $session?->set('redirect_after_login', $this->generateUrl('app_order'));
+            $this->addFlash('error', 'Please sign in or register an account to place your order.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        return null;
+    }
+
+    #[Route('/order', name: 'app_order')]
+    public function index(Request $request, StoreService $store): Response
+    {
+        if ($redirect = $this->requireAuthenticatedUser($request)) {
+            return $redirect;
+        }
+
         $products = $store->getProducts();
 
         return $this->render('order/index.html.twig', [
@@ -23,7 +41,12 @@ final class OrderController extends AbstractController
     #[Route('/order/place', name: 'app_order_place', methods: ['POST'])]
     public function place(Request $request, StoreService $store): Response
     {
-        $customerName = $request->request->get('customer_name');
+        if ($redirect = $this->requireAuthenticatedUser($request)) {
+            return $redirect;
+        }
+
+        $session = $request->getSession();
+        $customerName = $request->request->get('customer_name') ?: $session->get('user_name', 'Valued Customer');
         $phone = $request->request->get('phone');
         $fulfillment = $request->request->get('fulfillment_method', 'Pickup');
         $deliveryAddress = $request->request->get('delivery_address');
@@ -42,8 +65,8 @@ final class OrderController extends AbstractController
                     'name' => $product['name'],
                     'quantity' => (int) $request->request->get('quantity', 1),
                     'unitPrice' => $product['price'],
-                    'options' => $request->request->get('options', 'Regular • 50% Sugar • Normal Ice')
-                ]
+                    'options' => $request->request->get('options', 'Regular • 50% Sugar • Normal Ice'),
+                ],
             ];
         }
 
@@ -70,13 +93,17 @@ final class OrderController extends AbstractController
         $this->addFlash('success', 'Your order ' . $order['orderNumber'] . ' has been received successfully!');
 
         return $this->redirectToRoute('app_order_confirmation', [
-            'orderNumber' => $order['orderNumber']
+            'orderNumber' => $order['orderNumber'],
         ]);
     }
 
     #[Route('/order/confirmation/{orderNumber}', name: 'app_order_confirmation')]
-    public function confirmation(string $orderNumber, StoreService $store): Response
+    public function confirmation(string $orderNumber, Request $request, StoreService $store): Response
     {
+        if ($redirect = $this->requireAuthenticatedUser($request)) {
+            return $redirect;
+        }
+
         $order = $store->getOrder($orderNumber);
         if (!$order) {
             $this->addFlash('error', 'Order not found.');

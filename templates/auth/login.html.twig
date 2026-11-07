@@ -1,78 +1,391 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Sign In — Matcha Moments Café{% endblock %}
+{% set currentTab = activeTab|default('login') %}
+
+{% block title %}{{ currentTab == 'register' ? 'Create Account' : 'Sign In' }} — Matcha Moments Café{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    <style>
+        .auth-stage {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2E5227 0%, #1A3216 55%, #2E5227 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(6rem, 10vw, 7.5rem) 1.5rem 3.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .auth-orb {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: authOrbFloat 9s ease-in-out infinite alternate;
+        }
+        .auth-orb-1 {
+            top: -110px;
+            right: -90px;
+            width: 440px;
+            height: 440px;
+            background: radial-gradient(circle, rgba(76, 107, 70, 0.45) 0%, transparent 70%);
+        }
+        .auth-orb-2 {
+            bottom: -90px;
+            left: -70px;
+            width: 340px;
+            height: 340px;
+            background: radial-gradient(circle, rgba(164, 185, 161, 0.28) 0%, transparent 70%);
+            animation-delay: -4s;
+        }
+        @keyframes authOrbFloat {
+            0%   { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(24px, -22px) scale(1.08); }
+        }
+
+        .auth-card-shell {
+            position: relative;
+            width: 100%;
+            max-width: 490px;
+            background: #FFFFFF;
+            border-radius: 28px;
+            padding: clamp(2rem, 5vw, 2.8rem);
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.28);
+            border: 1px solid rgba(210, 220, 208, 0.6);
+            animation: authCardEnter 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes authCardEnter {
+            from { opacity: 0; transform: translateY(28px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Animated Tab Switcher */
+        .auth-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: #E8F1E6;
+            padding: 0.3rem;
+            border-radius: 16px;
+            margin-bottom: 1.8rem;
+            border: 1px solid #D2DCD0;
+        }
+        .auth-tab-btn {
+            border: none;
+            background: transparent;
+            padding: 0.72rem 1rem;
+            border-radius: 13px;
+            font-family: var(--font-heading);
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #55744F;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .auth-tab-btn.active {
+            background: #2E5227;
+            color: #FFFFFF;
+            box-shadow: 0 6px 18px rgba(46, 82, 39, 0.22);
+        }
+
+        .auth-pane {
+            display: none;
+            animation: authPaneFade 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .auth-pane.active {
+            display: block;
+        }
+        @keyframes authPaneFade {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-field {
+            margin-bottom: 1.05rem;
+            text-align: left;
+        }
+        .auth-field label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #2E5227;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.38rem;
+        }
+        .auth-input-wrap {
+            position: relative;
+        }
+        .auth-input {
+            width: 100%;
+            border-radius: 14px;
+            border: 1.5px solid #D2DCD0;
+            padding: 0.82rem 1.05rem;
+            font-size: 0.92rem;
+            font-family: var(--font-body);
+            color: #2E5227;
+            background: #FAFDF9;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+        .auth-input:focus {
+            outline: none;
+            background: #FFFFFF;
+            border-color: #2E5227;
+            box-shadow: 0 0 0 4px rgba(46, 82, 39, 0.12);
+            transform: translateY(-1px);
+        }
+        .pw-toggle-btn {
+            position: absolute;
+            right: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #7D9778;
+            padding: 0.2rem;
+        }
+        .auth-submit-btn {
+            width: 100%;
+            background: #2E5227;
+            color: #FFFFFF;
+            border: none;
+            padding: 0.95rem;
+            border-radius: 14px;
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 0.96rem;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 8px 22px rgba(46, 82, 39, 0.22);
+            margin-top: 0.4rem;
+        }
+        .auth-submit-btn:hover {
+            background: #4C6B46;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(46, 82, 39, 0.3);
+        }
+        .demo-role-btn {
+            width: 100%;
+            border-radius: 13px;
+            padding: 0.75rem 1rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.55rem;
+            transition: all 0.2s ease;
+        }
+        .demo-role-btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-<section style="
-    min-height: 100vh;
-    background: linear-gradient(135deg, #2E5227 0%, #1A3216 60%, #2E5227 100%);
-    display: flex; align-items: center; justify-content: center;
-    padding: clamp(5rem,10vw,7rem) 1.5rem 3rem;
-    position: relative; overflow: hidden;">
+<section class="auth-stage">
+    <div class="auth-orb auth-orb-1"></div>
+    <div class="auth-orb auth-orb-2"></div>
 
-    {# decorative orbs #}
-    <div style="position:absolute;top:-100px;right:-80px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle, rgba(76,107,70,0.4) 0%, transparent 70%);pointer-events:none;"></div>
-    <div style="position:absolute;bottom:-80px;left:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle, rgba(125,151,120,0.3) 0%, transparent 70%);pointer-events:none;"></div>
+    <div class="auth-card-shell">
+        {# Brand Header #}
+        <div style="text-align:center;margin-bottom:1.4rem;">
+            <img src="{{ asset('images/logo.png') }}" alt="Matcha Moments" style="height:50px;width:auto;margin-bottom:0.7rem;">
+            <div style="display:inline-flex;align-items:center;gap:0.4rem;background:#E8F1E6;border-radius:50px;padding:0.28rem 0.95rem;font-size:0.7rem;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;color:#2E5227;">
+                🍵 Member Portal • Required to Order
+            </div>
+        </div>
 
-    <div style="position:relative;width:100%;max-width:460px;">
-        {# Card #}
-        <div style="background:#FFFFFF;border-radius:28px;padding:clamp(2rem,5vw,3rem);box-shadow:0 32px 80px rgba(0,0,0,0.25);">
+        {# Interactive Switcher: Sign In vs Create Account #}
+        <div class="auth-tabs" role="tablist">
+            <button type="button"
+                    id="tabBtnLogin"
+                    class="auth-tab-btn {{ currentTab != 'register' ? 'active' : '' }}"
+                    onclick="switchAuthTab('login')">
+                Sign In
+            </button>
+            <button type="button"
+                    id="tabBtnRegister"
+                    class="auth-tab-btn {{ currentTab == 'register' ? 'active' : '' }}"
+                    onclick="switchAuthTab('register')">
+                Create Account
+            </button>
+        </div>
 
-            {# Logo + heading #}
-            <div style="text-align:center;margin-bottom:2rem;">
-                <img src="{{ asset('images/logo.png') }}" alt="Matcha Moments" style="height:52px;width:auto;margin-bottom:1rem;">
-                <div style="display:inline-block;background:#E8F1E6;border-radius:50px;padding:0.3rem 1rem;font-size:0.72rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#2E5227;margin-bottom:0.8rem;">Account Access</div>
-                <h1 style="font-family:var(--font-heading);font-size:2rem;color:#2E5227;margin:0;font-weight:800;letter-spacing:-0.02em;">Welcome Back</h1>
-                <p style="font-size:0.88rem;color:#7D9778;margin:0.5rem 0 0;">Log in to manage your orders or access the café console.</p>
+        {# ==================== 1. SIGN IN PANE ==================== #}
+        <div id="paneLogin" class="auth-pane {{ currentTab != 'register' ? 'active' : '' }}">
+            <div style="text-align:center;margin-bottom:1.3rem;">
+                <h1 style="font-family:var(--font-heading);font-size:1.75rem;color:#2E5227;margin:0;font-weight:800;letter-spacing:-0.02em;">
+                    Welcome Back
+                </h1>
+                <p style="font-size:0.86rem;color:#55744F;margin:0.35rem 0 0;">
+                    Sign in to customize drinks and place your order.
+                </p>
             </div>
 
-            {# Form #}
+            {% if prefillEmail is defined and prefillEmail %}
+                <div style="background:#E8F1E6;border:1px solid #A4B9A1;border-radius:12px;padding:0.7rem 1rem;margin-bottom:1.1rem;font-size:0.82rem;color:#2E5227;font-weight:600;text-align:center;">
+                    ✅ Account ready! Enter your password below to sign in.
+                </div>
+            {% endif %}
+
             <form action="{{ path('app_login') }}" method="POST">
-                <div style="margin-bottom:1.1rem;">
-                    <label style="display:block;font-size:0.8rem;font-weight:700;color:#2E5227;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.4rem;" for="loginEmail">Email Address</label>
-                    <input type="email" name="email" id="loginEmail" class="form-control"
-                           placeholder="admin@matchamoments.com" value="admin@matchamoments.com" required
-                           style="border-radius:14px;border:1.5px solid #D2DCD0;padding:0.85rem 1.1rem;width:100%;font-size:0.92rem;font-family:var(--font-body);transition:border-color 0.2s;box-sizing:border-box;">
+                <div class="auth-field">
+                    <label for="loginEmail">Email Address</label>
+                    <input type="email"
+                           name="email"
+                           id="loginEmail"
+                           class="auth-input"
+                           placeholder="you@example.com"
+                           value="{{ prefillEmail|default('') }}"
+                           required>
                 </div>
-                <div style="margin-bottom:1.5rem;">
-                    <label style="display:block;font-size:0.8rem;font-weight:700;color:#2E5227;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.4rem;" for="loginPass">Password</label>
-                    <input type="password" name="password" id="loginPass" class="form-control"
-                           placeholder="••••••••" value="admin123" required
-                           style="border-radius:14px;border:1.5px solid #D2DCD0;padding:0.85rem 1.1rem;width:100%;font-size:0.92rem;font-family:var(--font-body);transition:border-color 0.2s;box-sizing:border-box;">
+
+                <div class="auth-field">
+                    <label for="loginPass">Password</label>
+                    <div class="auth-input-wrap">
+                        <input type="password"
+                               name="password"
+                               id="loginPass"
+                               class="auth-input"
+                               placeholder="Enter your password"
+                               required>
+                        <button type="button" class="pw-toggle-btn" onclick="togglePassword('loginPass', this)" aria-label="Show password">👁️</button>
+                    </div>
                 </div>
-                <button type="submit" class="btn-hero-primary"
-                        style="width:100%;border:none;padding:0.95rem;border-radius:14px;cursor:pointer;font-size:0.98rem;">
-                    Sign In →
+
+                <button type="submit" class="auth-submit-btn">
+                    Sign In &amp; Start Ordering &rarr;
                 </button>
             </form>
 
+            <p style="text-align:center;font-size:0.83rem;color:#55744F;margin:1.1rem 0 0;">
+                New to Matcha Moments?
+                <a href="{{ path('app_register') }}" onclick="switchAuthTab('register'); return false;" style="color:#2E5227;font-weight:800;text-decoration:underline;">Create an account</a>
+            </p>
+
             {# Divider #}
-            <div style="display:flex;align-items:center;gap:1rem;margin:1.8rem 0;">
+            <div style="display:flex;align-items:center;gap:0.8rem;margin:1.4rem 0 1rem;">
                 <div style="flex:1;height:1px;background:#E8F1E6;"></div>
-                <span style="font-size:0.75rem;color:#A4B9A1;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Quick Demo</span>
+                <span style="font-size:0.7rem;color:#7D9778;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;">Instant Demo Access</span>
                 <div style="flex:1;height:1px;background:#E8F1E6;"></div>
             </div>
 
-            {# Demo buttons #}
-            <div style="display:flex;flex-direction:column;gap:0.6rem;">
-                <form action="{{ path('app_login') }}" method="POST">
-                    <input type="hidden" name="demo_role" value="admin">
-                    <input type="hidden" name="email" value="admin@matchamoments.com">
-                    <button type="submit" style="width:100%;background:#2E5227;color:#FFFFFF;border:none;padding:0.8rem;border-radius:14px;font-weight:700;font-size:0.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.6rem;">
-                        <span>👑</span> Enter as Administrator
-                    </button>
-                </form>
+            <div style="display:flex;flex-direction:column;gap:0.55rem;">
                 <form action="{{ path('app_login') }}" method="POST">
                     <input type="hidden" name="demo_role" value="customer">
                     <input type="hidden" name="email" value="customer@matchamoments.com">
                     <input type="hidden" name="full_name" value="Valued Customer">
-                    <button type="submit" style="width:100%;background:#E8F1E6;color:#2E5227;border:1.5px solid #D2DCD0;padding:0.8rem;border-radius:14px;font-weight:700;font-size:0.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.6rem;">
-                        <span>🍵</span> Enter as Customer
+                    <button type="submit" class="demo-role-btn" style="background:#E8F1E6;color:#2E5227;border:1.5px solid #A4B9A1;">
+                        <span>🍵</span> Quick Sign In as Customer
+                    </button>
+                </form>
+                <form action="{{ path('app_login') }}" method="POST">
+                    <input type="hidden" name="demo_role" value="admin">
+                    <input type="hidden" name="email" value="admin@matchamoments.com">
+                    <button type="submit" class="demo-role-btn" style="background:#2E5227;color:#FFFFFF;border:none;">
+                        <span>👑</span> Quick Sign In as Administrator
                     </button>
                 </form>
             </div>
-
         </div>
+
+        {# ==================== 2. CREATE ACCOUNT (REGISTER) PANE ==================== #}
+        <div id="paneRegister" class="auth-pane {{ currentTab == 'register' ? 'active' : '' }}">
+            <div style="text-align:center;margin-bottom:1.3rem;">
+                <h1 style="font-family:var(--font-heading);font-size:1.75rem;color:#2E5227;margin:0;font-weight:800;letter-spacing:-0.02em;">
+                    Create Your Account
+                </h1>
+                <p style="font-size:0.85rem;color:#55744F;margin:0.35rem 0 0;">
+                    Register in seconds — after signing up, you'll be directed to sign in and order.
+                </p>
+            </div>
+
+            <form action="{{ path('app_register') }}" method="POST">
+                <div class="auth-field">
+                    <label for="regName">Full Name *</label>
+                    <input type="text"
+                           name="full_name"
+                           id="regName"
+                           class="auth-input"
+                           placeholder="e.g. Maria Kristina Santos"
+                           required>
+                </div>
+
+                <div class="auth-field">
+                    <label for="regEmail">Email Address *</label>
+                    <input type="email"
+                           name="email"
+                           id="regEmail"
+                           class="auth-input"
+                           placeholder="maria@example.com"
+                           required>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+                    <div class="auth-field">
+                        <label for="regPass">Password *</label>
+                        <div class="auth-input-wrap">
+                            <input type="password"
+                                   name="password"
+                                   id="regPass"
+                                   class="auth-input"
+                                   placeholder="Min. 6 chars"
+                                   minlength="6"
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="auth-field">
+                        <label for="regConfirmPass">Confirm Password *</label>
+                        <div class="auth-input-wrap">
+                            <input type="password"
+                                   name="confirm_password"
+                                   id="regConfirmPass"
+                                   class="auth-input"
+                                   placeholder="Repeat password"
+                                   minlength="6"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-submit-btn">
+                    Create Account &amp; Continue to Sign In &rarr;
+                </button>
+            </form>
+
+            <p style="text-align:center;font-size:0.83rem;color:#55744F;margin:1.15rem 0 0;">
+                Already have an account?
+                <a href="{{ path('app_login') }}" onclick="switchAuthTab('login'); return false;" style="color:#2E5227;font-weight:800;text-decoration:underline;">Sign In here</a>
+            </p>
+        </div>
+
     </div>
 </section>
+
+<script>
+function switchAuthTab(tab) {
+    const isReg = (tab === 'register');
+    document.getElementById('tabBtnLogin')?.classList.toggle('active', !isReg);
+    document.getElementById('tabBtnRegister')?.classList.toggle('active', isReg);
+    document.getElementById('paneLogin')?.classList.toggle('active', !isReg);
+    document.getElementById('paneRegister')?.classList.toggle('active', isReg);
+}
+
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+    }
+}
+</script>
 {% endblock %}

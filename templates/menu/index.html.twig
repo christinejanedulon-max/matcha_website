@@ -834,7 +834,7 @@ function applyLiveFilter() {
 
 // Quick Add Single Drink Helper
 function quickAddSingle(id, name, imageUrl, price) {
-    addToCart({
+    const added = addToCart({
         id: id,
         name: name,
         imageUrl: imageUrl,
@@ -842,8 +842,9 @@ function quickAddSingle(id, name, imageUrl, price) {
         quantity: 1,
         options: 'Regular • 50% Sugar • Normal Ice'
     });
-    showToast(`Added 1x ${name} to order!`);
-    updateFloatingOrderPill();
+    if (added) {
+        updateFloatingOrderPill();
+    }
 }
 
 // Floating Order Pill Sync

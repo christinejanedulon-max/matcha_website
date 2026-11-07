@@ -48,19 +48,24 @@
                 <span class="cart-badge" id="cartBadgeCount">0</span>
             </button>
 
-            <!-- Order Now CTA -->
-            <a href="{{ path('app_menu') }}" class="btn-nav-order">Order Now</a>
-
             {% set isAdmin = (app.session and app.session.get('user_role') == 'admin') %}
             {% set isCustomer = (app.session and app.session.get('user_role') == 'customer') %}
+            {% set isLoggedIn = (isAdmin or isCustomer) %}
             {% set userName = app.session ? app.session.get('user_name') : null %}
+
+            <!-- Order Now CTA -->
+            {% if isLoggedIn %}
+                <a href="{{ path('app_menu') }}" class="btn-nav-order">Order Now</a>
+            {% else %}
+                <button type="button" class="btn-nav-order" onclick="openAuthGateModal()" style="border: none; cursor: pointer;">Order Now</button>
+            {% endif %}
 
             {% if isAdmin %}
                 <!-- Admin Dashboard (ONLY visible when logged in as Admin) -->
                 <a href="{{ path('admin_dashboard') }}" class="btn-nav-admin" title="Admin Dashboard">
                     ⚙️ Dashboard
                 </a>
-                <a href="{{ path('app_logout') }}" class="btn-nav-auth" style="padding: 0.45rem 0.85rem; border-radius: 50px; font-size: 0.78rem; font-weight: 600; color: #b91c1c; background: #fee2e2; border: none; text-decoration: none;">
+                <a href="{{ path('app_logout') }}" onclick="localStorage.removeItem('matcha_moments_cart_v1');" class="btn-nav-auth" style="padding: 0.45rem 0.85rem; border-radius: 50px; font-size: 0.78rem; font-weight: 600; color: #b91c1c; background: #fee2e2; border: none; text-decoration: none;">
                     Sign Out
                 </a>
             {% elseif isCustomer %}
@@ -68,13 +73,16 @@
                 <span class="nav-user-chip" style="font-size: 0.82rem; font-weight: 600; color: var(--clr-matcha-dark); background: var(--clr-cream); padding: 0.4rem 0.8rem; border-radius: 50px; border: 1px solid var(--clr-cream-dark);">
                     👤 {{ userName|split(' ')|first }}
                 </span>
-                <a href="{{ path('app_logout') }}" class="btn-nav-auth" style="padding: 0.45rem 0.85rem; border-radius: 50px; font-size: 0.78rem; font-weight: 600; color: var(--clr-text-muted); background: var(--clr-cream-dark); border: none; text-decoration: none;">
+                <a href="{{ path('app_logout') }}" onclick="localStorage.removeItem('matcha_moments_cart_v1');" class="btn-nav-auth" style="padding: 0.45rem 0.85rem; border-radius: 50px; font-size: 0.78rem; font-weight: 600; color: var(--clr-text-muted); background: var(--clr-cream-dark); border: none; text-decoration: none;">
                     Sign Out
                 </a>
             {% else %}
-                <!-- Guest / Not Logged In (Admin section is HIDDEN) -->
-                <a href="{{ path('app_login') }}" class="btn-nav-login" style="padding: 0.45rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; text-decoration: none;">
+                <!-- Guest / Not Logged In -->
+                <a href="{{ path('app_login') }}" class="btn-nav-login" style="padding: 0.45rem 0.95rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; text-decoration: none;">
                     Sign In
+                </a>
+                <a href="{{ path('app_register') }}" style="padding: 0.45rem 0.95rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; background: #E8F1E6; color: #2E5227; border: 1.5px solid #A4B9A1; text-decoration: none; transition: all 0.2s;">
+                    Register
                 </a>
             {% endif %}
         </div>
@@ -182,6 +190,33 @@
     </div>
 </div>
 
+<!-- ==================== AUTH GATE MODAL (SIGN IN REQUIRED TO ORDER) ==================== -->
+<div class="modal-backdrop" id="authGateModalBackdrop" style="display: none;">
+    <div class="custom-modal" role="dialog" aria-modal="true" style="max-width: 440px; padding: 2.4rem 2rem; text-align: center; border-radius: 26px;">
+        <button class="modal-close-btn" onclick="closeAuthGateModal()">&times;</button>
+        <div style="width: 68px; height: 68px; border-radius: 50%; background: #E8F1E6; border: 2px solid #A4B9A1; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1.1rem; animation: pulseBadgeGlow 2.4s infinite;">
+            🍵
+        </div>
+        <span style="display: inline-block; background: #E8F1E6; color: #2E5227; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; padding: 0.28rem 0.9rem; border-radius: 50px; margin-bottom: 0.65rem;">
+            Member Ordering
+        </span>
+        <h3 style="font-family: var(--font-heading); font-size: 1.65rem; font-weight: 800; color: #2E5227; margin: 0 0 0.55rem;">
+            Sign In to Place Your Order
+        </h3>
+        <p style="font-size: 0.9rem; color: #55744F; line-height: 1.6; margin: 0 0 1.6rem;">
+            You can browse our menu anytime! To customize drinks and place an order, please sign in or register a free account first.
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+            <a href="{{ path('app_login') }}" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #2E5227; color: #FFFFFF; padding: 0.9rem 1.4rem; border-radius: 14px; font-family: var(--font-heading); font-weight: 800; font-size: 0.95rem; text-decoration: none; box-shadow: 0 8px 20px rgba(46, 82, 39, 0.22); transition: all 0.2s;">
+                Sign In to Your Account &rarr;
+            </a>
+            <a href="{{ path('app_register') }}" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: #E8F1E6; color: #2E5227; border: 1.5px solid #A4B9A1; padding: 0.85rem 1.4rem; border-radius: 14px; font-family: var(--font-heading); font-weight: 800; font-size: 0.92rem; text-decoration: none; transition: all 0.2s;">
+                ✨ Create a Free Account
+            </a>
+        </div>
+    </div>
+</div>
+
 <!-- ==================== TOAST NOTIFICATIONS ==================== -->
 <div id="toastNotification" class="toast-popup" style="display: none;">
     <span class="toast-icon">🍵</span>
@@ -271,6 +306,18 @@
 <script>
 // ---------- Shopping Cart State Management (localStorage) ----------
 const CART_STORAGE_KEY = 'matcha_moments_cart_v1';
+const IS_LOGGED_IN = {{ isLoggedIn ? 'true' : 'false' }};
+
+function openAuthGateModal() {
+    closeCustomModal();
+    const modal = document.getElementById('authGateModalBackdrop');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeAuthGateModal() {
+    const modal = document.getElementById('authGateModalBackdrop');
+    if (modal) modal.style.display = 'none';
+}
 
 function resolveDrinkImg(url) {
     if (!url) return 'images/drinks/latte.jpg';
@@ -278,6 +325,7 @@ function resolveDrinkImg(url) {
 }
 
 function getCart() {
+    if (!IS_LOGGED_IN) return [];
     try {
         const stored = localStorage.getItem(CART_STORAGE_KEY);
         return stored ? JSON.parse(stored) : [];
@@ -292,6 +340,10 @@ function saveCart(cart) {
 }
 
 function addToCart(item) {
+    if (!IS_LOGGED_IN) {
+        openAuthGateModal();
+        return false;
+    }
     const cart = getCart();
     // Check if identical item (id + options) already exists
     const existingIndex = cart.findIndex(c => c.id === item.id && c.options === item.options);
@@ -301,7 +353,14 @@ function addToCart(item) {
         cart.push(item);
     }
     saveCart(cart);
+    const badge = document.getElementById('cartBadgeCount');
+    if (badge) {
+        badge.classList.remove('cart-pop');
+        void badge.offsetWidth;
+        badge.classList.add('cart-pop');
+    }
     showToast(`Added ${item.name} to cart!`);
+    return true;
 }
 
 function updateCartItemQty(index, delta) {
@@ -395,6 +454,10 @@ const openCartBtn = document.getElementById('openCartDrawerBtn');
 const closeCartBtn = document.getElementById('closeCartDrawerBtn');
 
 function openCartDrawer() {
+    if (!IS_LOGGED_IN) {
+        openAuthGateModal();
+        return;
+    }
     updateCartUI();
     if (cartDrawer) cartDrawer.classList.add('open');
     if (cartBackdrop) cartBackdrop.classList.add('active');
@@ -492,7 +555,7 @@ if (confirmAddBtn) {
         const ice = document.querySelector('#iceChips .chip.active')?.dataset.ice || 'Normal Ice';
         const unitPrice = modalBasePrice + modalExtra;
 
-        addToCart({
+        const added = addToCart({
             id: currentModalDrink.id,
             name: currentModalDrink.name,
             imageUrl: currentModalDrink.imageUrl || 'images/drinks/latte.jpg',
@@ -501,8 +564,10 @@ if (confirmAddBtn) {
             options: `${size} • ${sweet} Sugar • ${ice}`
         });
 
-        closeCustomModal();
-        openCartDrawer();
+        if (added) {
+            closeCustomModal();
+            openCartDrawer();
+        }
     });
 }
 
@@ -522,8 +587,59 @@ window.addEventListener('scroll', () => {
     if (nav) nav.classList.toggle('scrolled', window.scrollY > 40);
 });
 
-// Initial Cart Render
-document.addEventListener('DOMContentLoaded', updateCartUI);
+// Initial Cart Render + Interactive Scroll-Reveal & 3D Tilt Animations
+document.addEventListener('DOMContentLoaded', () => {
+    updateCartUI();
+
+    // 1. Scroll-Reveal Animation via IntersectionObserver
+    const revealSelectors = [
+        '.drink-card',
+        '.compact-drink-row',
+        '.ribbon-item',
+        '.review-card',
+        '.category-group-header',
+        '.section-title-group',
+        '.why-us-content-side',
+        '.why-us-visual-side',
+        '.checkout-card',
+        '.order-summary-card'
+    ];
+    const revealNodes = document.querySelectorAll(revealSelectors.join(','));
+    revealNodes.forEach((el, idx) => {
+        el.classList.add('reveal-item');
+        el.style.transitionDelay = `${(idx % 4) * 65}ms`;
+    });
+
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+        revealNodes.forEach(el => observer.observe(el));
+    } else {
+        revealNodes.forEach(el => el.classList.add('is-visible'));
+    }
+
+    // 2. Subtle Interactive 3D Tilt on Drink Cards & Hero Showcase
+    document.querySelectorAll('.drink-card, .hero-cup-glass-card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const rotateY = ((x / rect.width) - 0.5) * 7;
+            const rotateX = ((0.5 - (y / rect.height))) * 7;
+            card.style.transform = `perspective(900px) translateY(-6px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+        });
+    });
+});
 </script>
 
 {% block javascripts %}{% endblock %}
