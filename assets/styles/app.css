@@ -1091,32 +1091,32 @@ ul { list-style: none; }
 
 .social-links { display: flex; gap: 0.75rem; }
 .social-link {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.12);
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(232,241,230,0.2);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255,255,255,0.55);
+    color: #E8F1E6;
     transition: all var(--trans-fast);
-    overflow: hidden;
+    text-decoration: none;
 }
-.social-link svg { width: 18px; height: 18px; }
-.social-link img {
-    width: 18px;
-    height: 18px;
-    filter: brightness(0) invert(1);
-    opacity: 0.6;
-    transition: opacity var(--trans-fast);
+.social-link i {
+    font-size: 1.15rem;
+    color: #E8F1E6;
+    transition: transform var(--trans-fast);
 }
 .social-link:hover {
     background: var(--clr-matcha);
-    border-color: var(--clr-matcha);
+    border-color: #A4B9A1;
     transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(46, 82, 39, 0.4);
 }
-.social-link:hover img {
-    opacity: 1;
+.social-link:hover i {
+    transform: scale(1.12);
+    color: #FFFFFF;
 }
 
 .footer-bottom {

@@ -87,4 +87,6 @@ Grade-Image 'hero.jpg'                0.45
 Grade-Image 'banner.jpg'              0.50
 Grade-Image 'bowl.jpg'                0.50
 Grade-Image 'whisk.jpg'               0.50
+Grade-Image 'why-us-craft.jpg'        0.35
+Grade-Image 'matcha-loop-3d.jpg'      0.35
 

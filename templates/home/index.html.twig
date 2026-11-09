@@ -33,9 +33,18 @@
             );
             z-index: 1;
         }
+        /* 3D Interactive Matcha Particles Canvas */
+        .hero-matcha-particles {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
         .hero-container {
             position: relative;
-            z-index: 2;
+            z-index: 3;
             max-width: var(--container);
             margin: 0 auto;
             padding: 0 clamp(1rem, 4vw, 2.5rem);
@@ -297,12 +306,282 @@
 
         /* Homepage cards share .drink-card / .drink-pedestal-stage from app.css */
 
+        /* 3D Craft Showcase Card */
+        .craft-3d-card {
+            position: relative;
+            border-radius: 26px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(46, 82, 39, 0.16);
+            border: 1px solid #D2DCD0;
+            background: #FFFFFF;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-style: preserve-3d;
+        }
+        .craft-3d-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 28px 60px rgba(46, 82, 39, 0.24);
+        }
+        .craft-3d-card img {
+            width: 100%;
+            height: auto;
+            max-height: 480px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .craft-3d-card:hover img {
+            transform: scale(1.04);
+        }
+        .craft-3d-badge-top {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            background: rgba(46, 82, 39, 0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #E8F1E6;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.45rem 1rem;
+            border-radius: 50px;
+            border: 1px solid rgba(232, 241, 230, 0.35);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            z-index: 2;
+        }
+        .craft-3d-caption {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(46, 82, 39, 0.94);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 18px;
+            padding: 1.15rem 1.35rem;
+            color: #FFFFFF;
+            border: 1px solid rgba(232, 241, 230, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            z-index: 2;
+        }
+
+        /* 3D Newsletter Section (Stay in the Matcha Loop) */
+        .loop-3d-section {
+            background: linear-gradient(135deg, #1C3419 0%, #2E5227 50%, #152712 100%);
+            color: #FFFFFF;
+            padding: clamp(4rem, 7vw, 5.5rem) clamp(1rem, 4vw, 2rem);
+            position: relative;
+            overflow: hidden;
+        }
+        .loop-3d-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -20%;
+            width: 140%;
+            height: 200%;
+            background: radial-gradient(circle at 75% 40%, rgba(164, 185, 161, 0.16) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .loop-3d-container {
+            max-width: var(--container);
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: clamp(2rem, 5vw, 4rem);
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(232, 241, 230, 0.22);
+            border-radius: 32px;
+            padding: clamp(2rem, 5vw, 3.5rem);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+        }
+        .loop-vip-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            background: rgba(232, 241, 230, 0.16);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(232, 241, 230, 0.35);
+            padding: 0.4rem 1.1rem;
+            border-radius: 50px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #E8F1E6;
+            margin-bottom: 1rem;
+        }
+        .loop-title {
+            font-family: var(--font-heading);
+            font-size: clamp(2.1rem, 4.5vw, 3.2rem);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            color: #FFFFFF;
+            margin: 0 0 0.85rem;
+            text-shadow: 0 4px 18px rgba(0,0,0,0.3);
+        }
+        .loop-subtext {
+            color: rgba(232, 241, 230, 0.9);
+            font-size: 0.98rem;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            max-width: 520px;
+        }
+        .btn-loop-submit {
+            background: #FFFFFF;
+            color: #2E5227;
+            border: none;
+            padding: 0.95rem 2rem;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all var(--trans-fast);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-body);
+            white-space: nowrap;
+        }
+        .btn-loop-submit:hover {
+            background: #E8F1E6;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+        }
+        .loop-perks-row {
+            display: flex;
+            gap: 0.85rem;
+            flex-wrap: wrap;
+            margin-top: 1.8rem;
+            border-top: 1px solid rgba(232, 241, 230, 0.18);
+            padding-top: 1.5rem;
+        }
+        .loop-perk-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(232, 241, 230, 0.1);
+            border: 1px solid rgba(232, 241, 230, 0.2);
+            padding: 0.45rem 0.95rem;
+            border-radius: 50px;
+            font-size: 0.78rem;
+            color: #E8F1E6;
+            font-weight: 600;
+        }
+        .loop-perk-item i {
+            color: #A4B9A1;
+            font-size: 0.95rem;
+        }
+        /* 3D Visual Stage Right */
+        .loop-3d-stage-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1200px;
+        }
+        .loop-3d-stage {
+            position: relative;
+            width: 100%;
+            max-width: 440px;
+            border-radius: 28px;
+            overflow: hidden;
+            border: 1.5px solid rgba(232, 241, 230, 0.35);
+            background: #1B3518;
+            box-shadow: 0 35px 80px rgba(0, 0, 0, 0.55), 0 0 40px rgba(164, 185, 161, 0.2);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-style: preserve-3d;
+        }
+        .loop-3d-stage img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .loop-3d-stage:hover img {
+            transform: scale(1.05);
+        }
+        .loop-3d-tag-top {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            background: rgba(46, 82, 39, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            color: #FFFFFF;
+            font-weight: 800;
+            font-size: 0.74rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 0.45rem 1rem;
+            border-radius: 50px;
+            border: 1px solid rgba(232, 241, 230, 0.3);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            z-index: 3;
+        }
+        .loop-3d-floating-card {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 20px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            box-shadow: 0 16px 36px rgba(0,0,0,0.35);
+            border: 1px solid #D2DCD0;
+            z-index: 3;
+            color: #2E5227;
+        }
+        .loop-3d-card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: #2E5227;
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            box-shadow: 0 6px 16px rgba(46, 82, 39, 0.3);
+        }
+
         @media (max-width: 950px) {
             .hero-container { grid-template-columns: 1fr; text-align: center; }
             .hero-floating-content { align-items: center; }
             .hero-actions-group { justify-content: center; }
             .hero-floating-badges { justify-content: center; }
             .hero-floating-card-wrap { display: none; }
+            .why-us-inner { grid-template-columns: 1fr !important; }
+            .loop-3d-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+                padding: 2rem 1.5rem;
+            }
+            .loop-subtext { margin: 0 auto 1.8rem; }
+            .loop-perks-row { justify-content: center; }
+            .loop-3d-stage-wrapper { margin-top: 1.5rem; }
         }
     </style>
 {% endblock %}
@@ -311,6 +590,9 @@
 
 {# ==================== 1. HERO SECTION ==================== #}
 <section id="home" class="hero-landscape-section">
+    <!-- 3D Interactive Matcha Particles Canvas -->
+    <canvas id="matchaParticlesCanvas" class="hero-matcha-particles" aria-hidden="true"></canvas>
+
     <div class="hero-container">
 
         <!-- Left: Modern Typography & CTAs -->
@@ -321,8 +603,8 @@
             </div>
 
             <h1 class="hero-floating-title">
-                Pure Ceremonial Matcha,<br>
-                <span>Mindfully Handcrafted.</span>
+                Pure Matcha,<br>
+                <span>Pure Moments.</span>
             </h1>
 
             <p class="hero-floating-sub">
@@ -585,13 +867,29 @@
             </a>
         </div>
 
-        <div class="why-us-image-side" style="position: relative;">
-            <img src="{{ asset('images/about/tea-ceremony.jpg') }}"
-                 alt="Ceremonial Matcha Bowl and Whisk"
-                 style="width: 100%; height: auto; border-radius: 24px; box-shadow: 0 16px 40px rgba(46, 82, 39, 0.12); border: 1px solid #D2DCD0; object-fit: cover; max-height: 480px;">
-            <div style="position: absolute; bottom: 20px; left: 20px; right: 20px; background: rgba(46, 82, 39, 0.92); backdrop-filter: blur(12px); border-radius: 16px; padding: 1.1rem; color: #FFFFFF; border: 1px solid rgba(232, 241, 230, 0.25);">
-                <strong style="color: #E8F1E6; display: block; font-size: 0.95rem; font-family: var(--font-heading);">Kyoto Ceremonial Heritage</strong>
-                <span style="font-size: 0.8rem; color: rgba(232, 241, 230, 0.85);">Slow granite stone-ground for 1 hour to yield just 30 grams of pure green tea powder.</span>
+        <div class="why-us-image-side">
+            <div class="craft-3d-card" id="craft3dCard">
+                <span class="craft-3d-badge-top">
+                    <i class="bi bi-patch-check-fill" style="color: #A4B9A1;"></i> Uji First-Harvest Tencha
+                </span>
+
+                <img src="{{ asset('images/why-us-craft.jpg') }}"
+                     alt="Artisanal Japanese Ceremonial Matcha Preparation with Stone-Ground Chawan and Bamboo Whisk"
+                     loading="lazy">
+
+                <div class="craft-3d-caption">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+                        <strong style="color: #E8F1E6; font-size: 1rem; font-family: var(--font-heading); letter-spacing: 0.02em;">
+                            Kyoto Ceremonial Heritage
+                        </strong>
+                        <span style="background: rgba(232, 241, 230, 0.2); color: #E8F1E6; font-size: 0.72rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 50px;">
+                            Single Origin
+                        </span>
+                    </div>
+                    <span style="font-size: 0.8rem; color: rgba(232, 241, 230, 0.88); line-height: 1.5; display: block;">
+                        Slow granite stone-ground at 30g per hour to preserve delicate aroma, vibrant chlorophyll, and umami richness.
+                    </span>
+                </div>
             </div>
         </div>
 
@@ -654,31 +952,403 @@
     </div>
 </section>
 
-{# ==================== 6. NEWSLETTER SUBSCRIPTION ==================== #}
-<section id="contact-newsletter" style="background: #2E5227; color: #FFFFFF; padding: clamp(3.5rem, 6vw, 4.5rem) 1.5rem; text-align: center;">
-    <div style="max-width: 650px; margin: 0 auto;">
-        <span style="font-size: 0.78rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #E8F1E6;">Exclusive Member Drops</span>
-        <h2 style="font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; color: #FFFFFF; margin: 0.4rem 0 0.8rem;">
-            STAY IN THE MATCHA LOOP
-        </h2>
-        <p style="color: rgba(232, 241, 230, 0.85); font-size: 0.95rem; margin-bottom: 2rem;">
-            Get seasonal drink secret recipes, member-only tasting invites, and instant discount vouchers directly in your inbox.
-        </p>
+{# ==================== 6. NEWSLETTER SUBSCRIPTION (3D IMMERSIVE SHOWCASE) ==================== #}
+<section id="contact-newsletter" class="loop-3d-section">
+    <div class="loop-3d-container">
 
-        <form class="newsletter-form" id="newsletterForm" action="{{ path('app_newsletter_subscribe') }}" method="POST" style="display: flex; gap: 0.6rem; max-width: 480px; margin: 0 auto; flex-wrap: wrap;">
-            <input
-                id="newsletter-email"
-                type="email"
-                name="email"
-                placeholder="Enter your email address"
-                required
-                style="flex: 1; min-width: 240px; padding: 0.85rem 1.4rem; border-radius: 50px; border: 1.5px solid rgba(232,241,230,0.3); background: #FFFFFF; color: #2E5227; font-size: 0.9rem; font-family: var(--font-body);">
-            <button type="submit"
-                    style="background: #FFFFFF; color: #2E5227; border: none; padding: 0.85rem 1.8rem; border-radius: 50px; font-weight: 800; font-size: 0.88rem; cursor: pointer; transition: all var(--trans-fast); box-shadow: 0 4px 14px rgba(0,0,0,0.15);">
-                Subscribe
-            </button>
-        </form>
+        <!-- Left: Newsletter Offer & Interactive Form -->
+        <div class="loop-3d-content">
+            <div class="loop-vip-pill">
+                <span class="hero-pulse-dot"></span>
+                <span><i class="bi bi-stars"></i> Exclusive Member Drops</span>
+            </div>
+
+            <h2 class="loop-title">
+                STAY IN THE MATCHA LOOP
+            </h2>
+
+            <p class="loop-subtext">
+                Join our private circle of matcha lovers. Receive secret seasonal drink drops, ceremonial preparation guides, and an instant <strong>10% welcome voucher</strong> delivered straight to your inbox.
+            </p>
+
+            <form class="newsletter-form" id="newsletterForm" action="{{ path('app_newsletter_subscribe') }}" method="POST" style="display: flex; gap: 0.75rem; max-width: 480px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 240px; position: relative;">
+                    <i class="bi bi-envelope-fill" style="position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%); color: #4C6B46; font-size: 1.05rem; pointer-events: none;"></i>
+                    <input
+                        id="newsletter-email"
+                        type="email"
+                        name="email"
+                        placeholder="Enter your email address"
+                        required
+                        style="width: 100%; padding: 0.95rem 1.2rem 0.95rem 3rem; border-radius: 50px; border: 1.5px solid rgba(232,241,230,0.35); background: #FFFFFF; color: #2E5227; font-size: 0.92rem; font-family: var(--font-body); outline: none; box-shadow: 0 4px 18px rgba(0,0,0,0.15);">
+                </div>
+                <button type="submit" class="btn-loop-submit" id="newsletterSubmitBtn">
+                    <span>Join VIP Circle</span> &rarr;
+                </button>
+            </form>
+
+            <div id="newsletterSuccessMsg" style="display: none; margin-top: 1rem; background: rgba(232, 241, 230, 0.18); border: 1px solid rgba(232, 241, 230, 0.35); border-radius: 12px; padding: 0.75rem 1.1rem; color: #E8F1E6; font-size: 0.88rem; align-items: center; gap: 0.5rem;">
+                <i class="bi bi-check-circle-fill" style="color: #A4B9A1; font-size: 1.15rem;"></i>
+                <span>Welcome to the Matcha Loop! Check your inbox for your 10% voucher.</span>
+            </div>
+
+            <!-- 3D Perk Pills -->
+            <div class="loop-perks-row">
+                <div class="loop-perk-item">
+                    <i class="bi bi-gift-fill"></i>
+                    <span>10% Welcome Voucher</span>
+                </div>
+                <div class="loop-perk-item">
+                    <i class="bi bi-cup-hot-fill"></i>
+                    <span>Secret Seasonal Drinks</span>
+                </div>
+                <div class="loop-perk-item">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                    <span>Priority Tasting Drops</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: 3D Visual Stage with Floating Badges & Tilt -->
+        <div class="loop-3d-stage-wrapper">
+            <div class="loop-3d-stage" id="loop3dStage">
+                <span class="loop-3d-tag-top">
+                    <i class="bi bi-box-fill" style="color: #A4B9A1;"></i> 3D Member Experience
+                </span>
+
+                <img src="{{ asset('images/matcha-loop-3d.jpg') }}"
+                     alt="Matcha Moments 3D Signature Cloud Latte with Floating Ceremonial Leaves and VIP Member Card"
+                     loading="lazy">
+
+                <div class="loop-3d-floating-card">
+                    <div class="loop-3d-card-icon">
+                        <i class="bi bi-patch-check-fill"></i>
+                    </div>
+                    <div>
+                        <strong style="display: block; font-size: 0.95rem; font-family: var(--font-heading); color: #2E5227; margin-bottom: 0.15rem;">
+                            10% OFF Welcome Drink
+                        </strong>
+                        <span style="display: block; font-size: 0.78rem; color: #55744F;">
+                            Instant digital voucher automatically sent to your inbox
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </section>
 
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    /* =========================================================================
+       1. 3D INTERACTIVE MATCHA PARTICLES ENGINE (HERO CANVAS)
+       - Ethereal floating matcha powder particles, tiny tea leaf flecks & steam
+       - Perspective projection with spatial depth Z
+       - Interactive mouse deflection & 3D parallax drift
+       - Auto-pauses with IntersectionObserver when scrolled out of view
+       ========================================================================= */
+    const canvas = document.getElementById('matchaParticlesCanvas');
+    const heroSection = document.getElementById('home');
+
+    if (canvas && heroSection) {
+        const ctx = canvas.getContext('2d');
+        let width = 0;
+        let height = 0;
+        let dpr = Math.min(window.devicePixelRatio || 1, 2);
+        let animationId = null;
+        let isVisible = true;
+
+        // Mouse tracking with smooth interpolation
+        const mouse = {
+            x: -1000,
+            y: -1000,
+            targetX: -1000,
+            targetY: -1000,
+            active: false
+        };
+
+        function resizeCanvas() {
+            const rect = heroSection.getBoundingClientRect();
+            width = rect.width;
+            height = rect.height;
+            canvas.width = Math.floor(width * dpr);
+            canvas.height = Math.floor(height * dpr);
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
+        }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas, { passive: true });
+
+        // Particle count tuned for buttery 60fps
+        const PARTICLE_COUNT = width < 600 ? 28 : 50;
+
+        class MatchaParticle {
+            constructor(initRandomY = false) {
+                this.reset(initRandomY);
+            }
+
+            reset(randomY = false) {
+                this.x = Math.random() * width;
+                this.y = randomY ? Math.random() * height : height + 15 + Math.random() * 30;
+                // 3D Depth Z: 0.5 (far) to 2.2 (close to camera)
+                this.z = 0.5 + Math.random() * 1.7;
+                
+                // Base upward drift scaled by perspective
+                this.vy = -(0.35 + (0.45 / this.z));
+                this.baseVx = (Math.random() - 0.5) * 0.25;
+                this.phase = Math.random() * Math.PI * 2;
+                this.swaySpeed = 0.0012 + Math.random() * 0.0015;
+                this.swayAmp = 0.4 + Math.random() * 0.6;
+
+                // Mouse deflection velocity
+                this.deflectX = 0;
+                this.deflectY = 0;
+
+                // Particle type: 'powder' (65%), 'leaf' (25%), 'steam' (10%)
+                const randType = Math.random();
+                if (randType < 0.65) {
+                    this.type = 'powder';
+                    this.radius = (1.5 + Math.random() * 2.8) * this.z;
+                    this.alpha = 0.35 + Math.random() * 0.45;
+                } else if (randType < 0.90) {
+                    this.type = 'leaf';
+                    this.size = (3 + Math.random() * 4.5) * this.z;
+                    this.alpha = 0.4 + Math.random() * 0.4;
+                    // 3D Rotation angles & speeds
+                    this.rotX = Math.random() * Math.PI * 2;
+                    this.rotY = Math.random() * Math.PI * 2;
+                    this.rotZ = Math.random() * Math.PI * 2;
+                    this.vRotX = (Math.random() - 0.5) * 0.03;
+                    this.vRotY = (Math.random() - 0.5) * 0.03;
+                    this.vRotZ = (Math.random() - 0.5) * 0.02;
+                } else {
+                    this.type = 'steam';
+                    this.radius = (12 + Math.random() * 18) * this.z;
+                    this.alpha = 0.08 + Math.random() * 0.12;
+                }
+            }
+
+            update(time) {
+                // Interactive mouse repulsion
+                if (mouse.active) {
+                    const dx = this.x - mouse.x;
+                    const dy = this.y - mouse.y;
+                    const dist = Math.hypot(dx, dy);
+                    const reach = 110 * this.z;
+                    if (dist < reach && dist > 1) {
+                        const force = (reach - dist) / reach;
+                        this.deflectX += (dx / dist) * force * 1.8;
+                        this.deflectY += (dy / dist) * force * 1.8;
+                    }
+                }
+
+                // Dampen mouse deflection smoothly
+                this.deflectX *= 0.92;
+                this.deflectY *= 0.92;
+
+                // Organic upward convection & wind sway
+                const sway = Math.sin(time * this.swaySpeed + this.phase) * this.swayAmp;
+                this.x += (this.baseVx + sway) * this.z + this.deflectX;
+                this.y += this.vy * this.z + this.deflectY;
+
+                // 3D Rotations for leaves
+                if (this.type === 'leaf') {
+                    this.rotX += this.vRotX;
+                    this.rotY += this.vRotY;
+                    this.rotZ += this.vRotZ;
+                }
+
+                // Recycle particle once it floats past the top or sides
+                if (this.y < -30 || this.x < -40 || this.x > width + 40) {
+                    this.reset(false);
+                }
+            }
+
+            draw() {
+                ctx.save();
+
+                if (this.type === 'powder') {
+                    // Soft glowing spherical matcha particle
+                    const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+                    grad.addColorStop(0, `rgba(232, 241, 230, ${this.alpha})`);
+                    grad.addColorStop(0.45, `rgba(164, 185, 161, ${this.alpha * 0.75})`);
+                    grad.addColorStop(1, 'rgba(46, 82, 39, 0)');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (this.type === 'leaf') {
+                    // 3D tumbling matcha tea leaf flake
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.rotZ);
+                    // 3D perspective foreshortening via cos(rotX), cos(rotY)
+                    const scaleX = Math.max(0.15, Math.abs(Math.cos(this.rotX)));
+                    const scaleY = Math.max(0.15, Math.abs(Math.cos(this.rotY)));
+                    ctx.scale(scaleX, scaleY);
+
+                    ctx.fillStyle = `rgba(125, 151, 120, ${this.alpha})`;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -this.size);
+                    ctx.bezierCurveTo(this.size * 0.7, -this.size * 0.3, this.size * 0.7, this.size * 0.5, 0, this.size);
+                    ctx.bezierCurveTo(-this.size * 0.7, this.size * 0.5, -this.size * 0.7, -this.size * 0.3, 0, -this.size);
+                    ctx.fill();
+                } else if (this.type === 'steam') {
+                    // Soft luminescent matcha aroma cloud puff
+                    const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+                    grad.addColorStop(0, `rgba(232, 241, 230, ${this.alpha})`);
+                    grad.addColorStop(0.5, `rgba(164, 185, 161, ${this.alpha * 0.4})`);
+                    grad.addColorStop(1, 'rgba(46, 82, 39, 0)');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        // Initialize particles
+        const particles = [];
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+            particles.push(new MatchaParticle(true));
+        }
+
+        // Mouse listeners
+        heroSection.addEventListener('mousemove', function (e) {
+            const rect = heroSection.getBoundingClientRect();
+            mouse.targetX = e.clientX - rect.left;
+            mouse.targetY = e.clientY - rect.top;
+            mouse.active = true;
+        }, { passive: true });
+
+        heroSection.addEventListener('mouseleave', function () {
+            mouse.active = false;
+        });
+
+        // Main animation loop
+        function renderLoop(time) {
+            if (!isVisible) return;
+
+            // Smooth mouse interpolation
+            if (mouse.active) {
+                mouse.x += (mouse.targetX - mouse.x) * 0.15;
+                mouse.y += (mouse.targetY - mouse.y) * 0.15;
+            }
+
+            ctx.clearRect(0, 0, width, height);
+
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update(time);
+                particles[i].draw();
+            }
+
+            animationId = requestAnimationFrame(renderLoop);
+        }
+
+        // Pause loop when hero is offscreen for optimal battery/performance
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    isVisible = entry.isIntersecting;
+                    if (isVisible) {
+                        if (!animationId) {
+                            animationId = requestAnimationFrame(renderLoop);
+                        }
+                    } else if (animationId) {
+                        cancelAnimationFrame(animationId);
+                        animationId = null;
+                    }
+                });
+            }, { threshold: 0.05 });
+            observer.observe(heroSection);
+        } else {
+            animationId = requestAnimationFrame(renderLoop);
+        }
+    }
+
+    /* =========================================================================
+       2. INTERACTIVE 3D MOUSE TILT (NEWSLETTER & CRAFT CARDS)
+       ========================================================================= */
+    const tiltElements = [
+        document.getElementById('loop3dStage'),
+        document.getElementById('craft3dCard')
+    ].filter(Boolean);
+
+    tiltElements.forEach(el => {
+        el.addEventListener('mousemove', (e) => {
+            const rect = el.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const rotateY = ((x / rect.width) - 0.5) * 10;
+            const rotateX = ((0.5 - (y / rect.height))) * 10;
+            el.style.transform = `perspective(1000px) translateY(-6px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
+        });
+
+        el.addEventListener('mouseleave', () => {
+            el.style.transform = '';
+        });
+    });
+
+    /* =========================================================================
+       3. NEWSLETTER AJAX FORM HANDLER
+       ========================================================================= */
+    const newsletterForm = document.getElementById('newsletterForm');
+    const successMsg = document.getElementById('newsletterSuccessMsg');
+    const submitBtn = document.getElementById('newsletterSubmitBtn');
+
+    if (newsletterForm) {
+        newsletterForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('newsletter-email');
+            const email = emailInput ? emailInput.value.trim() : '';
+
+            if (!email) return;
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span>Subscribing...</span>';
+            }
+
+            const formData = new FormData(newsletterForm);
+
+            fetch(newsletterForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    newsletterForm.style.display = 'none';
+                    if (successMsg) successMsg.style.display = 'flex';
+                    if (typeof showToast === 'function') {
+                        showToast('Welcome to the Matcha Loop! Voucher sent.');
+                    }
+                } else {
+                    alert(data.message || 'Please enter a valid email address.');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<span>Join VIP Circle</span> &rarr;';
+                    }
+                }
+            })
+            .catch(() => {
+                // Graceful fallback to regular form submit if fetch fails
+                newsletterForm.submit();
+            });
+        });
+    }
+});
+</script>
 {% endblock %}

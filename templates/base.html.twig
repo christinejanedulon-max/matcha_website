@@ -319,8 +319,8 @@
                 <img src="{{ asset('images/logo-light.png') }}" alt="Matcha Moments" class="footer-logo-img">
             </a>
             <p class="footer-tagline">Pure Matcha. Pure Moments.</p>
-            <p class="footer-address">
-                <img src="{{ asset('images/place.png') }}" alt="" class="footer-mini-icon">
+            <p class="footer-address" style="display: flex; align-items: center; gap: 0.45rem;">
+                <i class="bi bi-geo-alt-fill" style="color: #A4B9A1; font-size: 1.05rem; flex-shrink: 0;"></i>
                 Authentic Japanese Matcha Experience
             </p>
         </div>
@@ -351,23 +351,23 @@
         <div class="footer-contact">
             <h4>Contact Us</h4>
             <p>
-                <a href="tel:09653994962">
-                    <img src="{{ asset('images/phone.png') }}" alt="" class="footer-contact-icon">
+                <a href="tel:09653994962" style="display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <i class="bi bi-telephone-fill" style="color: #A4B9A1; font-size: 0.95rem; flex-shrink: 0;"></i>
                     09653994962
                 </a>
             </p>
             <p>
-                <a href="mailto:matchamoments@gmail.com">
-                    <img src="{{ asset('images/mail.png') }}" alt="" class="footer-contact-icon">
+                <a href="mailto:matchamoments@gmail.com" style="display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <i class="bi bi-envelope-fill" style="color: #A4B9A1; font-size: 0.95rem; flex-shrink: 0;"></i>
                     matchamoments@gmail.com
                 </a>
             </p>
-            <div class="social-links" style="margin-top: 0.75rem;">
+            <div class="social-links" style="margin-top: 0.85rem; display: flex; gap: 0.6rem;">
                 <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Facebook">
-                    <img src="{{ asset('images/face.png') }}" alt="Facebook">
+                    <i class="bi bi-facebook" style="font-size: 1.15rem;"></i>
                 </a>
                 <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
-                    <img src="{{ asset('images/gram.png') }}" alt="Instagram">
+                    <i class="bi bi-instagram" style="font-size: 1.15rem;"></i>
                 </a>
             </div>
             {% if isAdmin %}
