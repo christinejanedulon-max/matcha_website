@@ -27,9 +27,11 @@
     </div>
 {% endfor %}
 
-{% set isAdmin = (app.session and app.session.get('user_role') == 'admin') %}
-{% set isCustomer = (app.session and app.session.get('user_role') == 'customer') %}
-{% set isLoggedIn = (isAdmin or isCustomer) %}
+{% set userRole = (app.session ? app.session.get('user_role') : null) %}
+{% set isAdmin = (userRole == 'admin') %}
+{% set isStaff = (userRole == 'staff') %}
+{% set isCustomer = (userRole == 'customer') %}
+{% set isLoggedIn = (userRole is not empty) %}
 {% set userName = app.session ? app.session.get('user_name') : null %}
 
 <!-- ==================== NAVBAR ==================== -->
@@ -45,9 +47,17 @@
             <a href="{{ path('app_about') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_about' %}active{% endif %}">About</a>
             <a href="{{ path('app_reviews') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_reviews' %}active{% endif %}">Reviews</a>
             <a href="{{ path('app_contact') }}" class="nav-link {% if app.request.attributes.get('_route') == 'app_contact' %}active{% endif %}">Contact</a>
-            {% if isCustomer %}
+            {% if isStaff %}
+                <a href="{{ path('staff_dashboard') }}" class="nav-link {% if 'staff' in (app.request.attributes.get('_route')|default('')) %}active{% endif %}" style="color: #2E5227; font-weight: 700;">
+                    <i class="bi bi-person-badge-fill me-1"></i> Staff Workspace
+                </a>
+            {% elseif isAdmin %}
+                <a href="{{ path('admin_dashboard') }}" class="nav-link {% if 'admin' in (app.request.attributes.get('_route')|default('')) %}active{% endif %}" style="color: #2E5227; font-weight: 700;">
+                    <i class="bi bi-speedometer2 me-1"></i> Admin Portal
+                </a>
+            {% elseif isCustomer %}
                 <a href="{{ path('app_account_orders') }}" class="nav-link {% if 'app_account' in (app.request.attributes.get('_route')|default('')) %}active{% endif %}">
-                    <i class="bi bi-clock-history"></i> My Orders
+                    <i class="bi bi-clock-history me-1"></i> My Orders
                 </a>
             {% endif %}
         </nav>
@@ -68,23 +78,15 @@
                 {% endif %}
             </div>
 
-            {% if isAdmin %}
-                <!-- Admin Dashboard (Desktop) -->
-                <a href="{{ path('admin_dashboard') }}" class="btn-nav-admin desktop-only-action" title="Admin Dashboard">
-                    <i class="bi bi-speedometer2"></i> Dashboard
-                </a>
-                <a href="{{ path('app_logout') }}" onclick="localStorage.removeItem('matcha_moments_cart_v1');" class="btn-nav-auth desktop-only-action" style="padding: 0.45rem 0.85rem; border-radius: 50px; font-size: 0.78rem; font-weight: 600; color: #b91c1c; background: #fee2e2; border: none; text-decoration: none;">
-                    Sign Out
-                </a>
-            {% elseif isCustomer %}
-                <!-- Regular User Logged In: Clean Profile Dropdown Menu -->
+            {% if isLoggedIn %}
+                <!-- Unified Profile Dropdown Menu for All Authenticated Users -->
                 <div class="nav-profile-dropdown-wrapper desktop-only-action">
                     <button type="button"
                             class="nav-profile-btn"
                             id="profileMenuToggle"
                             aria-expanded="false"
                             aria-haspopup="true"
-                            aria-label="User Profile and Orders Menu">
+                            aria-label="User Profile and Menu">
                         <span class="profile-avatar-pill">
                             {{ userName|split(' ')|map(w => w|first)|join('')|upper|slice(0,2)|default('U') }}
                         </span>
@@ -102,7 +104,13 @@
                                 <strong>{{ userName }}</strong>
                                 <small>{{ app.session.get('user_email') }}</small>
                                 <span class="profile-badge-status">
-                                    <i class="bi bi-patch-check-fill"></i> Verified Customer
+                                    {% if isAdmin %}
+                                        <i class="bi bi-shield-shaded"></i> Administrator
+                                    {% elseif isStaff %}
+                                        <i class="bi bi-person-badge-fill"></i> Staff / Barista
+                                    {% else %}
+                                        <i class="bi bi-patch-check-fill"></i> Verified Customer
+                                    {% endif %}
                                 </span>
                             </div>
                         </div>
@@ -110,27 +118,72 @@
                         <div class="profile-dropdown-divider"></div>
 
                         <div class="profile-dropdown-links">
-                            <a href="{{ path('app_account_orders') }}#active-orders" class="profile-dropdown-link" onclick="closeProfileDropdown()">
-                                <div class="profile-link-icon active-icon"><i class="bi bi-radar"></i></div>
-                                <div class="profile-link-text">
-                                    <strong>Track Active Order</strong>
-                                    <span>Real-time kitchen &amp; delivery steps</span>
-                                </div>
-                            </a>
+                            {% if isAdmin %}
+                                <a href="{{ path('admin_dashboard') }}" class="profile-dropdown-link" onclick="closeProfileDropdown()">
+                                    <div class="profile-link-icon active-icon"><i class="bi bi-speedometer2"></i></div>
+                                    <div class="profile-link-text">
+                                        <strong>Admin Dashboard</strong>
+                                        <span>System metrics &amp; store overview</span>
+                                    </div>
+                                </a>
+                                <a href="{{ path('admin_users') }}" class="profile-dropdown-link" onclick="closeProfileDropdown()">
+                                    <div class="profile-link-icon history-icon"><i class="bi bi-people-fill"></i></div>
+                                    <div class="profile-link-text">
+                                        <strong>User &amp; Staff (CRUD)</strong>
+                                        <span>Create, edit, reset &amp; delete users</span>
+                                    </div>
+                                </a>
+                                <a href="{{ path('admin_products') }}" class="profile-dropdown-link" onclick="closeProfileDropdown()">
+                                    <div class="profile-link-icon menu-icon"><i class="bi bi-cup-straw"></i></div>
+                                    <div class="profile-link-text">
+                                        <strong>Menu &amp; Stocks</strong>
+                                        <span>Full menu catalog &amp; drink inventory</span>
+                                    </div>
+                                </a>
+                            {% elseif isStaff %}
+                                <a href="{{ path('staff_dashboard') }}" class="profile-dropdown-link" onclick="closeProfileDropdown()">
+                                    <div class="profile-link-icon active-icon"><i class="bi bi-cup-hot-fill"></i></div>
+                                    <div class="profile-link-text">
+                                        <strong>Staff Workspace</strong>
+                                        <span>Manage &amp; edit your drink records</span>
+                                    </div>
+                                </a>
+                                <a href="{{ path('staff_orders') }}" class="profile-dropdown-link" onclick="closeProfileDropdown()">
+                                    <div class="profile-link-icon history-icon"><i class="bi bi-receipt"></i></div>
+                                    <div class="profile-link-text">
+                                        <strong>Order Prep Queue</strong>
+                                        <span>Fulfill incoming matcha tickets</span>
+                                    </div>
+                                </a>
+                            {% else %}
+                                <a href="{{ path('app_account_orders') }}#active-orders" class="profile-dropdown-link" onclick="closeProfileDropdown()">
+                                    <div class="profile-link-icon active-icon"><i class="bi bi-radar"></i></div>
+                                    <div class="profile-link-text">
+                                        <strong>Track Active Order</strong>
+                                        <span>Real-time kitchen &amp; delivery steps</span>
+                                    </div>
+                                </a>
+                                <a href="{{ path('app_account_orders') }}#past-orders" class="profile-dropdown-link" onclick="closeProfileDropdown()">
+                                    <div class="profile-link-icon history-icon"><i class="bi bi-clock-history"></i></div>
+                                    <div class="profile-link-text">
+                                        <strong>History of My Orders</strong>
+                                        <span>Past receipts &amp; order archive</span>
+                                    </div>
+                                </a>
+                                <a href="{{ path('app_menu') }}" class="profile-dropdown-link" onclick="closeProfileDropdown()">
+                                    <div class="profile-link-icon menu-icon"><i class="bi bi-cup-straw"></i></div>
+                                    <div class="profile-link-text">
+                                        <strong>Order Fresh Drinks</strong>
+                                        <span>Browse handcrafted ceremonial menu</span>
+                                    </div>
+                                </a>
+                            {% endif %}
 
-                            <a href="{{ path('app_account_orders') }}#past-orders" class="profile-dropdown-link" onclick="closeProfileDropdown()">
-                                <div class="profile-link-icon history-icon"><i class="bi bi-clock-history"></i></div>
+                            <a href="{{ path('app_account_profile') }}" class="profile-dropdown-link" onclick="closeProfileDropdown()">
+                                <div class="profile-link-icon" style="background: #E8F1E6; color: #2E5227;"><i class="bi bi-key-fill"></i></div>
                                 <div class="profile-link-text">
-                                    <strong>History of My Orders</strong>
-                                    <span>Past receipts &amp; order archive</span>
-                                </div>
-                            </a>
-
-                            <a href="{{ path('app_menu') }}" class="profile-dropdown-link" onclick="closeProfileDropdown()">
-                                <div class="profile-link-icon menu-icon"><i class="bi bi-cup-straw"></i></div>
-                                <div class="profile-link-text">
-                                    <strong>Order Fresh Drinks</strong>
-                                    <span>Browse handcrafted ceremonial menu</span>
+                                    <strong>Profile &amp; Password</strong>
+                                    <span>Account credentials &amp; password change</span>
                                 </div>
                             </a>
                         </div>
@@ -197,8 +250,37 @@
                 <a href="{{ path('admin_dashboard') }}" class="mobile-btn-action" style="background: #2E5227; color: #FFFFFF;" onclick="closeMobileMenu()">
                     <i class="bi bi-speedometer2"></i> Admin Dashboard
                 </a>
+                <a href="{{ path('admin_users') }}" class="mobile-btn-action" onclick="closeMobileMenu()">
+                    <i class="bi bi-people-fill"></i> Users &amp; Staff (CRUD)
+                </a>
+                <a href="{{ path('admin_products') }}" class="mobile-btn-action" onclick="closeMobileMenu()">
+                    <i class="bi bi-cup-straw"></i> Menu &amp; Stocks
+                </a>
                 <a href="{{ path('admin_orders') }}" class="mobile-btn-action" onclick="closeMobileMenu()">
                     <i class="bi bi-receipt"></i> Customer Orders
+                </a>
+                <a href="{{ path('app_account_profile') }}" class="mobile-btn-action" onclick="closeMobileMenu()">
+                    <i class="bi bi-person-gear"></i> Profile &amp; Password
+                </a>
+                <a href="{{ path('app_logout') }}" onclick="localStorage.removeItem('matcha_moments_cart_v1'); closeMobileMenu();" class="mobile-btn-action logout-btn">
+                    <i class="bi bi-box-arrow-right"></i> Sign Out
+                </a>
+            {% elseif isStaff %}
+                <div class="mobile-user-banner">
+                    <i class="bi bi-person-badge"></i>
+                    <div>
+                        <strong>{{ userName|default('Barista') }}</strong>
+                        <small>Cafe Staff Member</small>
+                    </div>
+                </div>
+                <a href="{{ path('staff_dashboard') }}" class="mobile-btn-action" style="background: #2E5227; color: #FFFFFF;" onclick="closeMobileMenu()">
+                    <i class="bi bi-cup-hot-fill"></i> Staff Workspace (Menu CRUD)
+                </a>
+                <a href="{{ path('staff_orders') }}" class="mobile-btn-action" onclick="closeMobileMenu()">
+                    <i class="bi bi-receipt"></i> Kitchen Order Queue
+                </a>
+                <a href="{{ path('app_account_profile') }}" class="mobile-btn-action" onclick="closeMobileMenu()">
+                    <i class="bi bi-person-gear"></i> Profile &amp; Password
                 </a>
                 <a href="{{ path('app_logout') }}" onclick="localStorage.removeItem('matcha_moments_cart_v1'); closeMobileMenu();" class="mobile-btn-action logout-btn">
                     <i class="bi bi-box-arrow-right"></i> Sign Out
@@ -221,6 +303,9 @@
                 </a>
                 <a href="{{ path('app_menu') }}" class="mobile-btn-action primary-btn" onclick="closeMobileMenu()">
                     <i class="bi bi-cup-straw"></i> Order Now
+                </a>
+                <a href="{{ path('app_account_profile') }}" class="mobile-btn-action" onclick="closeMobileMenu()">
+                    <i class="bi bi-person-gear"></i> Profile &amp; Password
                 </a>
                 <button type="button" class="mobile-btn-action" onclick="openCartDrawer(); closeMobileMenu();">
                     <i class="bi bi-bag"></i> View Cart (<span class="mobile-cart-count">0</span>)

@@ -1,0 +1,314 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}User &amp; Staff Management — Matcha Admin{% endblock %}
+
+{% block content %}
+<div class="admin-topbar">
+    <div>
+        <h1 style="margin: 0;">User &amp; Staff Management</h1>
+        <p style="color: var(--clr-text-muted); margin: 0.3rem 0 0; font-size: 0.9rem;">
+            Full CRUD control over administrative accounts, café baristas (staff), and registered customers.
+        </p>
+    </div>
+    <div>
+        <button type="button" class="btn-hero-primary" onclick="openCreateUserModal()" style="border: none; padding: 0.65rem 1.4rem; font-size: 0.9rem; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <i class="bi bi-person-plus-fill"></i> + Create User / Staff
+        </button>
+    </div>
+</div>
+
+<!-- Admin Stats Row specifically for Users & Staff -->
+<div class="admin-stats-grid" style="margin-bottom: 2rem;">
+    <div class="admin-stat-card">
+        <div class="stat-icon-wrap stat-icon-blue"><i class="bi bi-people-fill"></i></div>
+        <div class="stat-info-wrap">
+            <span class="stat-label">Total Users</span>
+            <span class="stat-value">{{ stats.totalUsers }}</span>
+        </div>
+    </div>
+    <div class="admin-stat-card">
+        <div class="stat-icon-wrap stat-icon-green"><i class="bi bi-person-badge-fill"></i></div>
+        <div class="stat-info-wrap">
+            <span class="stat-label">Total Staff (Baristas)</span>
+            <span class="stat-value">{{ stats.totalStaff }}</span>
+        </div>
+    </div>
+    <div class="admin-stat-card">
+        <div class="stat-icon-wrap stat-icon-gold"><i class="bi bi-cup-straw"></i></div>
+        <div class="stat-info-wrap">
+            <span class="stat-label">Total Records (Drinks)</span>
+            <span class="stat-value">{{ stats.totalRecords }}</span>
+        </div>
+    </div>
+    <div class="admin-stat-card">
+        <div class="stat-icon-wrap stat-icon-green"><i class="bi bi-person-check-fill"></i></div>
+        <div class="stat-info-wrap">
+            <span class="stat-label">Registered Customers</span>
+            <span class="stat-value">{{ stats.totalCustomers }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="admin-panel-card" style="padding: 1.2rem 1.5rem; margin-bottom: 1.5rem;">
+    <form method="GET" action="{{ path('admin_users') }}" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 240px; position: relative;">
+            <i class="bi bi-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #7D9778;"></i>
+            <input type="text" name="q" value="{{ currentSearch }}" placeholder="Search by user name or email..." class="form-control" style="padding-left: 2.5rem;">
+        </div>
+
+        <div style="min-width: 160px;">
+            <select name="role" class="form-control" onchange="this.form.submit()">
+                <option value="all" {% if currentRole == 'all' %}selected{% endif %}>All Roles</option>
+                <option value="admin" {% if currentRole == 'admin' %}selected{% endif %}>Admin Only</option>
+                <option value="staff" {% if currentRole == 'staff' %}selected{% endif %}>Staff Only</option>
+                <option value="customer" {% if currentRole == 'customer' %}selected{% endif %}>Customer Only</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn-hero-primary" style="border: none; padding: 0.65rem 1.2rem; border-radius: 8px; cursor: pointer;">
+            Search &amp; Filter
+        </button>
+        {% if currentSearch or currentRole != 'all' %}
+            <a href="{{ path('admin_users') }}" class="btn-hero-secondary" style="text-decoration: none; padding: 0.65rem 1rem; border-radius: 8px;">
+                Reset
+            </a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Users Table -->
+<div class="admin-panel-card">
+    <div class="admin-panel-header">
+        <h2>Registered System Users ({{ users|length }} records)</h2>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Account Holder</th>
+                    <th>Email Address</th>
+                    <th>System Role</th>
+                    <th>Account Status</th>
+                    <th>Date Registered</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                    <tr>
+                        <td>
+                            <strong style="color: #7D9778;">#{{ u.id }}</strong>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 36px; height: 36px; border-radius: 50%; background: #2E5227; color: #FFFFFF; font-size: 0.8rem; font-weight: 800; display: flex; align-items: center; justify-content: center;">
+                                    {{ u.fullName|split(' ')|map(w => w|first)|join('')|upper|slice(0,2)|default('U') }}
+                                </div>
+                                <strong style="font-size: 0.92rem; color: #2E5227;">{{ u.fullName }}</strong>
+                            </div>
+                        </td>
+                        <td>
+                            <span style="font-size: 0.88rem; color: #4C6B46;">{{ u.email }}</span>
+                        </td>
+                        <td>
+                            {% if u.role == 'admin' %}
+                                <span class="status-pill" style="background: #2E5227; color: #FFFFFF; font-weight: 700;">
+                                    <i class="bi bi-shield-shaded me-1"></i> Admin
+                                </span>
+                            {% elseif u.role == 'staff' %}
+                                <span class="status-pill" style="background: #4C6B46; color: #FFFFFF; font-weight: 700;">
+                                    <i class="bi bi-person-badge-fill me-1"></i> Staff
+                                </span>
+                            {% else %}
+                                <span class="status-pill status-ready" style="font-weight: 700;">
+                                    <i class="bi bi-person me-1"></i> Customer
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if u.status|default('active') == 'active' %}
+                                <span class="status-pill status-ready">Active</span>
+                            {% elseif u.status == 'disabled' %}
+                                <span class="status-pill status-cancelled">Disabled</span>
+                            {% else %}
+                                <span class="status-pill status-pending">{{ u.status|capitalize }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small style="color: #7D9778;">{{ u.createdAt|slice(0, 16) }}</small>
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="display: inline-flex; gap: 0.4rem;">
+                                <button type="button" 
+                                        class="btn-admin-action btn-primary-action"
+                                        title="Edit User"
+                                        onclick="openEditUserModal({{ u|json_encode|e('html_attr') }})">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </button>
+
+                                {% if u.email != 'admin@matchamoments.com' %}
+                                    <form action="{{ path('admin_user_delete', { id: u.id }) }}" 
+                                          method="POST" 
+                                          onsubmit="return confirm('MANDATORY RUBRIC CONFIRMATION:\nAre you sure you want to permanently delete user account \'{{ u.fullName|e('js') }}\' ({{ u.email|e('js') }})?');">
+                                        <button type="submit" class="btn-admin-action btn-danger-action" title="Delete User">
+                                            <i class="bi bi-trash3"></i> Delete
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span style="font-size: 0.75rem; color: #888; padding: 0.3rem 0.5rem; font-style: italic;">Primary Admin</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 2.5rem; color: #7D9778;">
+                            No user accounts match the current filter.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- =====================================================
+     CREATE USER / STAFF MODAL
+     ===================================================== -->
+<div class="modal-backdrop" id="createUserModalBackdrop" style="display: none;">
+    <div class="custom-modal" style="max-width: 520px; padding: 2rem;">
+        <button class="modal-close-btn" onclick="closeCreateUserModal()">&times;</button>
+        <h2 style="font-family: var(--font-heading); font-size: 1.6rem; color: var(--clr-matcha-dark); margin-bottom: 0.4rem;">
+            Create User / Staff Account
+        </h2>
+        <p style="font-size: 0.85rem; color: var(--clr-text-muted); margin-bottom: 1.4rem;">
+            Register a new system user with designated role and permissions.
+        </p>
+
+        <form action="{{ path('admin_user_create') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" name="fullName" class="form-control" placeholder="e.g. Kenji Tanaka" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email Address *</label>
+                <input type="email" name="email" class="form-control" placeholder="staff@matchamoments.com" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label">System Role *</label>
+                    <select name="role" class="form-control" required>
+                        <option value="staff" selected>Staff (Barista)</option>
+                        <option value="admin">Administrator</option>
+                        <option value="customer">Customer</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Initial Status *</label>
+                    <select name="status" class="form-control" required>
+                        <option value="active" selected>Active</option>
+                        <option value="disabled">Disabled / Inactive</option>
+                        <option value="archived">Archived</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password * (min 6 characters)</label>
+                <input type="password" name="password" class="form-control" minlength="6" placeholder="Assign initial password" required>
+            </div>
+
+            <button type="submit" class="btn-hero-primary" style="width: 100%; border: none; padding: 0.85rem; border-radius: 50px; cursor: pointer; font-size: 0.95rem; margin-top: 0.5rem;">
+                Save &amp; Create Account &rarr;
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- =====================================================
+     EDIT USER / STAFF MODAL
+     ===================================================== -->
+<div class="modal-backdrop" id="editUserModalBackdrop" style="display: none;">
+    <div class="custom-modal" style="max-width: 520px; padding: 2rem;">
+        <button class="modal-close-btn" onclick="closeEditUserModal()">&times;</button>
+        <h2 style="font-family: var(--font-heading); font-size: 1.6rem; color: var(--clr-matcha-dark); margin-bottom: 0.4rem;">
+            Edit User / Staff Details
+        </h2>
+        <p style="font-size: 0.85rem; color: var(--clr-text-muted); margin-bottom: 1.4rem;">
+            Update credentials, assign new roles, or change status.
+        </p>
+
+        <form id="editUserForm" action="" method="POST">
+            <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" name="fullName" id="editFullName" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email Address *</label>
+                <input type="email" name="email" id="editEmail" class="form-control" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label">System Role *</label>
+                    <select name="role" id="editRole" class="form-control" required>
+                        <option value="admin">Administrator</option>
+                        <option value="staff">Staff (Barista)</option>
+                        <option value="customer">Customer</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Account Status *</label>
+                    <select name="status" id="editStatus" class="form-control" required>
+                        <option value="active">Active</option>
+                        <option value="disabled">Disabled</option>
+                        <option value="archived">Archived</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Reset Password (leave empty to keep existing)</label>
+                <input type="password" name="password" id="editPassword" class="form-control" minlength="6" placeholder="Enter new password if resetting">
+            </div>
+
+            <button type="submit" class="btn-hero-primary" style="width: 100%; border: none; padding: 0.85rem; border-radius: 50px; cursor: pointer; font-size: 0.95rem; margin-top: 0.5rem;">
+                Save Changes &rarr;
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openCreateUserModal() {
+    document.getElementById('createUserModalBackdrop').style.display = 'flex';
+}
+function closeCreateUserModal() {
+    document.getElementById('createUserModalBackdrop').style.display = 'none';
+}
+
+function openEditUserModal(user) {
+    document.getElementById('editFullName').value = user.fullName || '';
+    document.getElementById('editEmail').value = user.email || '';
+    document.getElementById('editRole').value = user.role || 'customer';
+    document.getElementById('editStatus').value = user.status || 'active';
+    document.getElementById('editPassword').value = '';
+
+    const form = document.getElementById('editUserForm');
+    form.action = '/admin/users/' + user.id + '/edit';
+
+    document.getElementById('editUserModalBackdrop').style.display = 'flex';
+}
+function closeEditUserModal() {
+    document.getElementById('editUserModalBackdrop').style.display = 'none';
+}
+</script>
+{% endblock %}

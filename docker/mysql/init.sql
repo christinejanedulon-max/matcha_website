@@ -5,7 +5,7 @@
 CREATE DATABASE IF NOT EXISTS matcha_moments CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE matcha_moments;
 
--- 1. USERS TABLE (Supports Customers & Admins)
+-- 1. USERS TABLE (Supports Customers, Staff & Admins)
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
@@ -13,18 +13,21 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     role VARCHAR(50) DEFAULT 'customer',
     roles JSON DEFAULT NULL,
+    status VARCHAR(20) DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 2. PRODUCTS TABLE (Menu items, categories, pricing, and stocks)
+-- 2. PRODUCTS TABLE (Menu items, categories, pricing, stocks, and creator tracking)
 CREATE TABLE IF NOT EXISTS products (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    created_by_user_id INT NULL,
     name VARCHAR(150) NOT NULL,
     category VARCHAR(50) DEFAULT 'Drinks',
     price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     stock_quantity INT NOT NULL DEFAULT 0,
     image_url VARCHAR(255) DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (created_by_user_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 3. ORDERS TABLE (Tracks customer orders, fulfillment, payment, tracking & GCash reference)
@@ -78,8 +81,13 @@ CREATE TABLE IF NOT EXISTS newsletter_subscriptions (
 -- =====================================================
 
 -- Insert Default Admin Account (Password: admin123 hashed)
-INSERT INTO users (full_name, email, password, role, roles) VALUES 
-('Cafe Administrator', 'admin@matchamoments.com', '$2y$10$e0MYzXyjpJS7Pd0RVvHwHeH0iPq3vP.z1KzYy1Vv6p6Y1KzYy1Vv6', 'admin', '["ROLE_ADMIN"]')
+INSERT INTO users (full_name, email, password, role, roles, status) VALUES 
+('Cafe Administrator', 'admin@matchamoments.com', '$2y$10$e0MYzXyjpJS7Pd0RVvHwHeH0iPq3vP.z1KzYy1Vv6p6Y1KzYy1Vv6', 'admin', '["ROLE_ADMIN"]', 'active')
+ON DUPLICATE KEY UPDATE email=email;
+
+-- Insert Default Staff Account (Password: staff123 hashed)
+INSERT INTO users (full_name, email, password, role, roles, status) VALUES 
+('Matcha Lead Barista', 'staff@matchamoments.com', '$2y$12$vSculuY/ItX1pQdD1C3mc.5egegsdpv1Tdz7Kl1XD6vLopa0YetWW', 'staff', '["ROLE_STAFF"]', 'active')
 ON DUPLICATE KEY UPDATE email=email;
 
 -- Insert Default Menu Items

@@ -31,6 +31,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: 'role', length: 50, options: ['default' => 'customer'])]
     private ?string $role = 'customer';
 
+    #[ORM\Column(name: 'status', length: 20, options: ['default' => 'active'])]
+    private ?string $status = 'active';
+
     #[ORM\Column(name: 'password', length: 255)]
     private ?string $password = null;
 
@@ -98,9 +101,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
-        // Incorporate custom 'role' column logic if it matches 'admin'
+        // Incorporate custom 'role' column logic if it matches 'admin' or 'staff'
         if ($this->role === 'admin' && !in_array('ROLE_ADMIN', $roles, true)) {
             $roles[] = 'ROLE_ADMIN';
+        } elseif ($this->role === 'staff' && !in_array('ROLE_STAFF', $roles, true)) {
+            $roles[] = 'ROLE_STAFF';
         }
 
         return array_unique($roles);
@@ -121,6 +126,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRole(string $role): static
     {
         $this->role = $role;
+
+        return $this;
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status ?? 'active';
+    }
+
+    public function setStatus(string $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }

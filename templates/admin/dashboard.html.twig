@@ -20,8 +20,35 @@
     </div>
 </div>
 
-<!-- Stats Grid -->
+<!-- Mandatory Rubric Stats Grid (Total Users, Total Staff, Total Records, Revenue, Orders) -->
 <div class="admin-stats-grid">
+    <div class="admin-stat-card">
+        <div class="stat-icon-wrap stat-icon-blue"><i class="bi bi-people-fill"></i></div>
+        <div class="stat-info-wrap">
+            <span class="stat-label">Total Users</span>
+            <span class="stat-value">{{ stats.totalUsers }}</span>
+            <a href="{{ path('admin_users') }}" style="font-size: 0.72rem; color: #55744F; font-weight: 700; text-decoration: underline;">Manage Users &rarr;</a>
+        </div>
+    </div>
+
+    <div class="admin-stat-card">
+        <div class="stat-icon-wrap stat-icon-green"><i class="bi bi-person-badge-fill"></i></div>
+        <div class="stat-info-wrap">
+            <span class="stat-label">Total Staff</span>
+            <span class="stat-value">{{ stats.totalStaff }}</span>
+            <a href="{{ path('admin_users') }}?role=staff" style="font-size: 0.72rem; color: #2E5227; font-weight: 700; text-decoration: underline;">View Baristas &rarr;</a>
+        </div>
+    </div>
+
+    <div class="admin-stat-card">
+        <div class="stat-icon-wrap stat-icon-gold"><i class="bi bi-cup-straw"></i></div>
+        <div class="stat-info-wrap">
+            <span class="stat-label">Total Records</span>
+            <span class="stat-value">{{ stats.totalRecords }}</span>
+            <span style="font-size: 0.72rem; color: #7D9778;">Menu Drink Items</span>
+        </div>
+    </div>
+
     <div class="admin-stat-card">
         <div class="stat-icon-wrap stat-icon-green"><i class="bi bi-cash-stack"></i></div>
         <div class="stat-info-wrap">
@@ -43,14 +70,6 @@
         <div class="stat-info-wrap">
             <span class="stat-label">Pending Orders</span>
             <span class="stat-value">{{ stats.pendingOrders }}</span>
-        </div>
-    </div>
-
-    <div class="admin-stat-card">
-        <div class="stat-icon-wrap stat-icon-green"><i class="bi bi-cup-straw"></i></div>
-        <div class="stat-info-wrap">
-            <span class="stat-label">Menu Drinks</span>
-            <span class="stat-value">{{ stats.totalProducts }}</span>
         </div>
     </div>
 </div>

@@ -15,12 +15,20 @@ final class AdminController extends AbstractController
     {
         $session = $request->getSession();
         $userRole = $session?->get('user_role');
-        $userEmail = strtolower((string) $session?->get('user_email', ''));
 
-        // Strict Single-Admin Enforcement: Only the designated single administrator can access
-        if ($userRole !== 'admin' || $userEmail !== 'admin@matchamoments.com') {
-            $this->addFlash('error', 'Access restricted. Only the single authorized store administrator can access the admin dashboard.');
+        if (!$userRole) {
+            $this->addFlash('error', 'Please sign in with administrator credentials.');
             return $this->redirectToRoute('app_login');
+        }
+
+        // Strict 403 Forbidden Access Denial for non-admin users (including Staff)
+        if ($userRole !== 'admin') {
+            return new Response(
+                $this->renderView('security/access_denied.html.twig', [
+                    'message' => 'HTTP 403 Forbidden: Staff members and customers are strictly restricted from accessing the Administrator Dashboard and User Management systems.'
+                ]),
+                Response::HTTP_FORBIDDEN
+            );
         }
 
         return null;
@@ -102,6 +110,7 @@ final class AdminController extends AbstractController
         $description = $request->request->get('description', '');
 
         if ($name && $price) {
+            $session = $request->getSession();
             $store->addProduct([
                 'name' => $name,
                 'category' => $category,
@@ -109,6 +118,10 @@ final class AdminController extends AbstractController
                 'stockQuantity' => $stock,
                 'imageUrl' => $imageUrl,
                 'description' => $description,
+            ], [
+                'email' => $session?->get('user_email', 'admin@matchamoments.com'),
+                'fullName' => $session?->get('user_name', 'Cafe Administrator'),
+                'role' => 'admin',
             ]);
             $this->addFlash('success', "New drink '{$name}' successfully added to the menu.");
         } else {
@@ -175,5 +188,143 @@ final class AdminController extends AbstractController
         return $this->render('admin/subscribers.html.twig', [
             'subscribers' => $subscribers,
         ]);
+    }
+
+    // =====================================================
+    // USER & STAFF MANAGEMENT (CRUD) — RUBRIC CATEGORY 3
+    // =====================================================
+
+    #[Route('/users', name: 'admin_users')]
+    public function users(Request $request, StoreService $store): Response
+    {
+        if ($redirect = $this->checkAdmin($request)) return $redirect;
+
+        $allUsers = $store->getUsers();
+        $search = strtolower(trim((string) $request->query->get('q', '')));
+        $roleFilter = strtolower(trim((string) $request->query->get('role', 'all')));
+
+        $filteredUsers = array_filter($allUsers, function ($u) use ($search, $roleFilter) {
+            $matchesSearch = true;
+            if ($search !== '') {
+                $name = strtolower($u['fullName'] ?? '');
+                $email = strtolower($u['email'] ?? '');
+                $matchesSearch = (str_contains($name, $search) || str_contains($email, $search));
+            }
+
+            $matchesRole = true;
+            if ($roleFilter !== 'all') {
+                $matchesRole = (($u['role'] ?? '') === $roleFilter);
+            }
+
+            return $matchesSearch && $matchesRole;
+        });
+
+        return $this->render('admin/users.html.twig', [
+            'users' => array_values($filteredUsers),
+            'stats' => $store->getDashboardStats(),
+            'currentSearch' => $search,
+            'currentRole' => $roleFilter,
+        ]);
+    }
+
+    #[Route('/users/create', name: 'admin_user_create', methods: ['POST'])]
+    public function createUser(Request $request, StoreService $store): Response
+    {
+        if ($redirect = $this->checkAdmin($request)) return $redirect;
+
+        $fullName = trim((string) $request->request->get('fullName', ''));
+        $email = strtolower(trim((string) $request->request->get('email', '')));
+        $role = $request->request->get('role', 'staff');
+        $status = $request->request->get('status', 'active');
+        $password = (string) $request->request->get('password', '');
+
+        if ($fullName === '' || $email === '' || $password === '') {
+            $this->addFlash('error', 'All fields (Full Name, Email, Password) are required.');
+            return $this->redirectToRoute('admin_users');
+        }
+
+        if (strlen($password) < 6) {
+            $this->addFlash('error', 'Password must be at least 6 characters.');
+            return $this->redirectToRoute('admin_users');
+        }
+
+        // Duplicate check
+        if ($store->getUserByEmail($email)) {
+            $this->addFlash('error', "An account with email {$email} already exists.");
+            return $this->redirectToRoute('admin_users');
+        }
+
+        $store->createUser([
+            'fullName' => $fullName,
+            'email' => $email,
+            'role' => $role,
+            'status' => $status,
+            'password' => $password,
+        ]);
+
+        $this->addFlash('success', "New user account '{$fullName}' ({$role}) successfully created.");
+        return $this->redirectToRoute('admin_users');
+    }
+
+    #[Route('/users/{id}/edit', name: 'admin_user_edit', methods: ['POST'])]
+    public function editUser(int $id, Request $request, StoreService $store): Response
+    {
+        if ($redirect = $this->checkAdmin($request)) return $redirect;
+
+        $fullName = trim((string) $request->request->get('fullName', ''));
+        $email = strtolower(trim((string) $request->request->get('email', '')));
+        $role = $request->request->get('role', 'staff');
+        $status = $request->request->get('status', 'active');
+        $newPassword = (string) $request->request->get('password', '');
+
+        $data = [
+            'fullName' => $fullName,
+            'email' => $email,
+            'role' => $role,
+            'status' => $status,
+        ];
+
+        if ($newPassword !== '') {
+            if (strlen($newPassword) < 6) {
+                $this->addFlash('error', 'Reset password must be at least 6 characters.');
+                return $this->redirectToRoute('admin_users');
+            }
+            $data['password'] = $newPassword;
+        }
+
+        $updated = $store->updateUser($id, $data);
+        if ($updated) {
+            $this->addFlash('success', "User account updated successfully.");
+        } else {
+            $this->addFlash('error', "User not found.");
+        }
+
+        return $this->redirectToRoute('admin_users');
+    }
+
+    #[Route('/users/{id}/delete', name: 'admin_user_delete', methods: ['POST'])]
+    public function deleteUser(int $id, Request $request, StoreService $store): Response
+    {
+        if ($redirect = $this->checkAdmin($request)) return $redirect;
+
+        $user = $store->getUser($id);
+        if (!$user) {
+            $this->addFlash('error', 'User not found.');
+            return $this->redirectToRoute('admin_users');
+        }
+
+        if (strtolower($user['email']) === 'admin@matchamoments.com') {
+            $this->addFlash('error', 'The primary administrator account cannot be deleted.');
+            return $this->redirectToRoute('admin_users');
+        }
+
+        $deleted = $store->deleteUser($id);
+        if ($deleted) {
+            $this->addFlash('success', "User '{$user['fullName']}' ({$user['email']}) deleted with confirmation.");
+        } else {
+            $this->addFlash('error', "Could not delete user.");
+        }
+
+        return $this->redirectToRoute('admin_users');
     }
 }

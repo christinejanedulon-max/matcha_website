@@ -284,6 +284,13 @@
                     </button>
                 </form>
                 <form action="{{ path('app_login') }}" method="POST">
+                    <input type="hidden" name="demo_role" value="staff">
+                    <input type="hidden" name="email" value="staff@matchamoments.com">
+                    <button type="submit" class="demo-role-btn" style="background:#4C6B46;color:#FFFFFF;border:none;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+                        <i class="bi bi-person-badge-fill"></i> Quick Sign In as Staff (Barista)
+                    </button>
+                </form>
+                <form action="{{ path('app_login') }}" method="POST">
                     <input type="hidden" name="demo_role" value="admin">
                     <input type="hidden" name="email" value="admin@matchamoments.com">
                     <button type="submit" class="demo-role-btn" style="background:#2E5227;color:#FFFFFF;border:none;display:flex;align-items:center;justify-content:center;gap:0.5rem;">

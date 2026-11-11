@@ -39,6 +39,10 @@
                 <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
                 Dashboard
             </a>
+            <a href="{{ path('admin_users') }}" class="admin-nav-link {% if app.request.attributes.get('_route') == 'admin_users' %}active{% endif %}">
+                <span class="nav-icon"><i class="bi bi-people-fill"></i></span>
+                Users &amp; Staff (CRUD)
+            </a>
             <a href="{{ path('admin_orders') }}" class="admin-nav-link {% if app.request.attributes.get('_route') == 'admin_orders' %}active{% endif %}">
                 <span class="nav-icon"><i class="bi bi-receipt"></i></span>
                 Orders &amp; Dispatch
@@ -55,11 +59,18 @@
                 <span class="nav-icon"><i class="bi bi-envelope-paper"></i></span>
                 Newsletter List
             </a>
+            <a href="{{ path('app_account_profile') }}" class="admin-nav-link {% if app.request.attributes.get('_route') == 'app_account_profile' %}active{% endif %}">
+                <span class="nav-icon"><i class="bi bi-person-gear"></i></span>
+                Admin Profile &amp; Password
+            </a>
         </nav>
 
         <div class="admin-nav-footer">
-            <a href="{{ path('app_home') }}" class="admin-back-store-btn">
+            <a href="{{ path('app_home') }}" class="admin-back-store-btn" style="margin-bottom: 0.5rem;">
                 <span><i class="bi bi-shop me-1"></i></span> View Café Storefront
+            </a>
+            <a href="{{ path('app_logout') }}" class="admin-back-store-btn" style="background: rgba(220, 53, 69, 0.15); color: #ff8585; border-color: rgba(220, 53, 69, 0.3);">
+                <span><i class="bi bi-box-arrow-right me-1"></i></span> Sign Out
             </a>
         </div>
     </aside>

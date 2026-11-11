@@ -1,0 +1,126 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Staff Order Queue &amp; Preparation | Matcha Moments{% endblock %}
+
+{% block body %}
+<section class="section" style="padding: 3.5rem 0 5rem; background: #FAFDF9;">
+    <div class="container" style="max-width: 1180px;">
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 2rem;">
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: #E8F1E6; color: #2E5227; font-size: 0.72rem; font-weight: 800; padding: 0.35rem 0.9rem; border-radius: 50px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem;">
+                    <i class="bi bi-receipt"></i> Kitchen &amp; Barista Dispatch Queue
+                </div>
+                <h1 style="font-family: var(--font-heading); font-size: 2.2rem; color: #2E5227; margin: 0; font-weight: 800;">
+                    Live Drink Order Queue
+                </h1>
+                <p style="color: #55744F; font-size: 0.92rem; margin: 0.3rem 0 0;">
+                    Update preparation stages as you handcraft each matcha drink for waiting customers.
+                </p>
+            </div>
+
+            <div style="display: flex; gap: 0.8rem;">
+                <a href="{{ path('staff_dashboard') }}" class="btn-hero-secondary" style="text-decoration: none; padding: 0.65rem 1.2rem; border-radius: 10px; font-size: 0.88rem;">
+                    <i class="bi bi-cup-straw me-1"></i> Beverage Catalog
+                </a>
+                <a href="{{ path('staff_orders') }}" class="btn-hero-primary" style="text-decoration: none; padding: 0.65rem 1.2rem; border-radius: 10px; font-size: 0.88rem;">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Refresh Queue
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+            <a href="{{ path('staff_orders', { status: 'all' }) }}" class="btn-admin-action {% if currentFilter == 'all' %}btn-primary-action{% else %}btn-hero-secondary{% endif %}" style="padding: 0.45rem 1rem; border-radius: 50px; font-size: 0.85rem; text-decoration: none;">
+                All ({{ stats.totalOrders }})
+            </a>
+            <a href="{{ path('staff_orders', { status: 'Pending' }) }}" class="btn-admin-action {% if currentFilter == 'Pending' %}btn-primary-action{% else %}btn-hero-secondary{% endif %}" style="padding: 0.45rem 1rem; border-radius: 50px; font-size: 0.85rem; text-decoration: none;">
+                Pending ({{ stats.pendingOrders }})
+            </a>
+            <a href="{{ path('staff_orders', { status: 'Preparing' }) }}" class="btn-admin-action {% if currentFilter == 'Preparing' %}btn-primary-action{% else %}btn-hero-secondary{% endif %}" style="padding: 0.45rem 1rem; border-radius: 50px; font-size: 0.85rem; text-decoration: none;">
+                Preparing ({{ stats.preparingOrders }})
+            </a>
+            <a href="{{ path('staff_orders', { status: 'Ready' }) }}" class="btn-admin-action {% if currentFilter == 'Ready' %}btn-primary-action{% else %}btn-hero-secondary{% endif %}" style="padding: 0.45rem 1rem; border-radius: 50px; font-size: 0.85rem; text-decoration: none;">
+                Ready ({{ stats.readyOrders }})
+            </a>
+            <a href="{{ path('staff_orders', { status: 'Completed' }) }}" class="btn-admin-action {% if currentFilter == 'Completed' %}btn-primary-action{% else %}btn-hero-secondary{% endif %}" style="padding: 0.45rem 1rem; border-radius: 50px; font-size: 0.85rem; text-decoration: none;">
+                Completed ({{ stats.completedOrders }})
+            </a>
+        </div>
+
+        <div style="background: #FFFFFF; border-radius: 24px; border: 1.5px solid #D2DCD0; box-shadow: 0 12px 35px rgba(46, 82, 39, 0.08); overflow: hidden;">
+            <div style="overflow-x: auto;">
+                <table class="admin-table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #FAFDF9; border-bottom: 1.5px solid #D2DCD0;">
+                            <th style="padding: 1rem 1.2rem; text-align: left; font-size: 0.82rem; color: #2E5227;">Order &amp; Time</th>
+                            <th style="padding: 1rem 1.2rem; text-align: left; font-size: 0.82rem; color: #2E5227;">Customer</th>
+                            <th style="padding: 1rem 1.2rem; text-align: left; font-size: 0.82rem; color: #2E5227;">Fulfillment</th>
+                            <th style="padding: 1rem 1.2rem; text-align: left; font-size: 0.82rem; color: #2E5227;">Drink Items Ordered</th>
+                            <th style="padding: 1rem 1.2rem; text-align: left; font-size: 0.82rem; color: #2E5227;">Status</th>
+                            <th style="padding: 1rem 1.2rem; text-align: right; font-size: 0.82rem; color: #2E5227;">Update Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for o in orders %}
+                            <tr style="border-bottom: 1px solid #E8F1E6;">
+                                <td style="padding: 1rem 1.2rem;">
+                                    <strong style="font-size: 0.95rem; color: #2E5227; display: block;">{{ o.orderNumber }}</strong>
+                                    <small style="color: #7D9778;">{{ o.orderDate|slice(0, 16) }}</small>
+                                </td>
+                                <td style="padding: 1rem 1.2rem;">
+                                    <strong style="color: #2E5227;">{{ o.customerName }}</strong>
+                                    <div style="font-size: 0.78rem; color: #7D9778;">{{ o.phone }}</div>
+                                </td>
+                                <td style="padding: 1rem 1.2rem;">
+                                    <span class="status-pill status-ready">{{ o.fulfillmentMethod }}</span>
+                                </td>
+                                <td style="padding: 1rem 1.2rem;">
+                                    <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem; color: #2E5227;">
+                                        {% for itm in o.items %}
+                                            <li>
+                                                <strong>{{ itm.quantity }}x</strong> {{ itm.name }}
+                                                <small style="color: #7D9778;">({{ itm.options }})</small>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                                <td style="padding: 1rem 1.2rem;">
+                                    {% if o.status|lower == 'pending' %}
+                                        <span class="status-pill status-pending">Pending</span>
+                                    {% elseif o.status|lower == 'preparing' %}
+                                        <span class="status-pill" style="background: #E8F1E6; color: #2E5227; font-weight: 700;">Preparing</span>
+                                    {% elseif o.status|lower == 'ready' %}
+                                        <span class="status-pill status-ready">Ready</span>
+                                    {% elseif o.status|lower == 'completed' %}
+                                        <span class="status-pill" style="background: #E8F1E6; color: #2E5227;">Completed</span>
+                                    {% else %}
+                                        <span class="status-pill status-cancelled">{{ o.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 1rem 1.2rem; text-align: right;">
+                                    <form action="{{ path('staff_order_status', { orderNumber: o.orderNumber }) }}" method="POST" style="display: inline-flex; gap: 0.4rem; align-items: center;">
+                                        <select name="status" class="form-control" style="font-size: 0.8rem; padding: 0.35rem 0.6rem; width: auto;" onchange="this.form.submit()">
+                                            <option value="Pending" {% if o.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                            <option value="Preparing" {% if o.status == 'Preparing' %}selected{% endif %}>Preparing</option>
+                                            <option value="Ready" {% if o.status == 'Ready' %}selected{% endif %}>Ready</option>
+                                            <option value="Completed" {% if o.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                        </select>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 3rem; color: #7D9778;">
+                                    No orders in this status.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

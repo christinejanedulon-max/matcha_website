@@ -243,9 +243,43 @@ class StoreService
         ]
     ];
 
+    private const DEFAULT_USERS = [
+        [
+            'id' => 1,
+            'fullName' => 'Cafe Administrator',
+            'email' => 'admin@matchamoments.com',
+            'role' => 'admin',
+            'roles' => ['ROLE_ADMIN', 'ROLE_USER'],
+            'status' => 'active',
+            'password' => '$2y$10$e0MYzXyjpJS7Pd0RVvHwHeH0iPq3vP.z1KzYy1Vv6p6Y1KzYy1Vv6', // admin123
+            'createdAt' => '2026-11-01 08:00:00',
+        ],
+        [
+            'id' => 2,
+            'fullName' => 'Matcha Lead Barista',
+            'email' => 'staff@matchamoments.com',
+            'role' => 'staff',
+            'roles' => ['ROLE_STAFF', 'ROLE_USER'],
+            'status' => 'active',
+            'password' => '$2y$12$vSculuY/ItX1pQdD1C3mc.5egegsdpv1Tdz7Kl1XD6vLopa0YetWW', // staff123
+            'createdAt' => '2026-11-02 09:30:00',
+        ],
+        [
+            'id' => 3,
+            'fullName' => 'Jane Matcha Lover',
+            'email' => 'customer@matchamoments.com',
+            'role' => 'customer',
+            'roles' => ['ROLE_USER'],
+            'status' => 'active',
+            'password' => '$2y$12$vSculuY/ItX1pQdD1C3mc.5egegsdpv1Tdz7Kl1XD6vLopa0YetWW',
+            'createdAt' => '2026-11-03 14:15:00',
+        ],
+    ];
+
     private ?array $inMemoryProducts = null;
     private ?array $inMemoryReviews = null;
     private ?array $inMemoryOrders = null;
+    private ?array $inMemoryUsers = null;
 
     public function __construct(
         private readonly RequestStack $requestStack,
@@ -278,6 +312,7 @@ class StoreService
                 if (!empty($dbProducts)) {
                     $list = [];
                     foreach ($dbProducts as $p) {
+                        $creator = method_exists($p, 'getCreatedBy') ? $p->getCreatedBy() : null;
                         $list[] = [
                             'id' => $p->getId(),
                             'name' => $p->getName(),
@@ -285,7 +320,10 @@ class StoreService
                             'price' => (string) $p->getPrice(),
                             'stockQuantity' => $p->getStockQuantity() ?? 0,
                             'imageUrl' => $p->getImageUrl() ?? 'images/latte.png',
-                            'description' => 'Handcrafted premium matcha drink made with ceremonial grade ingredients.'
+                            'description' => 'Handcrafted premium matcha drink made with ceremonial grade ingredients.',
+                            'createdByEmail' => $creator ? $creator->getEmail() : 'admin@matchamoments.com',
+                            'createdByName' => $creator ? $creator->getFullName() : 'Cafe Administrator',
+                            'createdByRole' => $creator ? $creator->getRole() : 'admin',
                         ];
                     }
                     return $this->inMemoryProducts = $list;
@@ -297,10 +335,23 @@ class StoreService
 
         $session = $this->getSession();
         if ($session && $session->has('custom_products')) {
-            return $this->inMemoryProducts = $session->get('custom_products');
+            $sessionList = $session->get('custom_products');
+            foreach ($sessionList as &$sp) {
+                if (!isset($sp['createdByEmail'])) {
+                    $sp['createdByEmail'] = 'admin@matchamoments.com';
+                    $sp['createdByName'] = 'Cafe Administrator';
+                    $sp['createdByRole'] = 'admin';
+                }
+            }
+            return $this->inMemoryProducts = $sessionList;
         }
 
         $products = self::DEFAULT_PRODUCTS;
+        foreach ($products as &$dp) {
+            $dp['createdByEmail'] = 'admin@matchamoments.com';
+            $dp['createdByName'] = 'Cafe Administrator';
+            $dp['createdByRole'] = 'admin';
+        }
         return $this->inMemoryProducts = $products;
     }
 
@@ -371,9 +422,9 @@ class StoreService
     }
 
     /**
-     * Add a new product
+     * Add a new product (with creator tracking for Staff / Admin)
      */
-    public function addProduct(array $data): array
+    public function addProduct(array $data, ?array $creator = null): array
     {
         $products = $this->getProducts();
         $maxId = 0;
@@ -383,6 +434,10 @@ class StoreService
             }
         }
 
+        $creatorEmail = $creator['email'] ?? 'admin@matchamoments.com';
+        $creatorName = $creator['fullName'] ?? 'Cafe Administrator';
+        $creatorRole = $creator['role'] ?? 'admin';
+
         $newProduct = [
             'id' => $maxId + 1,
             'name' => $data['name'] ?? 'New Matcha Drink',
@@ -390,13 +445,53 @@ class StoreService
             'price' => number_format((float) ($data['price'] ?? 180), 2, '.', ''),
             'stockQuantity' => (int) ($data['stockQuantity'] ?? 30),
             'imageUrl' => $data['imageUrl'] ?? 'images/latte.png',
-            'description' => $data['description'] ?? 'Handcrafted fresh matcha beverage.'
+            'description' => $data['description'] ?? 'Handcrafted fresh matcha beverage.',
+            'createdByEmail' => $creatorEmail,
+            'createdByName' => $creatorName,
+            'createdByRole' => $creatorRole,
         ];
+
+        // Persist to DB if connected
+        if ($this->em) {
+            try {
+                $pEntity = new Product();
+                $pEntity->setName($newProduct['name']);
+                $pEntity->setCategory($newProduct['category']);
+                $pEntity->setPrice($newProduct['price']);
+                $pEntity->setStockQuantity($newProduct['stockQuantity']);
+                $pEntity->setImageUrl($newProduct['imageUrl']);
+                if ($creatorEmail) {
+                    $u = $this->em->getRepository(User::class)->findOneBy(['email' => $creatorEmail]);
+                    if ($u) {
+                        $pEntity->setCreatedBy($u);
+                    }
+                }
+                $this->em->persist($pEntity);
+                $this->em->flush();
+                $newProduct['id'] = $pEntity->getId();
+            } catch (\Throwable) {}
+        }
 
         $products[] = $newProduct;
         $this->saveProducts($products);
 
         return $newProduct;
+    }
+
+    /**
+     * Rubric Permission Check: Staff can only edit/delete their own records; Admin can edit/delete any record.
+     */
+    public function canUserModifyProduct(array $product, ?string $userEmail, ?string $userRole): bool
+    {
+        if ($userRole === 'admin') {
+            return true;
+        }
+        if ($userRole === 'staff') {
+            $productCreator = strtolower((string) ($product['createdByEmail'] ?? 'admin@matchamoments.com'));
+            $currentUser = strtolower((string) $userEmail);
+            return ($productCreator === $currentUser);
+        }
+        return false;
     }
 
     /**
@@ -859,6 +954,255 @@ class StoreService
     }
 
     /**
+     * Get all users (from Database with fallback)
+     */
+    public function getUsers(): array
+    {
+        if ($this->inMemoryUsers !== null) {
+            return $this->inMemoryUsers;
+        }
+
+        if ($this->em) {
+            try {
+                $dbUsers = $this->em->getRepository(User::class)->findBy([], ['id' => 'ASC']);
+                if (!empty($dbUsers)) {
+                    $list = [];
+                    foreach ($dbUsers as $u) {
+                        $list[] = [
+                            'id' => $u->getId(),
+                            'fullName' => $u->getFullName(),
+                            'email' => $u->getEmail(),
+                            'role' => $u->getRole() ?? 'customer',
+                            'roles' => $u->getRoles(),
+                            'status' => method_exists($u, 'getStatus') ? $u->getStatus() : 'active',
+                            'createdAt' => $u->getCreatedAt()?->format('Y-m-d H:i:s') ?? date('Y-m-d H:i:s'),
+                        ];
+                    }
+                    return $this->inMemoryUsers = $list;
+                }
+            } catch (\Throwable) {}
+        }
+
+        $session = $this->getSession();
+        if ($session && $session->has('store_users')) {
+            return $this->inMemoryUsers = $session->get('store_users');
+        }
+
+        $users = self::DEFAULT_USERS;
+        if ($session && $session->has('registered_users')) {
+            $reg = $session->get('registered_users');
+            $idx = 10;
+            foreach ($reg as $email => $data) {
+                $users[] = [
+                    'id' => $idx++,
+                    'fullName' => $data['fullName'] ?? 'Customer',
+                    'email' => $email,
+                    'role' => $data['role'] ?? 'customer',
+                    'roles' => ['ROLE_USER'],
+                    'status' => 'active',
+                    'createdAt' => date('Y-m-d H:i:s'),
+                ];
+            }
+        }
+
+        if ($session) {
+            $session->set('store_users', $users);
+        }
+
+        return $this->inMemoryUsers = $users;
+    }
+
+    public function getUser(int $id): ?array
+    {
+        foreach ($this->getUsers() as $user) {
+            if ($user['id'] === $id) {
+                return $user;
+            }
+        }
+        return null;
+    }
+
+    public function getUserByEmail(string $email): ?array
+    {
+        $email = strtolower(trim($email));
+        foreach ($this->getUsers() as $user) {
+            if (strtolower($user['email']) === $email) {
+                return $user;
+            }
+        }
+        return null;
+    }
+
+    public function createUser(array $data): array
+    {
+        $users = $this->getUsers();
+        $email = strtolower(trim((string) ($data['email'] ?? '')));
+        $fullName = trim((string) ($data['fullName'] ?? 'Staff Member'));
+        $role = in_array($data['role'] ?? '', ['admin', 'staff', 'customer'], true) ? $data['role'] : 'staff';
+        $status = in_array($data['status'] ?? '', ['active', 'disabled', 'archived'], true) ? $data['status'] : 'active';
+        $plainPass = $data['password'] ?? 'matcha123';
+        $hashed = password_hash($plainPass, PASSWORD_BCRYPT);
+
+        $maxId = 0;
+        foreach ($users as $u) {
+            if ($u['id'] > $maxId) $maxId = $u['id'];
+        }
+
+        $newUser = [
+            'id' => $maxId + 1,
+            'fullName' => $fullName,
+            'email' => $email,
+            'role' => $role,
+            'roles' => ($role === 'admin') ? ['ROLE_ADMIN', 'ROLE_USER'] : (($role === 'staff') ? ['ROLE_STAFF', 'ROLE_USER'] : ['ROLE_USER']),
+            'status' => $status,
+            'password' => $hashed,
+            'createdAt' => date('Y-m-d H:i:s'),
+        ];
+
+        if ($this->em) {
+            try {
+                $uEntity = new User();
+                $uEntity->setFullName($fullName);
+                $uEntity->setEmail($email);
+                $uEntity->setRole($role);
+                if (method_exists($uEntity, 'setStatus')) {
+                    $uEntity->setStatus($status);
+                }
+                $uEntity->setPassword($hashed);
+                $uEntity->setRoles($newUser['roles']);
+                $this->em->persist($uEntity);
+                $this->em->flush();
+                $newUser['id'] = $uEntity->getId();
+            } catch (\Throwable) {}
+        }
+
+        $users[] = $newUser;
+        $this->saveUsers($users);
+
+        return $newUser;
+    }
+
+    public function updateUser(int $id, array $data): bool
+    {
+        $users = $this->getUsers();
+        $found = false;
+        foreach ($users as &$u) {
+            if ($u['id'] === $id) {
+                if (isset($data['fullName'])) $u['fullName'] = trim((string)$data['fullName']);
+                if (isset($data['email'])) $u['email'] = strtolower(trim((string)$data['email']));
+                if (isset($data['role']) && in_array($data['role'], ['admin', 'staff', 'customer'], true)) {
+                    $u['role'] = $data['role'];
+                    $u['roles'] = ($data['role'] === 'admin') ? ['ROLE_ADMIN', 'ROLE_USER'] : (($data['role'] === 'staff') ? ['ROLE_STAFF', 'ROLE_USER'] : ['ROLE_USER']);
+                }
+                if (isset($data['status']) && in_array($data['status'], ['active', 'disabled', 'archived'], true)) {
+                    $u['status'] = $data['status'];
+                }
+                if (!empty($data['password'])) {
+                    $u['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
+                }
+                $found = true;
+                break;
+            }
+        }
+
+        if ($this->em) {
+            try {
+                $uEntity = $this->em->getRepository(User::class)->find($id);
+                if ($uEntity) {
+                    if (isset($data['fullName'])) $uEntity->setFullName(trim((string)$data['fullName']));
+                    if (isset($data['email'])) $uEntity->setEmail(strtolower(trim((string)$data['email'])));
+                    if (isset($data['role'])) {
+                        $uEntity->setRole($data['role']);
+                        $uEntity->setRoles(($data['role'] === 'admin') ? ['ROLE_ADMIN', 'ROLE_USER'] : (($data['role'] === 'staff') ? ['ROLE_STAFF', 'ROLE_USER'] : ['ROLE_USER']));
+                    }
+                    if (isset($data['status']) && method_exists($uEntity, 'setStatus')) {
+                        $uEntity->setStatus($data['status']);
+                    }
+                    if (!empty($data['password'])) {
+                        $uEntity->setPassword(password_hash($data['password'], PASSWORD_BCRYPT));
+                    }
+                    $this->em->flush();
+                }
+            } catch (\Throwable) {}
+        }
+
+        if ($found) {
+            $this->saveUsers($users);
+        }
+        return $found;
+    }
+
+    public function deleteUser(int $id): bool
+    {
+        $users = $this->getUsers();
+        // Master admin safeguard
+        foreach ($users as $u) {
+            if ($u['id'] === $id && strtolower($u['email']) === 'admin@matchamoments.com') {
+                return false;
+            }
+        }
+
+        $filtered = array_values(array_filter($users, fn($u) => $u['id'] !== $id));
+
+        if ($this->em) {
+            try {
+                $uEntity = $this->em->getRepository(User::class)->find($id);
+                if ($uEntity && strtolower($uEntity->getEmail()) !== 'admin@matchamoments.com') {
+                    $this->em->remove($uEntity);
+                    $this->em->flush();
+                }
+            } catch (\Throwable) {}
+        }
+
+        $this->saveUsers($filtered);
+        return true;
+    }
+
+    public function updateUserPassword(string $email, string $currentPassword, string $newPassword): bool
+    {
+        $email = strtolower(trim($email));
+        $users = $this->getUsers();
+        $found = false;
+
+        if ($this->em) {
+            try {
+                $uEntity = $this->em->getRepository(User::class)->findOneBy(['email' => $email]);
+                if ($uEntity && password_verify($currentPassword, $uEntity->getPassword())) {
+                    $uEntity->setPassword(password_hash($newPassword, PASSWORD_BCRYPT));
+                    $this->em->flush();
+                    $found = true;
+                }
+            } catch (\Throwable) {}
+        }
+
+        foreach ($users as &$u) {
+            if (strtolower($u['email']) === $email) {
+                if (isset($u['password']) && !password_verify($currentPassword, $u['password'])) {
+                    return false;
+                }
+                $u['password'] = password_hash($newPassword, PASSWORD_BCRYPT);
+                $found = true;
+                break;
+            }
+        }
+
+        if ($found) {
+            $this->saveUsers($users);
+        }
+
+        return $found;
+    }
+
+    private function saveUsers(array $users): void
+    {
+        $this->inMemoryUsers = null;
+        $session = $this->getSession();
+        if ($session) {
+            $session->set('store_users', $users);
+        }
+    }
+
+    /**
      * Get summary metrics for Admin Dashboard
      */
     public function getDashboardStats(): array
@@ -867,6 +1211,7 @@ class StoreService
         $products = $this->getProducts();
         $reviews = $this->getReviews();
         $subscribers = $this->getSubscribers();
+        $users = $this->getUsers();
 
         $totalRevenue = 0;
         $pendingCount = 0;
@@ -885,6 +1230,11 @@ class StoreService
 
         $lowStockProducts = array_filter($products, fn($p) => ($p['stockQuantity'] ?? 0) <= 25);
 
+        $totalUsers = count($users);
+        $totalStaff = count(array_filter($users, fn($u) => ($u['role'] ?? '') === 'staff'));
+        $totalCustomers = count(array_filter($users, fn($u) => ($u['role'] ?? '') === 'customer'));
+        $totalAdmins = count(array_filter($users, fn($u) => ($u['role'] ?? '') === 'admin'));
+
         return [
             'totalRevenue' => number_format($totalRevenue, 2),
             'totalOrders' => count($orders),
@@ -893,6 +1243,11 @@ class StoreService
             'readyOrders' => $readyCount,
             'completedOrders' => $completedCount,
             'totalProducts' => count($products),
+            'totalRecords' => count($products),
+            'totalUsers' => $totalUsers,
+            'totalStaff' => $totalStaff,
+            'totalCustomers' => $totalCustomers,
+            'totalAdmins' => $totalAdmins,
             'lowStockCount' => count($lowStockProducts),
             'lowStockProducts' => array_values($lowStockProducts),
             'totalReviews' => count($reviews),

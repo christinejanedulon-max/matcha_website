@@ -1,0 +1,322 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Staff Workspace — Beverage Records &amp; Menu | Matcha Moments{% endblock %}
+
+{% block body %}
+<section class="section" style="padding: 3.5rem 0 5rem; background: #FAFDF9;">
+    <div class="container" style="max-width: 1180px;">
+
+        {# Workspace Top Bar #}
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 2rem;">
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: #E8F1E6; color: #2E5227; font-size: 0.72rem; font-weight: 800; padding: 0.35rem 0.9rem; border-radius: 50px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem;">
+                    <i class="bi bi-person-badge-fill"></i> Staff Barista Workspace • Limited CRUD
+                </div>
+                <h1 style="font-family: var(--font-heading); font-size: 2.2rem; color: #2E5227; margin: 0; font-weight: 800;">
+                    Beverage Catalog Management
+                </h1>
+                <p style="color: #55744F; font-size: 0.92rem; margin: 0.3rem 0 0;">
+                    Signed in as <strong>{{ app.session.get('user_name') }}</strong> ({{ currentUserEmail }}). You have full control over your own drink records.
+                </p>
+            </div>
+
+            <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
+                <a href="{{ path('staff_orders') }}" class="btn-hero-secondary" style="text-decoration: none; padding: 0.65rem 1.2rem; border-radius: 10px; font-size: 0.88rem;">
+                    <i class="bi bi-receipt me-1"></i> Order Prep Queue
+                </a>
+                <button type="button" class="btn-hero-primary" onclick="openStaffAddModal()" style="border: none; padding: 0.65rem 1.4rem; border-radius: 10px; font-size: 0.88rem; cursor: pointer;">
+                    <i class="bi bi-plus-lg me-1"></i> Add Seasonal Drink
+                </button>
+            </div>
+        </div>
+
+        {# Staff Metrics Overview #}
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem; margin-bottom: 2rem;">
+            <div style="background: #FFFFFF; border-radius: 18px; padding: 1.3rem 1.5rem; border: 1.5px solid #D2DCD0; box-shadow: 0 6px 20px rgba(46, 82, 39, 0.06); display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 50px; height: 50px; border-radius: 12px; background: #E8F1E6; color: #2E5227; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+                    <i class="bi bi-cup-hot-fill"></i>
+                </div>
+                <div>
+                    <span style="display: block; font-size: 0.78rem; color: #7D9778; font-weight: 700; text-transform: uppercase;">Your Created Drinks</span>
+                    <strong style="font-size: 1.6rem; color: #2E5227;">{{ myProductsCount }}</strong>
+                </div>
+            </div>
+
+            <div style="background: #FFFFFF; border-radius: 18px; padding: 1.3rem 1.5rem; border: 1.5px solid #D2DCD0; box-shadow: 0 6px 20px rgba(46, 82, 39, 0.06); display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 50px; height: 50px; border-radius: 12px; background: #E8F1E6; color: #4C6B46; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                </div>
+                <div>
+                    <span style="display: block; font-size: 0.78rem; color: #7D9778; font-weight: 700; text-transform: uppercase;">Total Shared Menu</span>
+                    <strong style="font-size: 1.6rem; color: #2E5227;">{{ totalMenuCount }}</strong>
+                </div>
+            </div>
+
+            <div style="background: #FFFFFF; border-radius: 18px; padding: 1.3rem 1.5rem; border: 1.5px solid #D2DCD0; box-shadow: 0 6px 20px rgba(46, 82, 39, 0.06); display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 50px; height: 50px; border-radius: 12px; background: #FEF3C7; color: #92400E; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+                    <i class="bi bi-shield-lock-fill"></i>
+                </div>
+                <div>
+                    <span style="display: block; font-size: 0.78rem; color: #92400E; font-weight: 700; text-transform: uppercase;">Access Restrictions</span>
+                    <span style="font-size: 0.85rem; color: #78350F; font-weight: 600;">Edit Own Records Only</span>
+                </div>
+            </div>
+        </div>
+
+        {# Filter Tabs & Rubric Notice #}
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="display: inline-flex; background: #E8F1E6; padding: 0.3rem; border-radius: 12px; border: 1px solid #D2DCD0;">
+                <a href="{{ path('staff_dashboard', { view: 'all' }) }}" 
+                   style="padding: 0.5rem 1.1rem; border-radius: 9px; font-size: 0.85rem; font-weight: 700; text-decoration: none; transition: all 0.2s; {{ currentView == 'all' ? 'background: #2E5227; color: #FFFFFF;' : 'color: #55744F;' }}">
+                    All Menu Drinks ({{ totalMenuCount }})
+                </a>
+                <a href="{{ path('staff_dashboard', { view: 'my' }) }}" 
+                   style="padding: 0.5rem 1.1rem; border-radius: 9px; font-size: 0.85rem; font-weight: 700; text-decoration: none; transition: all 0.2s; {{ currentView == 'my' ? 'background: #2E5227; color: #FFFFFF;' : 'color: #55744F;' }}">
+                    <i class="bi bi-star-fill me-1"></i> My Creations Only ({{ myProductsCount }})
+                </a>
+            </div>
+
+            <div style="font-size: 0.8rem; color: #55744F; background: #E8F1E6; padding: 0.45rem 1rem; border-radius: 50px;">
+                <i class="bi bi-info-circle-fill me-1" style="color: #2E5227;"></i>
+                Rubric Rule: Staff cannot edit admin or other staff records.
+            </div>
+        </div>
+
+        {# Products Table #}
+        <div style="background: #FFFFFF; border-radius: 24px; border: 1.5px solid #D2DCD0; box-shadow: 0 12px 35px rgba(46, 82, 39, 0.08); overflow: hidden;">
+            <div style="overflow-x: auto;">
+                <table class="admin-table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #FAFDF9; border-bottom: 1.5px solid #D2DCD0;">
+                            <th style="padding: 1rem 1.2rem; text-align: left; font-size: 0.82rem; color: #2E5227;">Preview</th>
+                            <th style="padding: 1rem 1.2rem; text-align: left; font-size: 0.82rem; color: #2E5227;">Drink Name &amp; Category</th>
+                            <th style="padding: 1rem 1.2rem; text-align: left; font-size: 0.82rem; color: #2E5227;">Price</th>
+                            <th style="padding: 1rem 1.2rem; text-align: left; font-size: 0.82rem; color: #2E5227;">Stock</th>
+                            <th style="padding: 1rem 1.2rem; text-align: left; font-size: 0.82rem; color: #2E5227;">Record Creator / Ownership</th>
+                            <th style="padding: 1rem 1.2rem; text-align: right; font-size: 0.82rem; color: #2E5227;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in products %}
+                            {% set isMyProduct = (p.createdByEmail|default('admin@matchamoments.com')|lower == currentUserEmail|lower) or (currentUserRole == 'admin') %}
+                            <tr style="border-bottom: 1px solid #E8F1E6;">
+                                <td style="padding: 0.85rem 1.2rem;">
+                                    <img src="{{ asset(p.imageUrl|drink_image) }}" alt="{{ p.name }}" style="width: 44px; height: 55px; object-fit: cover; object-position: center 45%; border-radius: 8px; background: #F2F0E9;">
+                                </td>
+                                <td style="padding: 0.85rem 1.2rem;">
+                                    <strong style="color: #2E5227; font-size: 0.95rem; display: block;">{{ p.name }}</strong>
+                                    <small style="color: #7D9778;">{{ p.category }}</small>
+                                </td>
+                                <td style="padding: 0.85rem 1.2rem;">
+                                    <strong style="color: #4C6B46;">₱{{ p.price }}</strong>
+                                </td>
+                                <td style="padding: 0.85rem 1.2rem;">
+                                    <span style="font-weight: 700; color: #2E5227;">{{ p.stockQuantity }}</span> cups
+                                </td>
+                                <td style="padding: 0.85rem 1.2rem;">
+                                    {% if isMyProduct and currentUserRole != 'admin' %}
+                                        <span class="status-pill" style="background: #4C6B46; color: #FFFFFF; font-weight: 700;">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Your Creation (Staff)
+                                        </span>
+                                    {% elseif p.createdByRole|default('admin') == 'admin' %}
+                                        <span class="status-pill" style="background: #E8F1E6; color: #2E5227; font-weight: 700;">
+                                            <i class="bi bi-shield-lock me-1"></i> Admin Record
+                                        </span>
+                                    {% else %}
+                                        <span class="status-pill status-ready" style="font-weight: 700;">
+                                            <i class="bi bi-person me-1"></i> {{ p.createdByName|default('Staff') }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 0.85rem 1.2rem; text-align: right;">
+                                    {% if isMyProduct %}
+                                        <div style="display: inline-flex; gap: 0.4rem;">
+                                            <button type="button" 
+                                                    class="btn-admin-action btn-primary-action"
+                                                    onclick="openStaffEditModal({{ p|json_encode|e('html_attr') }})">
+                                                <i class="bi bi-pencil-square"></i> Edit
+                                            </button>
+
+                                            <form action="{{ path('staff_product_delete', { id: p.id }) }}" 
+                                                  method="POST" 
+                                                  onsubmit="return confirm('MANDATORY RUBRIC CONFIRMATION:\nAre you sure you want to permanently delete your drink record \'{{ p.name|e('js') }}\'?');">
+                                                <button type="submit" class="btn-admin-action btn-danger-action">
+                                                    <i class="bi bi-trash3"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    {% else %}
+                                        <span style="font-size: 0.78rem; color: #9CA3AF; display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.6rem; background: #F3F4F6; border-radius: 6px;">
+                                            <i class="bi bi-lock-fill"></i> Read-Only (Protected)
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 3rem; color: #7D9778;">
+                                    No drinks found in this view.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- =====================================================
+     ADD PRODUCT MODAL (STAFF)
+     ===================================================== -->
+<div class="modal-backdrop" id="staffAddModalBackdrop" style="display: none;">
+    <div class="custom-modal" style="max-width: 560px; padding: 2rem;">
+        <button class="modal-close-btn" onclick="closeStaffAddModal()">&times;</button>
+        <h2 style="font-family: var(--font-heading); font-size: 1.6rem; color: var(--clr-matcha-dark); margin-bottom: 0.4rem;">
+            Add New Seasonal Creation
+        </h2>
+        <p style="font-size: 0.85rem; color: var(--clr-text-muted); margin-bottom: 1.4rem;">
+            Introduce a handcrafted recipe to the menu. You will be registered as the author.
+        </p>
+
+        <form action="{{ path('staff_product_add') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">Drink Name *</label>
+                <input type="text" name="name" class="form-control" placeholder="e.g. Lavender Blossom Matcha" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label">Category *</label>
+                    <select name="category" class="form-control" required>
+                        <option value="Signature Lattes &amp; Bestsellers">Signature Lattes &amp; Bestsellers</option>
+                        <option value="Fruit &amp; Specialty Fusions" selected>Fruit &amp; Specialty Fusions</option>
+                        <option value="Premium Cake Matcha Creations">Premium Cake Matcha Creations</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Price (₱) *</label>
+                    <input type="number" step="0.50" name="price" class="form-control" placeholder="185.00" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Initial Cup Stock</label>
+                <input type="number" name="stockQuantity" class="form-control" value="35" min="0">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Drink Image</label>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 0.4rem; max-height: 120px; overflow-y: auto; padding: 0.5rem; border: 1px solid var(--clr-cream-dark); border-radius: 8px;">
+                    {% set availableImages = [
+                        'images/tropical.png', 'images/latte.png', 'images/cloud.png',
+                        'images/choco.png', 'images/vanilla.png', 'images/strawberry.png',
+                        'images/mango.png', 'images/coconut.png', 'images/peach.png',
+                        'images/sea.png', 'images/ube.png', 'images/pis.png'
+                    ] %}
+                    {% for img in availableImages %}
+                        <label style="cursor: pointer; text-align: center; border: 2px solid transparent; border-radius: 6px; padding: 2px;" class="staff-add-img-label">
+                            <input type="radio" name="imageUrl" value="{{ img }}" {% if loop.first %}checked{% endif %} style="display: none;" onchange="highlightStaffAddImg(this)">
+                            <img src="{{ asset(img|drink_image) }}" alt="" style="width: 40px; height: 50px; object-fit: cover; object-position: center 45%; border-radius: 4px;">
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Description / Flavor Notes</label>
+                <textarea name="description" class="form-control" rows="2" placeholder="Flavor profile and ingredients notes"></textarea>
+            </div>
+
+            <button type="submit" class="btn-hero-primary" style="width: 100%; border: none; padding: 0.85rem; border-radius: 50px; cursor: pointer; font-size: 0.95rem; margin-top: 0.5rem;">
+                Publish Drink to Menu &rarr;
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- =====================================================
+     EDIT PRODUCT MODAL (STAFF - OWN RECORD ONLY)
+     ===================================================== -->
+<div class="modal-backdrop" id="staffEditModalBackdrop" style="display: none;">
+    <div class="custom-modal" style="max-width: 560px; padding: 2rem;">
+        <button class="modal-close-btn" onclick="closeStaffEditModal()">&times;</button>
+        <h2 style="font-family: var(--font-heading); font-size: 1.6rem; color: var(--clr-matcha-dark); margin-bottom: 0.4rem;">
+            Edit Your Drink Record
+        </h2>
+        <p style="font-size: 0.85rem; color: var(--clr-text-muted); margin-bottom: 1.4rem;">
+            Update pricing, inventory, or description for your own beverage creation.
+        </p>
+
+        <form id="staffEditForm" action="" method="POST">
+            <div class="form-group">
+                <label class="form-label">Drink Name *</label>
+                <input type="text" name="name" id="staffEditName" class="form-control" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label">Category *</label>
+                    <select name="category" id="staffEditCategory" class="form-control" required>
+                        <option value="Signature Lattes &amp; Bestsellers">Signature Lattes &amp; Bestsellers</option>
+                        <option value="Fruit &amp; Specialty Fusions">Fruit &amp; Specialty Fusions</option>
+                        <option value="Premium Cake Matcha Creations">Premium Cake Matcha Creations</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Price (₱) *</label>
+                    <input type="number" step="0.50" name="price" id="staffEditPrice" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Current Stock (Cups)</label>
+                <input type="number" name="stockQuantity" id="staffEditStock" class="form-control" min="0">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea name="description" id="staffEditDescription" class="form-control" rows="2"></textarea>
+            </div>
+
+            <button type="submit" class="btn-hero-primary" style="width: 100%; border: none; padding: 0.85rem; border-radius: 50px; cursor: pointer; font-size: 0.95rem; margin-top: 0.5rem;">
+                Save Changes &rarr;
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openStaffAddModal() {
+    document.getElementById('staffAddModalBackdrop').style.display = 'flex';
+}
+function closeStaffAddModal() {
+    document.getElementById('staffAddModalBackdrop').style.display = 'none';
+}
+
+function openStaffEditModal(product) {
+    document.getElementById('staffEditName').value = product.name || '';
+    document.getElementById('staffEditCategory').value = product.category || '';
+    document.getElementById('staffEditPrice').value = product.price || '';
+    document.getElementById('staffEditStock').value = product.stockQuantity || 0;
+    document.getElementById('staffEditDescription').value = product.description || '';
+
+    const form = document.getElementById('staffEditForm');
+    form.action = '/staff/products/' + product.id + '/edit';
+
+    document.getElementById('staffEditModalBackdrop').style.display = 'flex';
+}
+function closeStaffEditModal() {
+    document.getElementById('staffEditModalBackdrop').style.display = 'none';
+}
+
+function highlightStaffAddImg(radio) {
+    document.querySelectorAll('.staff-add-img-label').forEach(lbl => lbl.style.borderColor = 'transparent');
+    radio.parentElement.style.borderColor = 'var(--clr-matcha)';
+}
+document.querySelector('.staff-add-img-label')?.style.setProperty('border-color', 'var(--clr-matcha)');
+</script>
+{% endblock %}

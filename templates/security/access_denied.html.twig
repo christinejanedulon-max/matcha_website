@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}403 Forbidden — Access Denied | Matcha Moments{% endblock %}
+
+{% block body %}
+<section style="min-height: 75vh; display: flex; align-items: center; justify-content: center; padding: 4rem 1.5rem; background: radial-gradient(circle at 50% 20%, #E8F1E6 0%, #FAFDF9 70%);">
+    <div style="max-width: 520px; width: 100%; background: #FFFFFF; border-radius: 28px; padding: 3rem 2.5rem; text-align: center; border: 1.5px solid #D2DCD0; box-shadow: 0 20px 60px rgba(46, 82, 39, 0.12);">
+        <div style="width: 76px; height: 76px; border-radius: 50%; background: #FDE8E8; color: #9B1C1C; display: inline-flex; align-items: center; justify-content: center; font-size: 2.2rem; margin-bottom: 1.5rem; box-shadow: 0 8px 24px rgba(155, 28, 28, 0.15);">
+            <i class="bi bi-shield-x"></i>
+        </div>
+
+        <span style="display: inline-block; background: #FDE8E8; color: #9B1C1C; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; padding: 0.3rem 0.9rem; border-radius: 50px; margin-bottom: 0.8rem;">
+            HTTP 403 • Forbidden
+        </span>
+
+        <h1 style="font-family: var(--font-heading); font-size: 2rem; color: #2E5227; margin: 0 0 0.8rem; font-weight: 800;">
+            Access Denied
+        </h1>
+
+        <p style="font-size: 0.95rem; color: #55744F; line-height: 1.6; margin-bottom: 2rem;">
+            {{ message|default('You do not have permission to access this administrative resource. Staff members and customers are strictly restricted from the admin control panel.') }}
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            {% if app.session.get('user_role') == 'staff' %}
+                <a href="{{ path('staff_dashboard') }}" class="btn-hero-primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.85rem 1.6rem; border-radius: 50px; text-decoration: none;">
+                    <i class="bi bi-person-badge-fill"></i> Return to Staff Workspace
+                </a>
+            {% else %}
+                <a href="{{ path('app_menu') }}" class="btn-hero-primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.85rem 1.6rem; border-radius: 50px; text-decoration: none;">
+                    <i class="bi bi-cup-straw"></i> Browse Drink Menu
+                </a>
+            {% endif %}
+
+            <a href="{{ path('app_home') }}" style="color: #2E5227; font-size: 0.88rem; font-weight: 700; text-decoration: underline; margin-top: 0.5rem;">
+                Back to Café Homepage
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

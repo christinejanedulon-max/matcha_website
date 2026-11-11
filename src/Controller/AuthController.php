@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Service\StoreService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class AuthController extends AbstractController
 {
     #[Route('/login', name: 'app_login', methods: ['GET', 'POST'])]
-    public function login(Request $request, UserRepository $userRepository): Response
+    public function login(Request $request, UserRepository $userRepository, StoreService $store): Response
     {
         $session = $request->getSession();
 
@@ -22,7 +23,7 @@ final class AuthController extends AbstractController
             $password = (string) $request->request->get('password', '');
             $demoRole = $request->request->get('demo_role');
 
-            // 1. One-Click Demo Admin or Default Admin Credentials
+            // 1. One-Click Demo Admin
             if ($demoRole === 'admin' || ($email === 'admin@matchamoments.com' && ($password === 'admin123' || $demoRole === 'admin'))) {
                 $session->set('user_role', 'admin');
                 $session->set('user_name', 'Cafe Administrator');
@@ -37,7 +38,22 @@ final class AuthController extends AbstractController
                 return $this->redirectToRoute('admin_dashboard');
             }
 
-            // 2. One-Click Demo Customer
+            // 2. One-Click Demo Staff (Barista)
+            if ($demoRole === 'staff' || ($email === 'staff@matchamoments.com' && ($password === 'staff123' || $demoRole === 'staff'))) {
+                $session->set('user_role', 'staff');
+                $session->set('user_name', 'Matcha Lead Barista');
+                $session->set('user_email', 'staff@matchamoments.com');
+                $session->set('user', [
+                    'fullName' => 'Matcha Lead Barista',
+                    'email' => 'staff@matchamoments.com',
+                    'role' => 'staff',
+                ]);
+
+                $this->addFlash('success', 'Welcome to the Staff Workspace, Barista! Ready to curate seasonal drinks.');
+                return $this->redirectToRoute('staff_dashboard');
+            }
+
+            // 3. One-Click Demo Customer
             if ($demoRole === 'customer') {
                 $name = $request->request->get('full_name') ?: 'Valued Customer';
                 $session->set('user_role', 'customer');
@@ -53,13 +69,17 @@ final class AuthController extends AbstractController
                 return $this->redirectAfterLogin($session);
             }
 
-            // 3. Database / Registered User Lookup
+            // 4. Database / Store User Lookup
             $authenticatedUser = null;
             try {
                 $dbUser = $userRepository->findOneBy(['email' => $email]);
                 if ($dbUser && password_verify($password, $dbUser->getPassword())) {
-                    // Strict Single-Admin Rule: Only the designated master admin can hold admin role
-                    $role = (strtolower($dbUser->getEmail()) === 'admin@matchamoments.com' && $dbUser->getRole() === 'admin') ? 'admin' : 'customer';
+                    if (method_exists($dbUser, 'getStatus') && in_array($dbUser->getStatus(), ['disabled', 'archived'], true)) {
+                        $this->addFlash('error', 'Your account has been deactivated. Please contact the cafe administrator.');
+                        return $this->redirectToRoute('app_login');
+                    }
+
+                    $role = $dbUser->getRole() ?: 'customer';
                     $authenticatedUser = [
                         'fullName' => $dbUser->getFullName(),
                         'email' => $dbUser->getEmail(),
@@ -67,13 +87,21 @@ final class AuthController extends AbstractController
                     ];
                 }
             } catch (\Throwable) {
-                // Fallback to session-stored registered users if DB is unreachable
+                // Fallback to StoreService if DB is unreachable
             }
 
             if (!$authenticatedUser) {
-                $sessionUsers = $session->get('registered_users', []);
-                if (isset($sessionUsers[$email]) && password_verify($password, $sessionUsers[$email]['password'])) {
-                    $authenticatedUser = $sessionUsers[$email];
+                $storeUser = $store->getUserByEmail($email);
+                if ($storeUser && isset($storeUser['password']) && password_verify($password, $storeUser['password'])) {
+                    if (($storeUser['status'] ?? 'active') !== 'active') {
+                        $this->addFlash('error', 'Your account has been deactivated. Please contact the cafe administrator.');
+                        return $this->redirectToRoute('app_login');
+                    }
+                    $authenticatedUser = [
+                        'fullName' => $storeUser['fullName'],
+                        'email' => $storeUser['email'],
+                        'role' => $storeUser['role'] ?? 'customer',
+                    ];
                 }
             }
 
@@ -88,6 +116,11 @@ final class AuthController extends AbstractController
                 if ($role === 'admin') {
                     $this->addFlash('success', 'Welcome back, Administrator!');
                     return $this->redirectToRoute('admin_dashboard');
+                }
+
+                if ($role === 'staff') {
+                    $this->addFlash('success', 'Welcome back, ' . $authenticatedUser['fullName'] . '! Staff Portal unlocked.');
+                    return $this->redirectToRoute('staff_dashboard');
                 }
 
                 $this->addFlash('success', 'Signed in as ' . $authenticatedUser['fullName'] . '. Enjoy ordering your matcha moments!');
