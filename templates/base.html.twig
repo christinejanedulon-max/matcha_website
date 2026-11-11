@@ -77,16 +77,75 @@
                     Sign Out
                 </a>
             {% elseif isCustomer %}
-                <!-- Regular User Logged In (Desktop) -->
-                <a href="{{ path('app_account_orders') }}" class="btn-nav-orders desktop-only-action" title="View order history and live tracking">
-                    <i class="bi bi-receipt"></i> Orders
-                </a>
-                <span class="nav-user-chip desktop-only-action" style="font-size: 0.82rem; font-weight: 600; color: var(--clr-matcha-dark); background: var(--clr-cream); padding: 0.4rem 0.8rem; border-radius: 50px; border: 1px solid var(--clr-cream-dark); display: inline-flex; align-items: center; gap: 0.35rem;">
-                    <i class="bi bi-person-fill"></i> {{ userName|split(' ')|first }}
-                </span>
-                <a href="{{ path('app_logout') }}" onclick="localStorage.removeItem('matcha_moments_cart_v1');" class="btn-nav-auth desktop-only-action" style="padding: 0.45rem 0.85rem; border-radius: 50px; font-size: 0.78rem; font-weight: 600; color: var(--clr-text-muted); background: var(--clr-cream-dark); border: none; text-decoration: none;">
-                    Sign Out
-                </a>
+                <!-- Regular User Logged In: Clean Profile Dropdown Menu -->
+                <div class="nav-profile-dropdown-wrapper desktop-only-action">
+                    <button type="button"
+                            class="nav-profile-btn"
+                            id="profileMenuToggle"
+                            aria-expanded="false"
+                            aria-haspopup="true"
+                            aria-label="User Profile and Orders Menu">
+                        <span class="profile-avatar-pill">
+                            {{ userName|split(' ')|map(w => w|first)|join('')|upper|slice(0,2)|default('U') }}
+                        </span>
+                        <span class="profile-name-text">{{ userName|split(' ')|first }}</span>
+                        <i class="bi bi-chevron-down profile-chevron"></i>
+                    </button>
+
+                    <!-- Clean Profile Dropdown Menu -->
+                    <div class="profile-dropdown-menu" id="profileDropdownMenu" role="menu" aria-labelledby="profileMenuToggle">
+                        <div class="profile-dropdown-header">
+                            <div class="profile-header-avatar">
+                                {{- userName|split(' ')|map(w => w|first)|join('')|upper|slice(0,2)|default('U') -}}
+                            </div>
+                            <div class="profile-header-meta">
+                                <strong>{{ userName }}</strong>
+                                <small>{{ app.session.get('user_email') }}</small>
+                                <span class="profile-badge-status">
+                                    <i class="bi bi-patch-check-fill"></i> Verified Customer
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="profile-dropdown-divider"></div>
+
+                        <div class="profile-dropdown-links">
+                            <a href="{{ path('app_account_orders') }}#active-orders" class="profile-dropdown-link" onclick="closeProfileDropdown()">
+                                <div class="profile-link-icon active-icon"><i class="bi bi-radar"></i></div>
+                                <div class="profile-link-text">
+                                    <strong>Track Active Order</strong>
+                                    <span>Real-time kitchen &amp; delivery steps</span>
+                                </div>
+                            </a>
+
+                            <a href="{{ path('app_account_orders') }}#past-orders" class="profile-dropdown-link" onclick="closeProfileDropdown()">
+                                <div class="profile-link-icon history-icon"><i class="bi bi-clock-history"></i></div>
+                                <div class="profile-link-text">
+                                    <strong>History of My Orders</strong>
+                                    <span>Past receipts &amp; order archive</span>
+                                </div>
+                            </a>
+
+                            <a href="{{ path('app_menu') }}" class="profile-dropdown-link" onclick="closeProfileDropdown()">
+                                <div class="profile-link-icon menu-icon"><i class="bi bi-cup-straw"></i></div>
+                                <div class="profile-link-text">
+                                    <strong>Order Fresh Drinks</strong>
+                                    <span>Browse handcrafted ceremonial menu</span>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="profile-dropdown-divider"></div>
+
+                        <div class="profile-dropdown-footer">
+                            <a href="{{ path('app_logout') }}"
+                               onclick="localStorage.removeItem('matcha_moments_cart_v1');"
+                               class="profile-dropdown-logout">
+                                <i class="bi bi-box-arrow-right"></i> Log Out
+                            </a>
+                        </div>
+                    </div>
+                </div>
             {% else %}
                 <!-- Guest / Not Logged In (Desktop) -->
                 <a href="{{ path('app_login') }}" class="btn-nav-login desktop-only-action">
@@ -146,14 +205,19 @@
                 </a>
             {% elseif isCustomer %}
                 <div class="mobile-user-banner">
-                    <i class="bi bi-person-circle"></i>
+                    <div class="profile-header-avatar" style="width: 40px; height: 40px; font-size: 0.85rem;">
+                        {{- userName|split(' ')|map(w => w|first)|join('')|upper|slice(0,2)|default('U') -}}
+                    </div>
                     <div>
-                        <strong>Hello, {{ userName|split(' ')|first }}!</strong>
+                        <strong>{{ userName }}</strong>
                         <small>{{ app.session.get('user_email') }}</small>
                     </div>
                 </div>
-                <a href="{{ path('app_account_orders') }}" class="mobile-btn-action orders-highlight-btn" onclick="closeMobileMenu()">
-                    <i class="bi bi-clock-history"></i> My Orders & Live Tracking
+                <a href="{{ path('app_account_orders') }}#active-orders" class="mobile-btn-action orders-highlight-btn" onclick="closeMobileMenu()">
+                    <i class="bi bi-radar"></i> Track Active Order
+                </a>
+                <a href="{{ path('app_account_orders') }}#past-orders" class="mobile-btn-action" onclick="closeMobileMenu()">
+                    <i class="bi bi-clock-history"></i> History of My Orders
                 </a>
                 <a href="{{ path('app_menu') }}" class="mobile-btn-action primary-btn" onclick="closeMobileMenu()">
                     <i class="bi bi-cup-straw"></i> Order Now
@@ -162,7 +226,7 @@
                     <i class="bi bi-bag"></i> View Cart (<span class="mobile-cart-count">0</span>)
                 </button>
                 <a href="{{ path('app_logout') }}" onclick="localStorage.removeItem('matcha_moments_cart_v1'); closeMobileMenu();" class="mobile-btn-action logout-btn">
-                    <i class="bi bi-box-arrow-right"></i> Sign Out
+                    <i class="bi bi-box-arrow-right"></i> Log Out
                 </a>
             {% else %}
                 <button type="button" class="mobile-btn-action primary-btn" onclick="openAuthGateModal(); closeMobileMenu();">
@@ -743,6 +807,33 @@ document.addEventListener('DOMContentLoaded', () => {
             card.style.transform = '';
         });
     });
+
+    // 3. Clean Profile Dropdown Menu Toggle & Outside Click Listener
+    const profileToggle = document.getElementById('profileMenuToggle');
+    const profileMenu = document.getElementById('profileDropdownMenu');
+
+    if (profileToggle && profileMenu) {
+        profileToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = profileMenu.classList.toggle('show');
+            profileToggle.classList.toggle('open', isOpen);
+            profileToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!profileMenu.contains(e.target) && !profileToggle.contains(e.target)) {
+                profileMenu.classList.remove('show');
+                profileToggle.classList.remove('open');
+                profileToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        window.closeProfileDropdown = function() {
+            profileMenu.classList.remove('show');
+            profileToggle.classList.remove('open');
+            profileToggle.setAttribute('aria-expanded', 'false');
+        };
+    }
 });
 </script>
 

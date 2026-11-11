@@ -15,10 +15,11 @@ final class AdminController extends AbstractController
     {
         $session = $request->getSession();
         $userRole = $session?->get('user_role');
-        $isGranted = $this->isGranted('ROLE_ADMIN');
+        $userEmail = strtolower((string) $session?->get('user_email', ''));
 
-        if (!$isGranted && $userRole !== 'admin') {
-            $this->addFlash('error', 'Access restricted. Please log in as an administrator to view the admin dashboard.');
+        // Strict Single-Admin Enforcement: Only the designated single administrator can access
+        if ($userRole !== 'admin' || $userEmail !== 'admin@matchamoments.com') {
+            $this->addFlash('error', 'Access restricted. Only the single authorized store administrator can access the admin dashboard.');
             return $this->redirectToRoute('app_login');
         }
 

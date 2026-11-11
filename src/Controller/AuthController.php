@@ -58,10 +58,12 @@ final class AuthController extends AbstractController
             try {
                 $dbUser = $userRepository->findOneBy(['email' => $email]);
                 if ($dbUser && password_verify($password, $dbUser->getPassword())) {
+                    // Strict Single-Admin Rule: Only the designated master admin can hold admin role
+                    $role = (strtolower($dbUser->getEmail()) === 'admin@matchamoments.com' && $dbUser->getRole() === 'admin') ? 'admin' : 'customer';
                     $authenticatedUser = [
                         'fullName' => $dbUser->getFullName(),
                         'email' => $dbUser->getEmail(),
-                        'role' => $dbUser->getRole() ?: 'customer',
+                        'role' => $role,
                     ];
                 }
             } catch (\Throwable) {
