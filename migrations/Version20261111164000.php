@@ -33,3 +33,4 @@ final class Version20261111164000 extends AbstractMigration
         $this->addSql('ALTER TABLE users DROP status');
     }
 }
+

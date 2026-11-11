@@ -219,3 +219,4 @@ final class StaffController extends AbstractController
         return $this->redirectToRoute('staff_orders');
     }
 }
+
