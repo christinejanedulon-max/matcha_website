@@ -874,6 +874,18 @@ class StoreService
             'createdAt' => (new \DateTime())->format('Y-m-d H:i:s')
         ];
 
+        if ($this->em) {
+            try {
+                $r = new Review();
+                $r->setCustomerName($newReview['customerName']);
+                $r->setRating($newReview['rating']);
+                $r->setComment($newReview['comment']);
+                $this->em->persist($r);
+                $this->em->flush();
+                $newReview['id'] = $r->getId();
+            } catch (\Throwable) {}
+        }
+
         array_unshift($reviews, $newReview);
 
         $session = $this->getSession();
@@ -892,6 +904,17 @@ class StoreService
         $this->inMemoryReviews = null;
         $reviews = $this->getReviews();
         $filtered = array_values(array_filter($reviews, fn($r) => $r['id'] !== $id));
+
+        if ($this->em) {
+            try {
+                $r = $this->em->getRepository(Review::class)->find($id);
+                if ($r) {
+                    $this->em->remove($r);
+                    $this->em->flush();
+                }
+            } catch (\Throwable) {}
+        }
+
         $session = $this->getSession();
         if ($session) {
             $session->set('store_reviews', $filtered);
@@ -904,6 +927,24 @@ class StoreService
      */
     public function getSubscribers(): array
     {
+        if ($this->em) {
+            try {
+                $dbSubs = $this->em->getRepository(NewsletterSubscription::class)->findBy([], ['subscribedAt' => 'DESC']);
+                if (!empty($dbSubs)) {
+                    $list = [];
+                    foreach ($dbSubs as $s) {
+                        $list[] = [
+                            'id' => $s->getId(),
+                            'email' => $s->getEmail(),
+                            'subscribedAt' => $s->getSubscribedAt()?->format('Y-m-d H:i:s') ?? date('Y-m-d H:i:s'),
+                            'status' => $s->getStatus() ?? 'Active',
+                        ];
+                    }
+                    return $list;
+                }
+            } catch (\Throwable) {}
+        }
+
         $session = $this->getSession();
         if ($session && $session->has('store_subscribers')) {
             return $session->get('store_subscribers');
@@ -938,12 +979,25 @@ class StoreService
             }
         }
 
-        array_unshift($subscribers, [
+        $newSub = [
             'id' => count($subscribers) + 1,
             'email' => $email,
             'subscribedAt' => (new \DateTime())->format('Y-m-d H:i:s'),
             'status' => 'Active'
-        ]);
+        ];
+
+        if ($this->em) {
+            try {
+                $sub = new NewsletterSubscription();
+                $sub->setEmail($email);
+                $sub->setStatus('Active');
+                $this->em->persist($sub);
+                $this->em->flush();
+                $newSub['id'] = $sub->getId();
+            } catch (\Throwable) {}
+        }
+
+        array_unshift($subscribers, $newSub);
 
         $session = $this->getSession();
         if ($session) {

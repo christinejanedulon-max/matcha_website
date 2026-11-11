@@ -33,15 +33,21 @@ CREATE TABLE IF NOT EXISTS products (
 -- 3. ORDERS TABLE (Tracks customer orders, fulfillment, payment, tracking & GCash reference)
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    order_number VARCHAR(50) UNIQUE NULL,
     user_id INT NULL,
     customer_name VARCHAR(100) NOT NULL,
+    customer_email VARCHAR(180) NULL,
+    phone VARCHAR(50) NULL,
     total_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     fulfillment_method VARCHAR(50) DEFAULT 'Pickup',
+    delivery_address TEXT NULL,
     payment_method VARCHAR(50) DEFAULT 'Cash',
     reference_number VARCHAR(100) DEFAULT NULL,
+    notes TEXT NULL,
     product_name VARCHAR(255) DEFAULT NULL,
     item_name VARCHAR(255) DEFAULT NULL,
     status VARCHAR(50) DEFAULT 'Pending',
+    status_updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -50,11 +56,13 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE TABLE IF NOT EXISTS order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
-    product_id INT NOT NULL,
+    product_id INT NULL,
+    product_name VARCHAR(255) DEFAULT NULL,
+    options VARCHAR(255) DEFAULT NULL,
     quantity INT NOT NULL DEFAULT 1,
     unit_price DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 5. REVIEWS TABLE (Customer ratings and feedback comments)
