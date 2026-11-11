@@ -6,8 +6,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-matcha_moments}
-      MYSQL_USER: ${MYSQL_USER:-matcha_user}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-matcha_password}
+      MYSQL_USER: ${MYSQL_USER:-matcha}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-matcha}
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       timeout: 5s
