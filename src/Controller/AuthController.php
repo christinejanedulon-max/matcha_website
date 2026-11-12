@@ -53,19 +53,18 @@ final class AuthController extends AbstractController
                 return $this->redirectToRoute('staff_dashboard');
             }
 
-            // 3. One-Click Demo Customer
-            if ($demoRole === 'customer') {
-                $name = $request->request->get('full_name') ?: 'Valued Customer';
+            // 3. User / Customer (Matcha Account)
+            if ($demoRole === 'customer' || (($email === 'matcha@matchamoments.com' || $email === 'matcha') && $password === 'matcha')) {
                 $session->set('user_role', 'customer');
-                $session->set('user_name', $name);
-                $session->set('user_email', 'customer@matchamoments.com');
+                $session->set('user_name', 'Matcha Customer');
+                $session->set('user_email', 'matcha@matchamoments.com');
                 $session->set('user', [
-                    'fullName' => $name,
-                    'email' => 'customer@matchamoments.com',
+                    'fullName' => 'Matcha Customer',
+                    'email' => 'matcha@matchamoments.com',
                     'role' => 'customer',
                 ]);
 
-                $this->addFlash('success', "Welcome, {$name}! You can now customize and order your favorite matcha drinks.");
+                $this->addFlash('success', 'Signed in as Matcha Customer. Enjoy ordering your matcha moments!');
                 return $this->redirectAfterLogin($session);
             }
 
