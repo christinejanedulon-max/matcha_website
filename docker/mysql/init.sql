@@ -98,11 +98,10 @@ INSERT INTO users (full_name, email, password, role, roles, status) VALUES
 ('Matcha Lead Barista', 'staff@matchamoments.com', '$2y$12$ohfwI1ZQr83AmZHgYthxf.Ue/eB9/qE3Rzd/55N8Yp0SxwwMtx7o.', 'staff', '["ROLE_STAFF"]', 'active')
 ON DUPLICATE KEY UPDATE password='$2y$12$ohfwI1ZQr83AmZHgYthxf.Ue/eB9/qE3Rzd/55N8Yp0SxwwMtx7o.', roles='["ROLE_STAFF"]', status='active';
 
--- 3. Insert Default Customer / User Accounts (both 'matcha' and standard demo user)
+-- 3. Insert Default Customer / User Account
 INSERT INTO users (full_name, email, password, role, roles, status) VALUES 
-('Matcha Customer', 'matcha@matchamoments.com', '$2y$12$MiEBaZ6/GQFh6Fm4JKIMg.qB/4EforlM7eHG29qKahZZoWOGBqq8S', 'customer', '["ROLE_USER"]', 'active'),
-('Regular Customer', 'user@matchamoments.com', '$2y$12$d3h.01J5xFP8lwTKPomscuIoI5a1NzIxH2VFiI2hrnrct2ebvslEi', 'customer', '["ROLE_USER"]', 'active')
-ON DUPLICATE KEY UPDATE password=VALUES(password), status='active';
+('Matcha Customer', 'matcha@matchamoments.com', '$2y$12$MiEBaZ6/GQFh6Fm4JKIMg.qB/4EforlM7eHG29qKahZZoWOGBqq8S', 'customer', '["ROLE_USER"]', 'active')
+ON DUPLICATE KEY UPDATE password='$2y$12$MiEBaZ6/GQFh6Fm4JKIMg.qB/4EforlM7eHG29qKahZZoWOGBqq8S', status='active';
 
 -- Insert Default Menu Items
 INSERT INTO products (name, category, price, stock_quantity, image_url) VALUES 
