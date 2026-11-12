@@ -262,42 +262,10 @@
                 </button>
             </form>
 
-            <p style="text-align:center;font-size:0.83rem;color:#55744F;margin:1.1rem 0 0;">
+            <p style="text-align:center;font-size:0.83rem;color:#55744F;margin:1.4rem 0 0;">
                 New to Matcha Moments?
                 <a href="{{ path('app_register') }}" onclick="switchAuthTab('register'); return false;" style="color:#2E5227;font-weight:800;text-decoration:underline;">Create an account</a>
             </p>
-
-            {# Divider #}
-            <div style="display:flex;align-items:center;gap:0.8rem;margin:1.4rem 0 1rem;">
-                <div style="flex:1;height:1px;background:#E8F1E6;"></div>
-                <span style="font-size:0.7rem;color:#7D9778;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;">Instant Demo Access</span>
-                <div style="flex:1;height:1px;background:#E8F1E6;"></div>
-            </div>
-
-            <div style="display:flex;flex-direction:column;gap:0.55rem;">
-                <form action="{{ path('app_login') }}" method="POST">
-                    <input type="hidden" name="demo_role" value="customer">
-                    <input type="hidden" name="email" value="customer@matchamoments.com">
-                    <input type="hidden" name="full_name" value="Valued Customer">
-                    <button type="submit" class="demo-role-btn" style="background:#E8F1E6;color:#2E5227;border:1.5px solid #A4B9A1;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
-                        <i class="bi bi-cup-hot-fill"></i> Quick Sign In as Customer
-                    </button>
-                </form>
-                <form action="{{ path('app_login') }}" method="POST">
-                    <input type="hidden" name="demo_role" value="staff">
-                    <input type="hidden" name="email" value="staff@matchamoments.com">
-                    <button type="submit" class="demo-role-btn" style="background:#4C6B46;color:#FFFFFF;border:none;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
-                        <i class="bi bi-person-badge-fill"></i> Quick Sign In as Staff (Barista)
-                    </button>
-                </form>
-                <form action="{{ path('app_login') }}" method="POST">
-                    <input type="hidden" name="demo_role" value="admin">
-                    <input type="hidden" name="email" value="admin@matchamoments.com">
-                    <button type="submit" class="demo-role-btn" style="background:#2E5227;color:#FFFFFF;border:none;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
-                        <i class="bi bi-shield-shaded"></i> Quick Sign In as Administrator
-                    </button>
-                </form>
-            </div>
         </div>
 
         {# ==================== 2. CREATE ACCOUNT (REGISTER) PANE ==================== #}
