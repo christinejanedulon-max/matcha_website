@@ -1254,16 +1254,18 @@ ul { list-style: none; }
     gap: 0.5rem;
 }
 .footer-logo-img {
-    height: 68px;
+    height: 95px;
     width: auto;
-    max-width: 260px;
+    max-width: 320px;
     display: block;
     object-fit: contain;
-    margin-bottom: 0.75rem;
-    transition: opacity var(--trans-fast);
+    margin-bottom: 0.85rem;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
+    transition: transform var(--trans-fast), opacity var(--trans-fast);
 }
 .footer-logo-img:hover {
-    opacity: 0.9;
+    transform: scale(1.03);
+    opacity: 0.95;
 }
 .footer-logo { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
 .footer-brand-name {
