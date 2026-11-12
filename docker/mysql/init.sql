@@ -88,15 +88,21 @@ CREATE TABLE IF NOT EXISTS newsletter_subscriptions (
 -- INITIAL DEFAULT DATA SEEDING
 -- =====================================================
 
--- Insert Default Admin Account (Password: admin123 hashed)
+-- 1. Insert Default Admin Account
 INSERT INTO users (full_name, email, password, role, roles, status) VALUES 
-('Cafe Administrator', 'admin@matchamoments.com', '$2y$10$e0MYzXyjpJS7Pd0RVvHwHeH0iPq3vP.z1KzYy1Vv6p6Y1KzYy1Vv6', 'admin', '["ROLE_ADMIN"]', 'active')
-ON DUPLICATE KEY UPDATE email=email;
+('Cafe Administrator', 'admin@matchamoments.com', '$2y$12$fPAL955t/YTIUJKv8jn4SOR2Z7StZLTgXr3RZgAHO0D82NCq/1z5S', 'admin', '["ROLE_ADMIN"]', 'active')
+ON DUPLICATE KEY UPDATE password='$2y$12$fPAL955t/YTIUJKv8jn4SOR2Z7StZLTgXr3RZgAHO0D82NCq/1z5S', roles='["ROLE_ADMIN"]', status='active';
 
--- Insert Default Staff Account (Password: staff123 hashed)
+-- 2. Insert Default Staff Account
 INSERT INTO users (full_name, email, password, role, roles, status) VALUES 
-('Matcha Lead Barista', 'staff@matchamoments.com', '$2y$12$vSculuY/ItX1pQdD1C3mc.5egegsdpv1Tdz7Kl1XD6vLopa0YetWW', 'staff', '["ROLE_STAFF"]', 'active')
-ON DUPLICATE KEY UPDATE email=email;
+('Matcha Lead Barista', 'staff@matchamoments.com', '$2y$12$ohfwI1ZQr83AmZHgYthxf.Ue/eB9/qE3Rzd/55N8Yp0SxwwMtx7o.', 'staff', '["ROLE_STAFF"]', 'active')
+ON DUPLICATE KEY UPDATE password='$2y$12$ohfwI1ZQr83AmZHgYthxf.Ue/eB9/qE3Rzd/55N8Yp0SxwwMtx7o.', roles='["ROLE_STAFF"]', status='active';
+
+-- 3. Insert Default Customer / User Accounts (both 'matcha' and standard demo user)
+INSERT INTO users (full_name, email, password, role, roles, status) VALUES 
+('Matcha Customer', 'matcha@matchamoments.com', '$2y$12$MiEBaZ6/GQFh6Fm4JKIMg.qB/4EforlM7eHG29qKahZZoWOGBqq8S', 'customer', '["ROLE_USER"]', 'active'),
+('Regular Customer', 'user@matchamoments.com', '$2y$12$d3h.01J5xFP8lwTKPomscuIoI5a1NzIxH2VFiI2hrnrct2ebvslEi', 'customer', '["ROLE_USER"]', 'active')
+ON DUPLICATE KEY UPDATE password=VALUES(password), status='active';
 
 -- Insert Default Menu Items
 INSERT INTO products (name, category, price, stock_quantity, image_url) VALUES 
